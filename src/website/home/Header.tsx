@@ -1,4 +1,4 @@
-import React, { useState, ReactNode, CSSProperties } from "react";
+import { useState, ReactNode, CSSProperties } from "react";
 import { map } from "lodash";
 import { useHistory } from "react-router-dom";
 import { LeftCircleOutlined } from "@ant-design/icons"
@@ -24,9 +24,9 @@ export const HomeHeader = () => {
         <nav className="flex items-center justify-between sm:h-10 lg:justify-start" aria-label="Global">
           <div className="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
             <div className="flex items-center justify-between w-full md:w-auto">
-              <a href="#">
-                <img className="h-8 w-auto rounded-full sm:h-10" src="https://portrait.gitee.com/uploads/avatars/user/1614/4843174_xiangzhengfeng_1578975544.png!avatar200" />
-              </a>
+              <div>
+                <img className="h-8 w-auto rounded-full sm:h-10" src="https://portrait.gitee.com/uploads/avatars/user/1614/4843174_xiangzhengfeng_1578975544.png!avatar200" alt=""/>
+              </div>
               <div className="-mr-2 flex items-center md:hidden">
                 <button type="button" onClick={() => { setMemuOpen(true) }} className="rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 focus:text-indigo-500" aria-expanded="false">
                   <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -37,7 +37,7 @@ export const HomeHeader = () => {
             </div>
           </div>
           <div className="hidden md:block md:ml-10 md:pr-4 md:space-x-8">
-            {map(memuList, (item, i) => <a className="font-medium text-gray-100 hover:text-gray-500" key={i} onClick={() => { history.push(item?.route) }}>{item?.name}</a>)}
+            {map(memuList, (item, i) => <div className="font-medium text-gray-100 hover:text-gray-500" key={i} onClick={() => { history.push(item?.route) }}>{item?.name}</div>)}
           </div>
         </nav>
       </div>
@@ -57,11 +57,11 @@ export const HomeHeader = () => {
             </div>
           </div>
           <div className="px-2 pt-2 pb-3 space-y-1">
-            {map(memuList.slice(0, 4), (item, i) => <a className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50" key={i} onClick={() => { history.push(item?.route) }}>{item?.name}</a>)}
+            {map(memuList.slice(0, 4), (item, i) => <div className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50" key={i} onClick={() => { history.push(item?.route) }}>{item?.name}</div>)}
           </div>
-          <a href="#" className="block w-full px-5 py-3 text-center font-medium text-indigo-600 bg-gray-50 hover:bg-gray-100">
+          <div className="block w-full px-5 py-3 text-center font-medium text-indigo-600 bg-gray-50 hover:bg-gray-100">
             {memuList[4]}
-          </a>
+          </div>
         </div>
       </div>}
     </>

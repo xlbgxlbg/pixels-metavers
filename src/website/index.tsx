@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import earth from "./image/earth.png"
 import { HomeHeader } from "./home/Header";
 
@@ -21,14 +20,14 @@ export const Website = () => {
             </p>
             <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start lg:mt-12">
               <div className="rounded-md shadow transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-105">
-                <a href="#" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white hover:text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10">
+                <div className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white hover:text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10">
                   Get started
-              </a>
+              </div>
               </div>
               <div className="mt-3 sm:mt-0 sm:ml-3 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-105">
-                <a href="#" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 hover:text-indigo-700 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10">
+                <div className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 hover:text-indigo-700 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10">
                   Live demo
-                  </a>
+                  </div>
               </div>
             </div>
           </div>
@@ -53,9 +52,9 @@ export const Website = () => {
           </p>
           <div className="mt-2 sm:flex sm:justify-center lg:justify-start xl:mt-6">
             <div className="rounded-md shadow transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-105">
-              <a href="#" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 border-indigo-700 hover:bg-indigo-800 hover:text-white md:py-3 md:text-lg md:px-10">
+              <div className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 border-indigo-700 hover:bg-indigo-800 hover:text-white md:py-3 md:text-lg md:px-10">
                 Get started
-              </a>
+              </div>
             </div>
           </div>
         </div>
