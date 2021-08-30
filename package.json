@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^6.2.0",
+    "@tailwindcss/postcss7-compat": "^2.2.8",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -13,14 +15,16 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat",
     "typescript": "^4.3.5",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "deploy": "bash deploy.sh",
+    "push": "git add . && git commit -m '人生何曾驻旧足，前端处处是新旅' && git push"
   },
   "eslintConfig": {
     "extends": [
@@ -41,6 +45,9 @@
     ]
   },
   "devDependencies": {
-    "eosjs": "^22.1.0"
+    "autoprefixer": "^9",
+    "eosjs": "^22.1.0",
+    "postcss": "^7",
+    "postcss-cli": "^8.3.1"
   }
 }
