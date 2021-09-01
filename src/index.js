@@ -1,6 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+/* import 'antd/lib/input/style/index.css';
+import 'antd/lib/menu/style/index.css';
+import 'antd/lib/dropdown/style/index.css'; */
+import "antd/dist/antd.css"
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from "react-router-dom";

@@ -5,6 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: rgba(255, 255, 255, 0.7)
 }
 
 code {
@@ -12,6 +13,93 @@ code {
     monospace;
 }
 
+.cursorP{
+  cursor: pointer;
+}
+
+.mainColor{
+  color: #009eff
+}
+
+input{
+  outline: "none" !important
+}
+
+@font-face {
+  /* font-properties */
+  font-family: PixelZH;
+  src:url("./font/cn.ttf"), 
+  url("./font/cn.ttf"),
+  url("./font/cn.ttf"); /* IE9 */
+}
+
+@font-face {
+  /* font-properties */
+  font-family: PixelEN;
+  src:url("./font/en.ttf"), 
+  url("./font/en.ttf"),
+  url("./font/en.ttf"); /* IE9 */
+}
+
+* {
+  font-family: "PixelZH"
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.header{
+  height: 70px;
+  box-shadow:  0px -5px 10px rgba(225,225,225,0.3);
+  background: rgba(225,225,225,0.1);
+  color: rgba(255, 255, 255, 0.7)
+}
+
+.contect{
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.contect:hover{
+  color: white
+}
+
+.card{
+  height: calc(100vh - 130px);
+  width: 320px;
+  background-color: transparent;
+  box-shadow:  -5px 5px 10px rgba(225,225,225,0.3);
+  overflow: auto;
+  border-radius: 10px;
+  border-color: rgba(225,225,225,0.3);
+  color: rgba(255, 255, 255, 0.7)
+}
+
+.main-box{
+  width: 600px;
+  background-color: rgba(17, 24, 39, 1);
+  box-shadow:  -0px 0px 20px rgba(225,225,225,0.3);
+  height: 600px;
+  border-radius: 2px;
+  border-color: rgba(225,225,225,0.3);
+  color: rgba(255, 255, 255, 0.7)
+}
+
+.box {
+  background-image: linear-gradient(-90deg, #353437, #33626C);
+}
+
+.search-box{
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.search{
+  width: 330px;
+  height: 40px;
+  outline: none;
+}
+
+.search:focus{
+  outline: none
+}

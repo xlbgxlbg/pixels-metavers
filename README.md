@@ -70,3 +70,21 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
 
+开发计划
+8月30日 完成项目前端项目的搭建和完成首页开发
+8月31日 完成游戏页面包括图片面板，左侧装扮面板和右侧商家面板
+9月01日 完成个人中心页面和商家页面，通过右上角下拉框来切换
+9月02日 完成整个游戏前端和合约交互接口的定义的规划以及前几天任务的补全
+9月03日 完成头像绘制的算法的结构和大体逻辑
+9月04日 完成头像绘制的算法
+9月05日 完成头像的绘制和展示，以及构思合约的初步逻辑
+9月06日 编写合约
+9月07日 编写合约
+9月08日 编写合约
+9月09日 编写合约
+9月10日 部署合约
+9月11日 合约和前端的交互
+9月12日 复盘或补全之前所有工作，并结束所有开发工作
+9月13日 编写白皮书
+9月14日 整理PPT或发言稿
+9月15日 上传项目或者录制视频
