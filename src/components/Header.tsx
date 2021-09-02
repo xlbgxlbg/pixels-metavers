@@ -67,12 +67,12 @@ const menu = (
   <Menu>
     <Menu.Item>
       <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-        个人中心
+        平台商家
       </a>
     </Menu.Item>
     <Menu.Item>
       <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-        商家
+        平台用户
       </a>
     </Menu.Item>
     <Menu.Item>

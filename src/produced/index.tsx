@@ -1,13 +1,9 @@
-import { useEffect, useRef } from "react";
-import { loadProduced } from "../produced/produced";
+import { useEffect, useRef } from "react"
+import { loadProduced } from "./produced"
 
-export const Avatar = () => {
+export const Produced = () => {
   const filedomRef = useRef<HTMLInputElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const size = {
-    width: 480,
-    height: 480
-  }
 
   useEffect(() => {
     const filedom = filedomRef.current
@@ -15,10 +11,6 @@ export const Avatar = () => {
 
     let context;
     if (canvas) {
-      canvas.width = size.width
-      canvas.height = size.height
-      canvas.style.width = size.width + "px"
-      canvas.style.height = size.height + "px"
       context = canvas.getContext("2d") as CanvasRenderingContext2D
     }
     if (filedom && canvas && context) {
@@ -31,9 +23,9 @@ export const Avatar = () => {
   }, [filedomRef, canvasRef])
 
   return (
-    <div className="m-4 card main-box">
+    <div>
       <input id="filebtn" type="file" hidden ref={filedomRef} />
-      <canvas id="avatar" ref={canvasRef}>Sorry, your browser dose not support canvas.</canvas>
+      <canvas id="canvas" width="200px" height="200px" ref={canvasRef}>Sorry, your browser dose not support canvas.</canvas>
     </div>
-  );
-};
+  )
+}

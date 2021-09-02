@@ -33,14 +33,6 @@ input{
   url("./font/cn.ttf"); /* IE9 */
 }
 
-@font-face {
-  /* font-properties */
-  font-family: PixelEN;
-  src:url("./font/en.ttf"), 
-  url("./font/en.ttf"),
-  url("./font/en.ttf"); /* IE9 */
-}
-
 * {
   font-family: "PixelZH"
 }
@@ -53,7 +45,8 @@ input{
   height: 70px;
   box-shadow:  0px -5px 10px rgba(225,225,225,0.3);
   background: rgba(225,225,225,0.1);
-  color: rgba(255, 255, 255, 0.7)
+  color: rgba(255, 255, 255, 0.7);
+  min-width: 1200px;
 }
 
 .contect{
@@ -76,10 +69,11 @@ input{
 }
 
 .main-box{
-  width: 600px;
+  width: 480px;
+  min-width: 480px;
   background-color: rgba(17, 24, 39, 1);
   box-shadow:  -0px 0px 20px rgba(225,225,225,0.3);
-  height: 600px;
+  height: 480px;
   border-radius: 2px;
   border-color: rgba(225,225,225,0.3);
   color: rgba(255, 255, 255, 0.7)

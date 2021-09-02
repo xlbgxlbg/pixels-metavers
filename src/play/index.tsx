@@ -556,7 +556,7 @@ class PixelsMetaverse extends React.Component<any, any> {
       result
     } = this.state;
     return (
-      <div className="h-screen max-h-screen bg-transparent" style={{ overflow: "auto" }}>
+      <div className="h-screen max-h-screen bg-transparent" style={{ overflow: "auto", minWidth: 1200 }}>
         <Header
           connected={connected}
           address={address}
