@@ -14,7 +14,7 @@ module.exports = {
       // 修改build的生成文件名称
       webpackConfig.output = {
         ...webpackConfig.output,
-        //publicPath: '/PixelMaster/'
+       //publicPath: '/PixelMaster/'
       }
       return webpackConfig;
     }

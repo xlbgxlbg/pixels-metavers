@@ -88,3 +88,5 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 9月13日 编写白皮书
 9月14日 整理PPT或发言稿
 9月15日 上传项目或者录制视频
+
+https://baike.baidu.com/item/RGB/342517 RGB （颜色系统）每像素颜色16777216(256 * 256 * 256)种
