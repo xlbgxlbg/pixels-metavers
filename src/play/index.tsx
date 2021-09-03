@@ -2,6 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import Web3 from "web3";
 import { convertUtf8ToHex } from "@walletconnect/utils";
+import MyContract from "../contracts/Todolist.json";
 
 import Web3Modal from "web3modal";
 // @ts-ignore
@@ -44,6 +45,8 @@ import ConnectButton from "../components/ConnectButton";
 import { PersonCenter } from "./PersonCenter";
 import { Avatar } from "./Avatar";
 import { Merchants } from "./Merchants";
+import getWeb3 from "../api/getWeb3";
+import { getListFun } from "../api/hook";
 
 const SLayout = styled.div`
   position: relative;
@@ -144,12 +147,12 @@ const INITIAL_STATE: IAppState = {
 function initWeb3(provider: any) {
   const web3: any = new Web3(provider);
 
-  web3.eth.extend({
+  web3?.eth.extend({
     methods: [
       {
         name: "chainId",
         call: "eth_chainId",
-        outputFormatter: web3.utils.hexToNumber
+        outputFormatter: web3?.utils.hexToNumber
       }
     ]
   });
@@ -177,24 +180,49 @@ class PixelsMetaverse extends React.Component<any, any> {
 
   public componentDidMount() {
     if (this.web3Modal.cachedProvider) {
-      this.onConnect();
+      this.toConnect();
     }
   }
 
-  public onConnect = async () => {
+  public toConnect = async () => {
     const provider = await this.web3Modal.connect();
+    let web3: any, chainId: any;
+    try {
+      await this.subscribeProvider(provider);
+      web3 = initWeb3(provider);
+      chainId = await web3?.eth.chainId();
+    } catch (error) {
+      web3 = await getWeb3()
+      chainId = await web3?.eth.getChainId();
+    }
 
-    await this.subscribeProvider(provider);
-
-    const web3: any = initWeb3(provider);
-
-    const accounts = await web3.eth.getAccounts();
+    const accounts = await web3?.eth.getAccounts();
 
     const address = accounts[0];
 
-    const networkId = await web3.eth.net.getId();
+    const networkId = await web3?.eth.net.getId();
 
-    const chainId = await web3.eth.chainId();
+    //const add = await web3?.eth.getBalance()
+
+    console.log(web3)
+
+    if (networkId === 1337) {
+      const deployedNetwork = (MyContract as any).networks[networkId];
+      const contract = new web3.eth.Contract(
+        MyContract.abi,
+        deployedNetwork && deployedNetwork.address,
+      );
+
+      contract.events.HandleList()
+        .on("connected", (subscriptionId: string) => {
+          console.log(subscriptionId, "events 已连接");
+          this.getList(contract)
+        })
+        .on('data', function (e: any) {
+          //setEvent(e)
+          //getList(contract)
+        })
+    }
 
     await this.setState({
       web3,
@@ -204,7 +232,13 @@ class PixelsMetaverse extends React.Component<any, any> {
       chainId,
       networkId
     });
-    await this.getAccountAssets();
+    //await this.getAccountAssets();
+  };
+
+  public getList = async (contract: any) => {
+    const list = await getListFun(contract);
+    console.log(list)
+    return list
   };
 
   public subscribeProvider = async (provider: any) => {
@@ -214,20 +248,20 @@ class PixelsMetaverse extends React.Component<any, any> {
     provider.on("close", () => this.resetApp());
     provider.on("accountsChanged", async (accounts: string[]) => {
       await this.setState({ address: accounts[0] });
-      await this.getAccountAssets();
+      //await this.getAccountAssets();
     });
     provider.on("chainChanged", async (chainId: number) => {
       const { web3 } = this.state;
-      const networkId = await web3.eth.net.getId();
+      const networkId = await web3?.eth.net.getId();
       await this.setState({ chainId, networkId });
-      await this.getAccountAssets();
+      //await this.getAccountAssets();
     });
 
     provider.on("networkChanged", async (networkId: number) => {
       const { web3 } = this.state;
-      const chainId = await web3.eth.chainId();
+      const chainId = await web3?.eth.chainId();
       await this.setState({ chainId, networkId });
-      await this.getAccountAssets();
+      //await this.getAccountAssets();
     });
   };
 
@@ -241,15 +275,6 @@ class PixelsMetaverse extends React.Component<any, any> {
           infuraId: "4bf032f2d38a4ed6bb975b80d6340847"
         }
       },
-      /* torus: {
-        package: Torus
-      }, */
-      /* fortmatic: {
-        package: Fortmatic,
-        options: {
-          key: process.env.REACT_APP_FORTMATIC_KEY
-        }
-      }, */
       authereum: {
         package: Authereum
       },
@@ -300,7 +325,7 @@ class PixelsMetaverse extends React.Component<any, any> {
       // @ts-ignore
       function sendTransaction(_tx: any) {
         return new Promise((resolve, reject) => {
-          web3.eth
+          web3?.eth
             .sendTransaction(_tx)
             .once("transactionHash", (txHash: string) => resolve(txHash))
             .catch((err: any) => reject(err));
@@ -352,7 +377,7 @@ class PixelsMetaverse extends React.Component<any, any> {
       this.setState({ pendingRequest: true });
 
       // send message
-      const result = await web3.eth.sign(hash, address);
+      const result = await web3?.eth.sign(hash, address);
 
       // verify signature
       const signer = recoverPublicKey(result, hash);
@@ -400,7 +425,7 @@ class PixelsMetaverse extends React.Component<any, any> {
       this.setState({ pendingRequest: true });
 
       // send message
-      const result = await web3.eth.personal.sign(hexMsg, address);
+      const result = await web3?.eth.personal.sign(hexMsg, address);
 
       // verify signature
       const signer = recoverPersonalSignature(result, message);
@@ -537,8 +562,8 @@ class PixelsMetaverse extends React.Component<any, any> {
 
   public resetApp = async () => {
     const { web3 } = this.state;
-    if (web3 && web3.currentProvider && web3.currentProvider.close) {
-      await web3.currentProvider.close();
+    if (web3 && web3?.currentProvider && web3?.currentProvider.close) {
+      await web3?.currentProvider.close();
     }
     await this.web3Modal.clearCachedProvider();
     this.setState({ ...INITIAL_STATE });
@@ -562,7 +587,7 @@ class PixelsMetaverse extends React.Component<any, any> {
           address={address}
           chainId={chainId}
           killSession={this.resetApp}
-          onConnect={this.onConnect}
+          toConnect={this.toConnect}
         />
         {/* <SContent>
           {fetching ? (
@@ -571,7 +596,7 @@ class PixelsMetaverse extends React.Component<any, any> {
                 <Loader />
               </SContainer>
             </Column>
-          ) : !!assets && !!assets.length ? (
+          ) : !!assets && !!assets.length && (
             <SBalances>
               <h3>Actions</h3>
               <Column center>
@@ -609,18 +634,13 @@ class PixelsMetaverse extends React.Component<any, any> {
               <h3>Balances</h3>
               <AccountAssets chainId={chainId} assets={assets} />{" "}
             </SBalances>
-          ) : (
-            <SLanding>
-              <ConnectButton onClick={this.onConnect} />
-            </SLanding>
           )}
-        </SContent>
- */}
-        <div className="flex justify-between bg-transparent flex-1 mt-4" style={{ paddingTop: 70 }}>
+        </SContent> */}
+        {/* <div className="flex justify-between bg-transparent flex-1 mt-4" style={{ paddingTop: 70 }}>
           <PersonCenter />
           <Avatar />
           <Merchants />
-        </div>
+        </div> */}
         <Modal show={showModal} toggleModal={this.toggleModal}>
           {pendingRequest ? (
             <SModalContainer>

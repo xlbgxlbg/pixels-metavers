@@ -192,7 +192,39 @@ const supportedChains: IChainData[] = [
       contractAddress: "",
       balance: ""
     }
-  }
+  },
+  {
+    name: "Ethereum LocalTest",
+    short_name: "local",
+    chain: "ETH",
+    network: "mainnet",
+    chain_id: 1337,
+    network_id: 1337,
+    rpc_url: "https://127.0.0.1:8545/",
+    native_currency: {
+      symbol: "ETH",
+      name: "Ethereum",
+      decimals: "18",
+      contractAddress: "",
+      balance: ""
+    }
+  },
+  {
+    name: "Matic",
+    short_name: "matic",
+    chain: "Matic",
+    network: "mainnet",
+    chain_id: 137,
+    network_id: 137,
+    rpc_url: "https://127.0.0.1:8545/",
+    native_currency: {
+      symbol: "ETH",
+      name: "Ethereum",
+      decimals: "18",
+      contractAddress: "",
+      balance: ""
+    }
+  },
 ];
 
 export default supportedChains;

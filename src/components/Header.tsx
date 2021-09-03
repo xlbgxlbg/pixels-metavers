@@ -3,7 +3,8 @@ import * as PropTypes from "prop-types";
 import Blockie from "./Blockie";
 import { ellipseAddress, getChainData } from "../helpers/utilities";
 import { transitions } from "../styles";
-import { Menu, Dropdown, Button, Space, Input } from 'antd';
+import { Menu, Dropdown } from 'antd';
+import { useActiveWeb3React } from "../hook/web3";
 
 const SHeader = styled.div`
   margin-bottom: 1px;
@@ -55,12 +56,26 @@ const SDisconnect = styled.div<IHeaderStyle>`
   }
 `;
 
+const Network = styled.div<IHeaderStyle>`
+  transition: ${transitions.button};
+  font-size: 12px;
+  font-family: monospace;
+  position: absolute;
+  right: 0;
+  top: 26px;
+  opacity: 0.7;
+
+  opacity: ${({ connected }) => (connected ? 1 : 0)};
+  visibility: ${({ connected }) => (connected ? "visible" : "hidden")};
+  pointer-events: ${({ connected }) => (connected ? "auto" : "none")};
+`;
+
 interface IHeaderProps {
   killSession: () => void;
   connected: boolean;
   address: string;
   chainId: number;
-  onConnect: () => void
+  toConnect: () => void
 }
 
 const menu = (
@@ -84,9 +99,11 @@ const menu = (
 );
 
 const Header = (props: IHeaderProps) => {
-  const { connected, address, chainId, killSession, onConnect } = props;
+  const { connected, address, chainId, killSession, toConnect } = props;
   const chainData = chainId ? getChainData(chainId) : null;
   const onSearch = () => console.log("value");
+  const { account } = useActiveWeb3React()
+  console.log(account)
 
   return (
     <div className="flex items-center px-4 justify-end text-l fixed w-full header" onClick={() => {
@@ -107,14 +124,16 @@ const Header = (props: IHeaderProps) => {
             <SActiveAccount>
               <SBlockie address={address} />
               <SAddress connected={connected}>{ellipseAddress(address)}</SAddress>
-              <SDisconnect connected={connected} style={{ left: 10 }}>
+              <Network connected={connected} style={{ left: 10 }}>
                 {chainData.name}
-              </SDisconnect>
+              </Network>
               <SDisconnect connected={connected} onClick={killSession}>
                 {"中断连接"}
               </SDisconnect>
             </SActiveAccount>)
-            : <div className="flex items-center justify-center rounded-md cursor-pointer contect w-36" style={{ height: 40 }} onClick={onConnect} >连接钱包</div>
+            : <div className="flex items-center justify-center rounded-md cursor-pointer contect w-36" style={{ height: 40 }} onClick={() => {
+              toConnect()
+            }} >连接钱包</div>
           }</div>
       </SHeader>
       <Dropdown overlay={menu} placement="bottomLeft">

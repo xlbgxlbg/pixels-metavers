@@ -116,8 +116,6 @@ export function getChainData(chainId: number): IChainData {
     (chain: any) => chain.chain_id === parseInt(String(chainId))
   )[0];
 
-  console.log(chainId, supportedChains)
-
   if (!chainData) {
     warning(parseInt(String(chainId)))
   }
