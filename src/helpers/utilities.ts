@@ -3,6 +3,8 @@ import { IChainData } from "./types";
 import supportedChains from "./chains";
 import { apiGetGasPrices, apiGetAccountNonce } from "./api";
 import { convertAmountToRawNumber, convertStringToHex } from "./bignumber";
+import { message } from "antd";
+import { throttle } from "lodash";
 
 export function capitalize(string: string): string {
   return string
@@ -105,20 +107,26 @@ export function isMobile(): boolean {
   return mobile;
 }
 
+export const warning = throttle((chainId: number | string) => {
+  message.warning(`很遗憾，暂时不支持 Chain ID 为 ${chainId} 的链！`)
+}, 5000)
+
 export function getChainData(chainId: number): IChainData {
   const chainData = supportedChains.filter(
-    (chain: any) => chain.chain_id === chainId
+    (chain: any) => chain.chain_id === parseInt(String(chainId))
   )[0];
 
+  console.log(chainId, supportedChains)
+
   if (!chainData) {
-    throw new Error("ChainId missing or not supported");
+    warning(parseInt(String(chainId)))
   }
 
   const API_KEY = process.env.REACT_APP_INFURA_ID;
 
   if (
-    chainData.rpc_url.includes("infura.io") &&
-    chainData.rpc_url.includes("%API_KEY%") &&
+    chainData?.rpc_url.includes("infura.io") &&
+    chainData?.rpc_url.includes("%API_KEY%") &&
     API_KEY
   ) {
     const rpcUrl = chainData.rpc_url.replace("%API_KEY%", API_KEY);

@@ -235,21 +235,21 @@ class PixelsMetaverse extends React.Component<any, any> {
 
   public getProviderOptions = () => {
     const providerOptions = {
-      /* walletconnect: {
+      walletconnect: {
         package: WalletConnectProvider,
         options: {
-          infuraId: process.env.REACT_APP_INFURA_ID
+          infuraId: "4bf032f2d38a4ed6bb975b80d6340847"
         }
-      }, */
+      },
       /* torus: {
         package: Torus
       }, */
-      fortmatic: {
+      /* fortmatic: {
         package: Fortmatic,
         options: {
           key: process.env.REACT_APP_FORTMATIC_KEY
         }
-      },
+      }, */
       authereum: {
         package: Authereum
       },
@@ -616,7 +616,7 @@ class PixelsMetaverse extends React.Component<any, any> {
           )}
         </SContent>
  */}
-        <div className="flex justify-between bg-transparent flex-1 mt-4" style={{paddingTop: 70}}>
+        <div className="flex justify-between bg-transparent flex-1 mt-4" style={{ paddingTop: 70 }}>
           <PersonCenter />
           <Avatar />
           <Merchants />
