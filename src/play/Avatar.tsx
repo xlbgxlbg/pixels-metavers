@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { loadProduced } from "../produced/produced";
 
 export const Avatar = () => {
   const filedomRef = useRef<HTMLInputElement>(null)
@@ -20,13 +19,6 @@ export const Avatar = () => {
       canvas.style.width = size.width + "px"
       canvas.style.height = size.height + "px"
       context = canvas.getContext("2d") as CanvasRenderingContext2D
-    }
-    if (filedom && canvas && context) {
-      loadProduced({
-        filedom,
-        canvas,
-        context,
-      })
     }
   }, [filedomRef, canvasRef])
 

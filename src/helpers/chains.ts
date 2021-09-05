@@ -2,7 +2,7 @@ import { IChainData } from "./types";
 
 const supportedChains: IChainData[] = [
   {
-    name: "Ethereum Mainnet",
+    name: "Ethereum",
     short_name: "eth",
     chain: "ETH",
     network: "mainnet",
@@ -18,7 +18,7 @@ const supportedChains: IChainData[] = [
     }
   },
   {
-    name: "Ethereum Ropsten",
+    name: "Ropsten",
     short_name: "rop",
     chain: "ETH",
     network: "ropsten",
@@ -34,7 +34,7 @@ const supportedChains: IChainData[] = [
     }
   },
   {
-    name: "Ethereum Rinkeby",
+    name: "Rinkeby",
     short_name: "rin",
     chain: "ETH",
     network: "rinkeby",
@@ -50,7 +50,7 @@ const supportedChains: IChainData[] = [
     }
   },
   {
-    name: "Ethereum Görli",
+    name: "Görli",
     short_name: "gor",
     chain: "ETH",
     network: "goerli",
@@ -82,7 +82,7 @@ const supportedChains: IChainData[] = [
     }
   },
   {
-    name: "Ethereum Kovan",
+    name: "Kovan",
     short_name: "kov",
     chain: "ETH",
     network: "kovan",
@@ -98,7 +98,7 @@ const supportedChains: IChainData[] = [
     }
   },
   {
-    name: "Ethereum Classic Mainnet",
+    name: "Classic",
     short_name: "etc",
     chain: "ETC",
     network: "mainnet",
@@ -114,7 +114,7 @@ const supportedChains: IChainData[] = [
     }
   },
   {
-    name: "POA Network Sokol",
+    name: "Sokol",
     short_name: "poa",
     chain: "POA",
     network: "sokol",
@@ -130,7 +130,7 @@ const supportedChains: IChainData[] = [
     }
   },
   {
-    name: "POA Network Core",
+    name: "Core",
     short_name: "skl",
     chain: "POA",
     network: "core",
@@ -146,7 +146,7 @@ const supportedChains: IChainData[] = [
     }
   },
   {
-    name: "xDAI Chain",
+    name: "xDAI",
     short_name: "xdai",
     chain: "POA",
     network: "dai",
@@ -162,7 +162,7 @@ const supportedChains: IChainData[] = [
     }
   },
   {
-    name: "Callisto Mainnet",
+    name: "Callisto",
     short_name: "clo",
     chain: "callisto",
     network: "mainnet",
@@ -178,7 +178,7 @@ const supportedChains: IChainData[] = [
     }
   },
   {
-    name: "Binance Smart Chain",
+    name: "Binance",
     short_name: "bsc",
     chain: "smartchain",
     network: "mainnet",
@@ -194,7 +194,7 @@ const supportedChains: IChainData[] = [
     }
   },
   {
-    name: "Ethereum LocalTest",
+    name: "LocalTest",
     short_name: "local",
     chain: "ETH",
     network: "mainnet",

@@ -1,75 +1,33 @@
-import React, { useCallback, useEffect, createContext, ReactNode, useState, useContext } from "react";
-import MyContract from "../contracts/Todolist.json";
-import getWeb3 from "./getWeb3";
+import React, { useCallback, useEffect, createContext, ReactNode, useState, useContext, Dispatch } from "react";
 
-export const ContrctContext = createContext(
+export const Web3jsContext = createContext(
   {} as {
     accounts: any;
     contract: any;
-    list: any[];
-    event: any;
+    setAccounts: Dispatch<React.SetStateAction<any>>;
+    setContract: Dispatch<React.SetStateAction<any>>;
   },
 );
 
-export const useContract = () => useContext(ContrctContext);
+export const useWeb3js = () => useContext(Web3jsContext);
 
-export const ContrctProvider = ({ children }: { children: ReactNode }) => {
-  const [{ accounts, contract }, setContractInfo] = useState({ accounts: null, contract: null })
-  const [list, setList] = useState<any[]>([]);
-  const [event, setEvent] = useState<any[]>([]);
-  const connectContract = useCallback(async () => {
-
-    try {
-      const web3 = await getWeb3();
-      const accounts = await web3.eth.getAccounts();
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = (MyContract as any).networks[networkId];
-      const contract = new web3.eth.Contract(
-        MyContract.abi,
-        deployedNetwork && deployedNetwork.address,
-      );
-
-      contract.events.HandleList()
-        .on("connected", function (subscriptionId: string) {
-          console.log(subscriptionId, "events 已连接");
-          getList(contract)
-        })
-        .on('data', function (e: any) {
-          setEvent(e)
-          getList(contract)
-        })
-
-      setContractInfo({ accounts, contract })
-
-    } catch (error) {
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
-      console.error(error);
-    }
-
-  }, [])
-
-  useEffect(() => {
-    connectContract()
-  }, [])
-
-  const getList = useCallback(async (contract: any) => {
-    const list = await getListFun(contract);
-    setList(list)
-  }, [])
+export const Web3jsProvider = ({ children }: { children: ReactNode }) => {
+  const [accounts, setAccounts] = useState(null);
+  const [contract, setContract] = useState(null);
 
   return (
-    <ContrctContext.Provider value={{ accounts, contract, list, event }}>
+    <Web3jsContext.Provider value={{ accounts, contract, setAccounts, setContract }}>
       {children}
-    </ContrctContext.Provider>
+    </Web3jsContext.Provider>
   )
 }
 
-export const useAdd = ({ accounts, contract }: { accounts: any, contract: any }) => {
+export const useAdd = () => {
+  const { accounts, contract } = useWeb3js()
   const add = useCallback(async (value: string) => {
-    await contract.methods.add(value).send({ from: accounts[0] });
-  }, [])
+    if (!contract) return
+    await contract.methods.add(value).send({ from: accounts?.address });
+  }, [accounts, contract])
   return add
 }
 

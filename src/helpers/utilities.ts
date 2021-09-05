@@ -5,6 +5,7 @@ import { apiGetGasPrices, apiGetAccountNonce } from "./api";
 import { convertAmountToRawNumber, convertStringToHex } from "./bignumber";
 import { message } from "antd";
 import { throttle } from "lodash";
+import { IPosition } from "../produced";
 
 export function capitalize(string: string): string {
   return string
@@ -41,7 +42,7 @@ export function ellipseText(
 
 export function ellipseAddress(
   address: string = "",
-  width: number = 15
+  width: number = 8
 ): string {
   return `${address.slice(0, width)}...${address.slice(-width)}`;
 }
@@ -209,4 +210,70 @@ export async function formatTestTransaction(address: string, chainId: number) {
 
 export function isObject(obj: any): boolean {
   return typeof obj === "object" && !!Object.keys(obj).length;
+}
+
+// 提供36位的表达 0-9 a-z
+export function getNums(number: number) {
+  var nums = [];
+  for (var i = 0; i < number; i++) {
+    if (i >= 0 && i <= 9) {
+      nums.push(i)
+    } else {
+      nums.push(String.fromCharCode(i + 55));
+    }
+  }
+  return nums;
+}
+export const char = '0123456789ABCDEFGHIGKLMNOPQRSTUVWXYZabcdefghigklmnopqrstuvwxyz/|'
+
+export function string16to64(number: string) {
+  if(number.length === 2) return ""
+  let chars = char.split(''),
+    radix = BigInt(chars.length),
+    qutient = BigInt(number),
+    arr = [];
+  do {
+    const mod = qutient % radix;
+    qutient = (qutient - mod) / radix;
+    arr.unshift(chars[Number(mod)]);
+  } while (qutient);
+  return arr.join('');
+}
+
+export function string64toBigInt10(number: string) {
+  let chars = char,
+    radix = BigInt(chars.length),
+    number_code = String(number),
+    len = number_code.length,
+    i = 0,
+    origin_number = BigInt(0);
+  while (i < len) {
+    origin_number += (radix**BigInt(i++)) * BigInt(chars.indexOf(number_code.charAt(len - i) || "0"));
+  }
+  return origin_number;
+}
+
+export const char16 = '0123456789ABCDEF'
+export function stringBigInt10to16(number: bigint) {
+  let chars = char16.split(''),
+    radix = BigInt(chars.length),
+    qutient = BigInt(number),
+    arr = [];
+  do {
+    const mod = qutient % radix;
+    qutient = (qutient - mod) / radix;
+    arr.unshift(chars[Number(mod)]);
+  } while (qutient);
+  return arr.join('');
+}
+
+export const positionToGrad = (point: IPosition, sizeGrid: number) => {
+  return {
+    x: Math.ceil((point.x / sizeGrid)),
+    y: Math.ceil((point.y / sizeGrid)),
+  }
+}
+
+export const gradToSort = (grad: IPosition, sizeGrid: number) => {
+  return grad.x + (grad.y - 1) * (480 / sizeGrid)
 }

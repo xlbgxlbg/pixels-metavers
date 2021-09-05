@@ -13,8 +13,8 @@ export const loadProduced = ({
   let config = {
     blockSize: 20,
     weight: 30,
-    iters: 4,
-    stride: 4,
+    iters: 10,
+    stride: 10,
     withGrid: true,
     withCenters: false,
     withContours: false,
@@ -59,8 +59,28 @@ export const loadProduced = ({
     displayImg()
   }
 
+  // read file 
+    /* filedom.addEventListener("change", function (e) {
+        let f = this.files[0]
+        filename = f.name
+        filetype = f.type
+        if (!f.type.match("image.*")) {
+            return
+        }
+        let reader = new FileReader()
+        reader.onload = function (event) {
+            let bytes = this.result
+            let img = new Image()
+            img.src = "" + bytes
+            img.onload = function () {
+                dealImg(img)
+            }
+        }
+        reader.readAsDataURL(f)
+    }) */
+
   let img = new Image()
-  img.src = mali
+  img.src = "https://lh3.googleusercontent.com/FRHkPkzzEp0aoWSz1sf70C_qFKAaILTs7ZQT_22iGbR2rV0-vx1TZHlEXEmjcwJ30tpoMN_4Y182RCraOnIlcNfhQtegqbl9emSpkw=w600" //"https://lh3.googleusercontent.com/sBc8EfYO-_GAhD8sWQEsoXQGZIITJP9pZJtcDg9nnSPwKa72X5-tIs-6nS9ji8b3vVXfNHXV7PQXLM_k9VN2x3QcQzIuql7P6qxR5w=w600"
   img.crossOrigin = ""
   img.onload = function () {
     dealImg(img)

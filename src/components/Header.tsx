@@ -1,10 +1,14 @@
 import styled from "styled-components";
 import * as PropTypes from "prop-types";
-import Blockie from "./Blockie";
 import { ellipseAddress, getChainData } from "../helpers/utilities";
 import { transitions } from "../styles";
-import { Menu, Dropdown } from 'antd';
-import { useActiveWeb3React } from "../hook/web3";
+import { Dropdown, Menu } from 'antd';
+import { useHistory } from "react-router";
+import { useLocation } from "react-router-dom";
+import { useWeb3js } from "../api/hook";
+import React, { useEffect } from "react";
+import MyContract from "../contracts/Todolist.json";
+import { getListFun } from "../api/hook";
 
 const SHeader = styled.div`
   margin-bottom: 1px;
@@ -22,10 +26,6 @@ const SActiveAccount = styled.div`
   font-weight: 500;
 `;
 
-const SBlockie = styled(Blockie)`
-  margin-right: 10px;
-`;
-
 interface IHeaderStyle {
   connected: boolean;
 }
@@ -33,7 +33,7 @@ interface IHeaderStyle {
 const SAddress = styled.p<IHeaderStyle>`
   transition: ${transitions.base};
   font-weight: bold;
-  margin: ${({ connected }) => (connected ? "-10px auto 1em" : "0")};
+  margin: ${({ connected }) => (connected ? "0px auto 1em" : "0")};
 `;
 
 const SDisconnect = styled.div<IHeaderStyle>`
@@ -42,7 +42,7 @@ const SDisconnect = styled.div<IHeaderStyle>`
   font-family: monospace;
   position: absolute;
   right: 0;
-  top: 26px;
+  top: 20px;
   opacity: 0.7;
   cursor: pointer;
 
@@ -62,7 +62,7 @@ const Network = styled.div<IHeaderStyle>`
   font-family: monospace;
   position: absolute;
   right: 0;
-  top: 26px;
+  top: 20px;
   opacity: 0.7;
 
   opacity: ${({ connected }) => (connected ? 1 : 0)};
@@ -75,43 +75,107 @@ interface IHeaderProps {
   connected: boolean;
   address: string;
   chainId: number;
-  toConnect: () => void
+  toConnect: () => void;
+  web3: any;
+  networkId: number
 }
 
-const menu = (
-  <Menu>
-    <Menu.Item>
-      <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-        平台商家
+const menu = () => {
+  return (
+    <Menu>
+      <Menu.Item>
+        <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
+          个人中心
       </a>
-    </Menu.Item>
-    <Menu.Item>
-      <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-        平台用户
+      </Menu.Item>
+      <Menu.Item>
+        <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
+          平台用户
       </a>
-    </Menu.Item>
-    <Menu.Item>
-      <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
-        申请入驻
+      </Menu.Item>
+      <Menu.Item>
+        <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
+          平台商家
       </a>
-    </Menu.Item>
-  </Menu>
-);
+      </Menu.Item>
+      <Menu.Item>
+        <a rel="noopener noreferrer" href="/#/">
+          申请入驻
+      </a>
+      </Menu.Item>
+      <Menu.Item>
+        <a rel="noopener noreferrer" href="/#/produced">
+          发布商品
+        </a>
+      </Menu.Item>
+    </Menu>
+  )
+}
+
+const nav = [
+  { label: "首页", path: "/app" },
+  { label: "个人中心", path: "/" },
+  { label: "合约商城", path: "" },
+]
 
 const Header = (props: IHeaderProps) => {
-  const { connected, address, chainId, killSession, toConnect } = props;
+  const { connected, address, chainId, killSession, toConnect, web3, networkId } = props;
   const chainData = chainId ? getChainData(chainId) : null;
   const onSearch = () => console.log("value");
-  const { account } = useActiveWeb3React()
-  console.log(account)
+  const history = useHistory()
+  const { pathname } = useLocation()
+  const { setAccounts, setContract } = useWeb3js()
+
+  useEffect(() => {
+    const deployedNetwork = (MyContract as any).networks[networkId]
+    if (deployedNetwork) {
+      const contract = new web3.eth.Contract(
+        MyContract.abi,
+        deployedNetwork && deployedNetwork.address,
+      );
+
+      setContract(contract)
+      console.log(contract)
+
+      contract.events.HandleList()
+        .on("connected", (subscriptionId: string) => {
+          console.log(subscriptionId, "events 已连接");
+          getList(contract)
+        })
+        .on('data', function (e: any) {
+          //setEvent(e)
+          //getList(contract)
+        })
+    } else {
+      setContract(null)
+    }
+  }, [networkId])
+
+  useEffect(() => {
+    setAccounts(props)
+  }, [props])
+
+
+
+  const getList = async (contract: any) => {
+    const list = await getListFun(contract);
+    console.log(list)
+    return list
+  };
 
   return (
     <div className="flex items-center px-4 justify-end text-l fixed w-full header" onClick={() => {
     }}>
       <SHeader {...props}>
-        <div className="text-2xl">像素元宇宙，从头开始</div>
-        <div className="flex">
-          <div className="mr-8 flex items-center search-box">
+        <div className="text-2xl cursor-pointer" onClick={() => { history.push("/") }}>像素元宇宙，从头开始</div>
+        <div className="flex justify-around items-center w-96">
+          {nav.map(item => {
+            return <div key={item?.label} style={{ color: pathname === item?.path ? "#EF4444" : "rgba(225,225,225,.9)" }} className="cursor-pointer hover:text-red-500"
+              onClick={() => { history.push(item?.path) }}>{item?.label}</div>
+          })}
+        </div>
+        <div className="flex justify-end" style={{ width: 500 }}>
+          <div className="mr-4 flex items-center search-box">
             <input
               className="py-2 pl-4 mr-2 bg-transparent search"
               placeholder="请输入以太坊钱包地址"
@@ -120,21 +184,23 @@ const Header = (props: IHeaderProps) => {
               style={{ borderTopRightRadius: 20, borderBottomRightRadius: 20 }}
               onClick={onSearch}>查询</div>
           </div>
+
           {address && chainData ? (
-            <SActiveAccount>
-              <SBlockie address={address} />
+            <div className="bg-black contect px-4 rounded-md"><SActiveAccount>
               <SAddress connected={connected}>{ellipseAddress(address)}</SAddress>
-              <Network connected={connected} style={{ left: 10 }}>
+              <Network connected={connected} style={{ left: 0 }}>
                 {chainData.name}
               </Network>
               <SDisconnect connected={connected} onClick={killSession}>
-                {"中断连接"}
+                {"断开连接"}
               </SDisconnect>
-            </SActiveAccount>)
-            : <div className="flex items-center justify-center rounded-md cursor-pointer contect w-36" style={{ height: 40 }} onClick={() => {
+            </SActiveAccount>
+            </div>)
+            : <div className="flex items-center justify-center rounded-md cursor-pointer contect w-24" style={{ height: 40 }} onClick={() => {
               toConnect()
             }} >连接钱包</div>
-          }</div>
+          }
+        </div>
       </SHeader>
       <Dropdown overlay={menu} placement="bottomLeft">
         <div className="flex items-center justify-center rounded-md cursor-pointer contect ml-4" style={{ height: 40, width: 40, marginTop: -1 }}>···</div>
