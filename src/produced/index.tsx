@@ -1,7 +1,7 @@
 import CloseCircleOutlined from "@ant-design/icons/lib/icons/CloseCircleOutlined"
 import React, { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { cloneDeep, Dictionary, divide, isEmpty, keys, map, orderBy } from "lodash";
-import { gradToSort, positionToGrad, string16to64 } from "../helpers/utilities"
+import { gradToSort, positionToGrad, string10to92 } from "../helpers/utilities"
 import { Popover, Tooltip } from "antd";
 import PlusCircleOutlined from "@ant-design/icons/lib/icons/PlusCircleOutlined";
 import MinusCircleOutlined from "@ant-design/icons/lib/icons/MinusCircleOutlined";
@@ -53,11 +53,9 @@ const get16Color = (color: string) => {
     var strHex = "#";
     // 把RGB的3个数值变成数组
     var colorArr = color.replace(/(?:\(|\)|rgb|RGB)*/g, "").split(",");
-    console.log(colorArr)
     // 转成16进制
     for (var i = 0; i < colorArr.length; i++) {
       var hex = Number(colorArr[i]).toString(16);
-      console.log(hex)
       if (hex.length < 2) {
         hex = `0${hex}`
       }
@@ -231,10 +229,8 @@ export const Produced = () => {
       const context = canvasRef.current?.getContext("2d") as CanvasRenderingContext2D
       const { x, y } = getGradPosition(event, canvasRef.current)
       let data = context.getImageData(x, y, 1, 1).data
-      console.log(context.getImageData(x, y, 1, 1))
       const rgba = 'rgb(' + data[0] + ',' + data[1] +
         ',' + data[2] + ')';
-      console.log(rgba)
       const sort = gradToSort(position, sizeGrid)
       const ponitColor = get16Color(color || rgba)
       add(sort, ponitColor)

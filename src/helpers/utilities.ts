@@ -224,10 +224,31 @@ export function getNums(number: number) {
   }
   return nums;
 }
-export const char = '0123456789ABCDEFGHIGKLMNOPQRSTUVWXYZabcdefghigklmnopqrstuvwxyz/|'
+export const char = `0123456789abcdef|ghigklmnopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ/+)(*&^%$#@!{}><?;:"~=.,[]'·¥`
 
-export function string16to64(number: string) {
-  if(number.length === 2) return ""
+// char和char1必须严格相等，不然解析后就会出问题
+export const cha1 = `0123456789abcdef|ghigklmnopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ/+)(*&^%$#@!{}><?;:"~=.,[]'·¥`
+
+export const char16 = '0123456789abcdef|'
+
+//将17进制数转换成10进制
+export function string17To10(number: string) {
+  let res = BigInt(0), len = number.length;
+  const radixBig = BigInt(char16.length)
+
+  for (let i = 0; i < len; i++) {
+    const count = len - 1 - i
+    let pow = eval("(function(a,b){return a**b})")
+    Math.pow = pow;
+    const miNum = radixBig ** BigInt(i)
+    res += BigInt(char16.indexOf(number[count])) * miNum
+  }
+  return res;
+}
+
+//将10进制数转换成92进制
+export function string10to92(number: string) {
+  if (number.length === 2) return ""
   let chars = char.split(''),
     radix = BigInt(chars.length),
     qutient = BigInt(number),
@@ -240,21 +261,23 @@ export function string16to64(number: string) {
   return arr.join('');
 }
 
-export function string64toBigInt10(number: string) {
-  let chars = char,
-    radix = BigInt(chars.length),
-    number_code = String(number),
-    len = number_code.length,
-    i = 0,
-    origin_number = BigInt(0);
-  while (i < len) {
-    origin_number += (radix**BigInt(i++)) * BigInt(chars.indexOf(number_code.charAt(len - i) || "0"));
+//将92进制数转换成10进制
+export function string92To10(number: string) { //把一个16进制数按照解析为十进制。
+  let res = BigInt(0), len = number.length;
+  const radixBig = BigInt(char.length)
+
+  for (let i = 0; i < len; i++) {
+    const count = len - 1 - i
+    let pow = eval("(function(a,b){return a**b})")
+    Math.pow = pow;
+    const miNum = radixBig ** BigInt(i)
+    res += BigInt(char.indexOf(number[count])) * miNum
   }
-  return origin_number;
+  return res;
 }
 
-export const char16 = '0123456789ABCDEF'
-export function stringBigInt10to16(number: bigint) {
+//将10进制数转换成17进制
+export function string10To17(number: bigint) {
   let chars = char16.split(''),
     radix = BigInt(chars.length),
     qutient = BigInt(number),

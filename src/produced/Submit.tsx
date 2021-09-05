@@ -1,10 +1,10 @@
 import React, { ChangeEvent, ReactNode, useCallback, useMemo, useState } from 'react';
-import { Form, Input, Button, Radio, Tooltip, Select, message } from 'antd';
+import { Form, Input, Button, Radio, Tooltip, Select, message, Modal } from 'antd';
 import { ExclamationCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { RequiredMark } from 'antd/lib/form/Form';
-import { Dictionary, map, orderBy } from 'lodash';
+import { Dictionary, keys, map, orderBy } from 'lodash';
 import { EHeader } from '../canvas';
-import { string16to64, string64toBigInt10, stringBigInt10to16 } from '../helpers/utilities';
+import { string10to92, string92To10, string10To17, string17To10 } from '../helpers/utilities';
 import { useAdd } from '../api/hook';
 const { Option } = Select;
 
@@ -86,6 +86,33 @@ export const SubminNFT = ({ value, positions }: ISubmit) => {
     price: "",
     weight: "",
   })
+  const [positionData, setPostionData] = useState("")
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const min = useMemo(() => Math.min(...positions), [positions])
+
+  const handleOk = useCallback(() => {
+    console.log(positionData, "positionData")
+    const str17To10 = String(string17To10(`${positionData}`))
+    const nftData = `${string10to92(str17To10)}-${min}`
+    console.log(nftData)
+    /* console.log(
+      {
+        name,
+        category,
+        amount,
+        price,
+        weight,
+      }
+    )
+    console.log(nftData) */
+    //addd(nftData)
+    //setIsModalVisible(false);
+  }, [positionData, min]);
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
   const addd = useAdd()
 
   const colorsObj = useMemo(() => {
@@ -96,36 +123,25 @@ export const SubminNFT = ({ value, positions }: ISubmit) => {
     return colors
   }, [value, positions])
 
-  const valueStr = useMemo(() => {
+  const getPositionStr = useCallback(() => {
     let str = ""
     let min = Math.min(...positions)
-    for (let i in colorsObj) {
+    const colorsArrBySort = keys(colorsObj).sort((a, b) => parseInt(a.slice(1), 16) - parseInt(b.slice(1), 16))
+    for (let i = 0; i < colorsArrBySort.length; i++) {
       //再对颜色排个序 小的放前面
-      const positions = orderBy(map(colorsObj[i], ite => ite - min)).join("A")
-      str += `${i.slice(1)}${positions}`
+      const positions = orderBy(map(colorsObj[colorsArrBySort[i]], ite => ite - min)).join("|")
+      str += `${colorsArrBySort[i].slice(1)}|${positions}|`
     }
-    return str
-  }, [value, positions, colorsObj])
+    return `${str}`
+  }, [value, positions, colorsObj, min])
 
-  const get64Str = useMemo(() => {
-    return string16to64(`0x${valueStr}`)
-  }, [valueStr])
-
-  const get10BigIntStr = useMemo(() => {
-    return string64toBigInt10(`${get64Str}`)
-  }, [get64Str])
-
-  const get16Str = useMemo(() => {
-    return stringBigInt10to16(get10BigIntStr)
-  }, [get10BigIntStr])
-
-  console.log(valueStr, "valueStr")
-  console.log(get64Str, "get64Str")
-  console.log(get10BigIntStr, "get10BigIntStr")
-  console.log(get16Str, "get16Str")
+  /*   const get64Str = useMemo(() => {
+      console.log(positionData, "nftData")
+      return string10to92(`0x${positionData}`)
+    }, [positionData]) */
 
   const checkData = useCallback(() => {
-    if (!name) {
+    /* if (!name) {
       message.warn("请输入商品名称");
       return;
     }
@@ -140,13 +156,9 @@ export const SubminNFT = ({ value, positions }: ISubmit) => {
     if (!price) {
       message.warn("请输入商品价格");
       return;
-    }
-    if (!get64Str) {
-      message.warn("请绘制商品");
-      return;
-    }
+    } */
     return true;
-  }, [name, category, amount, price, get64Str]);
+  }, [name, category, amount, price]);
 
   return (
     <div className="p-4 rounded-md text-gray-300"
@@ -158,8 +170,8 @@ export const SubminNFT = ({ value, positions }: ISubmit) => {
       }}>
       <div className="flex items-center text-2xl text-gray-300">发布商品&nbsp;
       <Tooltip placement="right" className="cursor-pointer" title={`建议各部位分开创建，组合性更强。`} color="#29303d">
-        <ExclamationCircleOutlined />
-      </Tooltip></div>
+          <ExclamationCircleOutlined />
+        </Tooltip></div>
       <Label>商品名称</Label>
       <input
         className="search p-2 mt-1 pl-3 shangping"
@@ -228,18 +240,20 @@ export const SubminNFT = ({ value, positions }: ISubmit) => {
         onClick={() => {
           const is = checkData()
           if (!is) return
-          console.log(
-            {
-              name,
-              category,
-              amount,
-              price,
-              weight,
-            }
-          )
-          addd(get64Str)
+          const positionData = getPositionStr()
+          setPostionData(positionData)
+          if (!positionData) {
+            message.warn("请绘制商品");
+            return;
+          }
+          setIsModalVisible(true);
         }}
       >发布</div>
+      <Modal title="是否发布商品" okText={positionData?.length >= 100 ? "资产多，我不担心，硬核提交" : "确认"} cancelText="取消" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+        <p>当前发布商品数据如下：</p>
+        <p>{`ID${positionData}`}</p>
+        <p>{positionData?.length >= 1000 && "当前数据量较大，可能消耗的GAS较多，且有可能提交不成功，请问是否继续提交数据？"}</p>
+      </Modal>
     </div>
   );
 };
