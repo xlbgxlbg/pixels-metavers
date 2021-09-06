@@ -1,6 +1,7 @@
 import { Dictionary } from "lodash";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { string10to92, string92To10, string10To17 } from "../helpers/utilities";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { stringRadixDeal } from "../helpers/radix";
+import { PixelsMetaverseImg } from "../pixels-metavers/PixelsMetaversImg";
 
 export const Avatar = () => {
   const filedomRef = useRef<HTMLInputElement>(null)
@@ -83,34 +84,19 @@ export const Avatar = () => {
 
     displayGrad(canvas, context, true)
   }, [canvasRef, positions])
-  //          a24a29a99a100a170a171a17286581ea0a1a5a6a77c47a25a30
-  // 000000|24|29|99|100|170|171|172|86581e|0|1|5|6|a77c47|25|30|  Fw=E%sPAmkVk·&OplVR(S56%.]=Wp/&~v·-274
-  // 7)&O@F*148NxD3MsMDaq4EPR#6SyckgEFAH4TKzNg11¥CorYY'hpRw?x?lkbGNvW*Dt/#rH$oThKZ$2o0g1nPy3,?f)%qXguR[8t9AAM?FuAw,%x|(w$U~s6zpX3XVM#xoP¥ce80q6XCF(R·>!Rg¥m)UGRIZ~.!,z4Bp=kl50ZGl~TxtwkWaXSmObb-151
-  const strOtherRadix = `7A>e[Ip+}¥]{,URy&zZ%sTf40(Y)]h;x¥0O"AP·8TD'v=$DM{x":xkxu=)aLRA61@<QeE*LG5zlbYg¥"hA`//`7B>e[Gq+}¥]{,VSz&A/%tUf40(Z)]i;y¥0P"BQ·8UE'w=$EN{y":ylyv=)aMSB61@<ReF*MH5AmbZh¥"iB`
 
-  const get10BigIntStr = useMemo(() => {
-    let str: bigint;
-    try {
-      str = string92To10(`${strOtherRadix}`)
-    } catch (error) {
-      str = BigInt(0)
-    }
-    return str
-  }, [strOtherRadix])
+  //const strOtherRadix = `7)&O@F*148NxD3MsMDaq4EPR#6SyckgEFAH4TKzNg11¥CorYY'hpRw?x?lkbGNvW*Dt/#rH$oThKZ$2o0g1nPy3,?f)%qXguR[8t9AAM?FuAw,%x|(w$U~s6zpX3XVM#xoP¥ce80q6XCF(R·>!Rg¥m)UGRIZ~.!,z4Bp=kl50ZGl~TxtwkWaXSmObb`; const min = 151
+  const strOtherRadix = `7A>e[Ip+}¥]{,URy&zZ%sTf40(Y)]h;x¥0O"AP·8TD'v=$DM{x":xkxu=)aLRA61@<QeE*LG5zlbYg¥"hA`; const min = 151
 
   const get16Str = useMemo(() => {
-    return string10To17(get10BigIntStr)
-  }, [get10BigIntStr])
+    return stringRadixDeal(strOtherRadix, 92, 17)
+  }, [strOtherRadix])
 
   const getPosttion = useMemo(() => {
-    const min = 178;
-    let positionObg: Dictionary<string> = {
-
-    }
+    let positionObg: Dictionary<string> = {}
     let postionStr = ""
     const splitArr = get16Str.split("|")
-    // 000000|24|29|99|100|170|171|172|86581e|0|1|5|6|a77c47|25|30|
-    // ["", "24", "29", "99", "100", "170", "171", "172", "86581e", "0", "1", "5", "6", "a77c47", "25", "30", ""]
+
     for (let i = 0; i < splitArr.length; i++) {
       if (splitArr[i] === "") {
         postionStr = "#000000"
@@ -125,15 +111,18 @@ export const Avatar = () => {
       positionObg[Number(splitArr[i]) + min] = postionStr
     }
     setPositions(positionObg)
-    console.log(splitArr)
-  }, [get16Str])
+    
+  }, [get16Str, min])
 
-  console.log(get16Str)
+  console.log(get16Str, "get16Str")
+
+  const width = 480
+  const height = 480
 
   return (
-    <div className="m-4 card main-box">
-      <input id="filebtn" type="file" hidden ref={filedomRef} />
-      <canvas id="avatar" ref={canvasRef}>Sorry, your browser dose not support canvas.</canvas>
+    <div className="m-4 card main-box" style={{width, height, overflow: "hidden", minWidth: width}}>
+      <PixelsMetaverseImg address={"0xaCaC0D517161891a0327649C2c4f571249B7720E"} width={width} height={height} showGrid/>
+      {/* <canvas id="avatar" ref={canvasRef}>Sorry, your browser dose not support canvas.</canvas> */}
     </div>
   );
 };

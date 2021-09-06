@@ -4,8 +4,10 @@ import { Website } from './home';
 import { PixelsMetaverse } from './play';
 import { Produced } from './produced';
 import PixelsMetaverseHead from './components/PixelsMetaverseHead';
-import React from 'react';
-import { Web3jsProvider } from './api/hook';
+import { useWeb3js, Web3jsProvider } from './api/hook';
+import { PixelsMetaverseContextProvider } from './pixels-metavers/PixelsMetaversProvider';
+import bgSvg from "./image/bg.svg"
+
 declare global {
   // tslint:disable-next-line
   interface Window {
@@ -19,23 +21,33 @@ declare global {
   }
 }
 
-const App = () => {
+export const Main = () => {
   const { hash } = useLocation()
+  const { accounts } = useWeb3js()
 
+  return (
+    <PixelsMetaverseContextProvider web3={accounts?.web3} networkId={accounts?.networkId}>
+      <div className="relative bg-white overflow-hidden" style={{ minWidth: 1400, minHeight: 600 }}>
+        <div className="relative w-full h-full min-h-screen mx-auto bg-no-repeat md:bg-contain bg-cover bg-gray-900"
+          style={{ backgroundImage: `url(${bgSvg})` }}>
+          {hash !== "#/" && <PixelsMetaverseHead />}
+          <Switch>
+            <Route path="/app" component={PixelsMetaverse} />
+            <Route path="/produced" component={Produced} />
+            <Route path="/" component={Website} />
+            <Route exact component={Website} />
+          </Switch>
+        </div>
+      </div>
+    </PixelsMetaverseContextProvider>
+  )
+}
+
+const App = () => {
   return (
     <Web3jsProvider>
       <HashRouter>
-        <div className="relative bg-white overflow-hidden" style={{ minWidth:  1400, minHeight: 600  }}>
-          <div className="relative w-full h-full min-h-screen mx-auto bg-no-repeat md:bg-contain bg-cover bg-gray-900" style={{ backgroundImage: "url(https://github.githubassets.com/images/modules/site/home/hero-glow.svg)" }}>
-            {hash !== "#/" && <PixelsMetaverseHead />}
-            <Switch>
-              <Route path="/app" component={PixelsMetaverse} />
-              <Route path="/produced" component={Produced} />
-              <Route path="/" component={Website} />
-              <Route exact component={Website} />
-            </Switch>
-          </div>
-        </div>
+        <Main />
       </HashRouter>
     </Web3jsProvider>
   );

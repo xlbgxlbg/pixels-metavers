@@ -1,4 +1,6 @@
 // craco.config.js
+const CracoLessPlugin = require('craco-less')
+
 module.exports = {
   style: {
     postcss: {
@@ -18,5 +20,19 @@ module.exports = {
       }
       return webpackConfig;
     }
-  }
+  },
+  // craco 提供的插件
+  plugins: [
+    // 配置 less
+  	{
+      plugin: CracoLessPlugin,
+      options: {
+        lessLoaderOptions: {
+          lessOptions: {
+            javascriptEnabled: true,
+          },
+        },
+      },
+    },
+  ]
 }

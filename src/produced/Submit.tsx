@@ -1,11 +1,11 @@
-import React, { ChangeEvent, ReactNode, useCallback, useMemo, useState } from 'react';
+import React, { ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { Form, Input, Button, Radio, Tooltip, Select, message, Modal } from 'antd';
 import { ExclamationCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { RequiredMark } from 'antd/lib/form/Form';
 import { Dictionary, keys, map, orderBy } from 'lodash';
 import { EHeader } from '../canvas';
-import { string10to92, string92To10, string10To17, string17To10 } from '../helpers/utilities';
-import { useAdd } from '../api/hook';
+import { stringRadixDeal } from '../pixels-metavers/utilities.ts/radix';
+import { useAdd, usePixelsMetaverseContract } from '../pixels-metavers/PixelsMetaversProvider';
 const { Option } = Select;
 
 function handleChange(value: string) {
@@ -88,13 +88,20 @@ export const SubminNFT = ({ value, positions }: ISubmit) => {
   })
   const [positionData, setPostionData] = useState("")
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const { event } = usePixelsMetaverseContract()
+  //const radixFun = new (require("radix.js"));
+
+  useEffect(() => {
+    console.log(event)
+    setIsModalVisible(false);
+  }, [event])
 
   const min = useMemo(() => Math.min(...positions), [positions])
 
   const handleOk = useCallback(() => {
-    console.log(positionData, "positionData")
-    const str17To10 = String(string17To10(`${positionData}`))
-    const nftData = `${string10to92(str17To10)}-${min}`
+    //const str17To92 = stringRadixDeal(positionData, 16, 36)
+    //const str17 = stringRadixDeal(str17To92, 36, 16)
+    const nftData = `${positionData}${min}`
     console.log(nftData)
     /* console.log(
       {
@@ -106,7 +113,7 @@ export const SubminNFT = ({ value, positions }: ISubmit) => {
       }
     )
     console.log(nftData) */
-    //addd(nftData)
+    addd(nftData)
     //setIsModalVisible(false);
   }, [positionData, min]);
 
@@ -127,18 +134,16 @@ export const SubminNFT = ({ value, positions }: ISubmit) => {
     let str = ""
     let min = Math.min(...positions)
     const colorsArrBySort = keys(colorsObj).sort((a, b) => parseInt(a.slice(1), 16) - parseInt(b.slice(1), 16))
+    console.log(colorsObj)
     for (let i = 0; i < colorsArrBySort.length; i++) {
       //再对颜色排个序 小的放前面
-      const positions = orderBy(map(colorsObj[colorsArrBySort[i]], ite => ite - min)).join("|")
-      str += `${colorsArrBySort[i].slice(1)}|${positions}|`
+      const position = map(colorsObj[colorsArrBySort[i]], ite => (ite - min).toString(36)).join("|")
+      //const positions = orderBy(colorsObj[colorsArrBySort[i]]).join("")
+      str += `${parseInt(colorsArrBySort[i].slice(1), 16).toString(36)}-${position}-`
+      //str += `${colorsArrBySort[i].slice(1)}${positions}`
     }
     return `${str}`
   }, [value, positions, colorsObj, min])
-
-  /*   const get64Str = useMemo(() => {
-      console.log(positionData, "nftData")
-      return string10to92(`0x${positionData}`)
-    }, [positionData]) */
 
   const checkData = useCallback(() => {
     /* if (!name) {
@@ -249,10 +254,10 @@ export const SubminNFT = ({ value, positions }: ISubmit) => {
           setIsModalVisible(true);
         }}
       >发布</div>
-      <Modal title="是否发布商品" okText={positionData?.length >= 100 ? "资产多，我不担心，硬核提交" : "确认"} cancelText="取消" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-        <p>当前发布商品数据如下：</p>
-        <p>{`ID${positionData}`}</p>
-        <p>{positionData?.length >= 1000 && "当前数据量较大，可能消耗的GAS较多，且有可能提交不成功，请问是否继续提交数据？"}</p>
+      <Modal title="是否发布商品" okText={positionData?.length >= 64 ? "资产多，我不担心，硬核提交" : "确认"} cancelText="取消" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+        <p>是否确认发布该商品？</p>
+        {/* <p>{`ID${positionData}`}</p> */}
+        <p>{positionData?.length >= 50 && "当前数据量较大，可能消耗的GAS较多，且有可能提交不成功，请问是否继续提交数据？"}</p>
       </Modal>
     </div>
   );

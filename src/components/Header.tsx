@@ -7,8 +7,6 @@ import { useHistory } from "react-router";
 import { useLocation } from "react-router-dom";
 import { useWeb3js } from "../api/hook";
 import React, { useEffect } from "react";
-import MyContract from "../contracts/Todolist.json";
-import { getListFun } from "../api/hook";
 
 const SHeader = styled.div`
   margin-bottom: 1px;
@@ -124,44 +122,16 @@ const Header = (props: IHeaderProps) => {
   const onSearch = () => console.log("value");
   const history = useHistory()
   const { pathname } = useLocation()
-  const { setAccounts, setContract } = useWeb3js()
+  const { setAccounts } = useWeb3js()
 
   useEffect(() => {
-    const deployedNetwork = (MyContract as any).networks[networkId]
-    if (deployedNetwork) {
-      const contract = new web3.eth.Contract(
-        MyContract.abi,
-        deployedNetwork && deployedNetwork.address,
-      );
-
-      setContract(contract)
-      console.log(contract)
-
-      contract.events.HandleList()
-        .on("connected", (subscriptionId: string) => {
-          console.log(subscriptionId, "events 已连接");
-          getList(contract)
-        })
-        .on('data', function (e: any) {
-          //setEvent(e)
-          //getList(contract)
-        })
-    } else {
-      setContract(null)
-    }
-  }, [networkId])
-
-  useEffect(() => {
-    setAccounts(props)
-  }, [props])
-
-
-
-  const getList = async (contract: any) => {
-    const list = await getListFun(contract);
-    console.log(list)
-    return list
-  };
+    if (!web3) return
+    setAccounts({
+      web3,
+      networkId,
+      address
+    })
+  }, [web3, networkId, address])
 
   return (
     <div className="flex items-center px-4 justify-end text-l fixed w-full header" onClick={() => {
