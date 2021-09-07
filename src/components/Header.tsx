@@ -6,7 +6,7 @@ import { Dropdown, Menu } from 'antd';
 import { useHistory } from "react-router";
 import { useLocation } from "react-router-dom";
 import { useWeb3js } from "../api/hook";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 const SHeader = styled.div`
   margin-bottom: 1px;

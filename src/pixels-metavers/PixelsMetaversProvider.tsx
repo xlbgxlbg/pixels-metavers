@@ -1,12 +1,11 @@
-import React, { useCallback, useEffect, createContext, ReactNode, useState, useContext, Dispatch, useRef, useMemo } from "react";
+import React, { useCallback, useEffect, createContext, ReactNode, useState, useContext, Dispatch, useRef } from "react";
 import Web3 from "web3";
 import PixelsMetaverseContract from "./contracts/Todolist.json";
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
-import { IConfigOptions, IPixelsMetaverseImgByPositionData, TData, TPostions } from "./PixelsMetaversImg";
+import { IConfigOptions, IPixelsMetaverseImgByPositionData, TPostions } from "./PixelsMetaversImg";
 import { Dictionary, isEmpty } from "lodash";
 import { useDealClick, useGetClickGradPosition } from "./canvasHook";
-import { stringRadixDeal } from "./utilities/radix";
 
 export const PixelsMetaverseContext = createContext(
   {} as {
@@ -117,6 +116,7 @@ export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGri
     sizeGrid: data.size === "small" ? size / 48 : size / 24,
     withGrid: !!showGrid,
     bgImg: "",
+    bgImgUp: "",
     bgColor: data.bgColor || "#638496",
     gridColor: data.gridColor || "white",
     isHandDraw: !!handDraw

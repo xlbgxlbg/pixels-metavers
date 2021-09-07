@@ -23,6 +23,7 @@ export interface IConfigOptions {
   imgSize: IImgSize,
   bgImg: CanvasImageSource | any,
   bgColor: string,
+  bgImgUp: CanvasImageSource | any, // 外面那一层的img
   isHandDraw?: boolean,
   gridColor?: string,
   drawColor?: string
@@ -124,7 +125,7 @@ export const PixelsMetaverseImgByPositionData = ({ data, size, showGrid, ...prop
 }
 
 export const PixelsMetaverseImgWithHandle = ({ address, size, showGrid, ...props }: IPixelsMetaverseImgByAddress) => {
-  const value = useGetPositionData(address)
+  //const value = useGetPositionData(address)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   return (
@@ -151,6 +152,7 @@ export const PixelsMetaverseHandleImg = ({ canvasRef, showBgImg, showGridColor, 
       const sort = gradToSort(position, config.imgSize.width, config.sizeGrid)
       const ponitColor = get16Color(config.drawColor || rgba)
       add(sort, ponitColor)
+      console.log(rgba, "rgba")
       if (!positionsArr.includes(sort)) {
         setPositionsArr(((pre) => ([...pre, sort])))
       }
@@ -223,7 +225,7 @@ export const PixelsMetaverseCanvas = ({
     setSize(canvas, config.imgSize)
     clearCanvas(canvas, context)
     if (config.imgSize.width > 1 && config.imgSize.height > 1 && config.sizeGrid >= 1) {
-      showBgImg && dealBgImg(canvas, context, config.bgImg)
+      //showBgImg && dealBgImg(canvas, context, config.bgImgUp)
       showGridColor && drawPixelsImg(config.imgSize, context, data, config.sizeGrid)
     }
     if (config.sizeGrid >= 1) {

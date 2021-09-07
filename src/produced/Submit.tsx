@@ -1,4 +1,4 @@
-import React, { ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { Tooltip, Select, message, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Dictionary, keys, map } from 'lodash';
@@ -58,11 +58,6 @@ export interface IMerchandise {
   amount: string;
   price: string;
   weight?: string
-}
-
-interface ISubmit {
-  value: Dictionary<string>
-  positions: number[];
 }
 
 export const SubminNFT = () => {

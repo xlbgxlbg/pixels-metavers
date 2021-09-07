@@ -1,7 +1,3 @@
-import earth from "../image/header.png"
-import mali from "../image/mali.png"
-import bg from "../image/bg.svg"
-import { HomeHeader } from "./Header";
 import { useHistory } from "react-router-dom";
 import { RefObject, useCallback, useEffect, useRef } from "react";
 

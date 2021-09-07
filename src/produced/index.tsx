@@ -8,9 +8,12 @@ import { AppstoreOutlined, ClearOutlined, DeleteOutlined, ExclamationCircleOutli
 import { SubminNFT } from "./Submit";
 import { PixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversImg";
 import { PixelsMetaverseHandleImgProvider, usePixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversProvider";
+import { CanvasSlicImg } from "../pixels-metavers/CanvasSlicImg";
 
 export const Controller = () => {
   const { setConfig, config, canvasRef, setPositionsArr, dealClick: { clear, value } } = usePixelsMetaverseHandleImg()
+
+  console.log(config?.sizeGrid, config?.withGrid, isEmpty(value), value, "config?.sizeGrid !== 20 && config?.withGrid && isEmpty(value)")
 
   return (
     <div
@@ -83,7 +86,7 @@ export const Controller = () => {
 }
 
 export const ProducedCore = () => {
-  const { setConfig, config, canvasRef, canvas2Ref } = usePixelsMetaverseHandleImg()
+  const { setConfig, config, canvasRef, canvas2Ref, dealClick: { setValue } } = usePixelsMetaverseHandleImg()
   const filedomRef = useRef<HTMLInputElement>(null)
   const [src, setSrc] = useState(localStorage.getItem("imgUrl") || "")
   const [url, setUrl] = useState(src)
@@ -102,6 +105,7 @@ export const ProducedCore = () => {
         let img = new Image()
         img.src = "" + bytes
         img.onload = function () {
+          setValue({})
           setConfig((pre) => ({ ...pre, bgImg: img }))
         }
       }
@@ -114,6 +118,7 @@ export const ProducedCore = () => {
     img.src = src
     img.crossOrigin = ""
     img.onload = function () {
+      setValue({})
       setConfig((pre) => ({ ...pre, bgImg: img }))
     }
   }
@@ -168,11 +173,15 @@ export const ProducedCore = () => {
                 canvasRef={canvasRef}
                 showBgImg
                 style={{
-                  backgroundColor: config.bgColor || "rgba(17, 24, 39, 1)",
+                  backgroundColor: "transparent",
                   border: "1px solid rgba(255, 255, 255, 0.5)",
                   cursor: "cell",
-                  boxShadow: "0px 0px 10px rgba(225,225,225,0.3)"
+                  boxShadow: "0px 0px 10px rgba(225,225,225,0.3)",
+                  zIndex: 1000
                 }} />}
+
+              {config?.bgImg && <CanvasSlicImg img={config?.bgImg} sizeGrid={config?.sizeGrid} />}
+
               <PixelsMetaverseHandleImg
                 canvasRef={canvas2Ref}
                 showGridColor

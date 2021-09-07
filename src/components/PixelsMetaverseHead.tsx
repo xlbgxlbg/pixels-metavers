@@ -2,13 +2,11 @@ import * as React from "react";
 import styled from "styled-components";
 import Web3 from "web3";
 import { convertUtf8ToHex } from "@walletconnect/utils";
-import MyContract from "../contracts/Todolist.json";
 
 import Web3Modal from "web3modal";
 // @ts-ignore
 import WalletConnectProvider from "@walletconnect/web3-provider";
 // @ts-ignore
-import Fortmatic from "fortmatic";
 import Authereum from "authereum";
 import { Bitski } from "bitski";
 
@@ -21,7 +19,6 @@ import {
   getChainData
 } from "../helpers/utilities";
 import { IAssetData, IBoxProfile } from "../helpers/types";
-import { fonts } from "../styles";
 import { openBox, getProfile } from "../helpers/box";
 import {
   ETH_SEND_TRANSACTION,
@@ -33,30 +30,12 @@ import {
 } from "../constants";
 import { callBalanceOf, callTransfer } from "../helpers/web3";
 
-import Button from "../components/Button";
-import Column from "../components/Column";
-import Wrapper from "../components/Wrapper";
 import Modal from "../components/Modal";
 import Header from "../components/Header";
 import Loader from "../components/Loader";
 import ModalResult from "../components/ModalResult";
-import AccountAssets from "../components/AccountAssets";
-import ConnectButton from "../components/ConnectButton";
 import getWeb3 from "../api/getWeb3";
-import { getListFun } from "../api/hook";
 
-const SLayout = styled.div`
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
-  text-align: center;
-`;
-
-const SContent = styled(Wrapper)`
-  width: 100%;
-  height: 100%;
-  padding: 0 16px;
-`;
 
 const SContainer = styled.div`
   height: 100%;
@@ -66,10 +45,6 @@ const SContainer = styled.div`
   justify-content: center;
   align-items: center;
   word-break: break-word;
-`;
-
-const SLanding = styled(Column)`
-  height: 600px;
 `;
 
 const SModalContainer = styled.div`
@@ -86,31 +61,6 @@ const SModalTitle = styled.div`
 
 const SModalParagraph = styled.p`
   margin-top: 30px;
-`;
-
-// @ts-ignore
-const SBalances = styled(SLanding)`
-  height: 100%;
-  & h3 {
-    padding-top: 30px;
-  }
-`;
-
-const STestButtonContainer = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-`;
-
-const STestButton = styled(Button)`
-  border-radius: 8px;
-  font-size: ${fonts.size.medium};
-  height: 44px;
-  width: 100%;
-  max-width: 175px;
-  margin: 12px;
 `;
 
 interface IAppState {
@@ -210,12 +160,6 @@ class PixelsMetaverseHead extends React.Component<any, any> {
       networkId
     });
     //await this.getAccountAssets();
-  };
-
-  public getList = async (contract: any) => {
-    const list = await getListFun(contract);
-    console.log(list)
-    return list
   };
 
   public subscribeProvider = async (provider: any) => {
@@ -548,7 +492,6 @@ class PixelsMetaverseHead extends React.Component<any, any> {
 
   public render = () => {
     const {
-      assets,
       address,
       connected,
       chainId,

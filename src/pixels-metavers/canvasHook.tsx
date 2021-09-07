@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { cloneDeep, Dictionary } from "lodash";
 import { IConfigOptions, IImgSize, TData } from "./PixelsMetaversImg";
 import { usePixelsMetaverseContract } from "./PixelsMetaversProvider";
 import { useGetListFun } from "./apiHook";
+import SLIC from "../canvas/js/SLIC.js"
 
 export const useDisplayGrad = () => {
   return useCallback((context: CanvasRenderingContext2D, config: IConfigOptions) => {

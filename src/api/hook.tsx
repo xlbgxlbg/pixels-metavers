@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, createContext, ReactNode, useState, useContext, Dispatch } from "react";
+import React, { useCallback, createContext, ReactNode, useState, useContext, Dispatch } from "react";
 
 export const Web3jsContext = createContext(
   {} as {

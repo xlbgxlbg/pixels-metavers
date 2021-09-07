@@ -1,5 +1,4 @@
-import React from "react";
-import { PixelsMetaverseHandleImg, PixelsMetaverseImgWithHandle } from "../pixels-metavers/PixelsMetaversImg";
+import { PixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversImg";
 import { usePixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversProvider";
 
 export const Avatar = () => {
@@ -7,7 +6,7 @@ export const Avatar = () => {
   
   return (
     <div className="m-4 card main-box" style={{ width: config.imgSize.width, height: config.imgSize.height, overflow: "hidden", minWidth: config.imgSize.width }}>
-      <PixelsMetaverseHandleImg canvasRef={canvas2Ref}/>
+      <PixelsMetaverseHandleImg canvasRef={canvas2Ref} showGridColor/>
     </div>
   );
 };
