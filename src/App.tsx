@@ -22,34 +22,34 @@ declare global {
 }
 
 export const Main = () => {
-  const { hash } = useLocation()
+  const { pathname } = useLocation()
   const { accounts } = useWeb3js()
 
   return (
-    <PixelsMetaverseContextProvider web3={accounts?.web3} networkId={accounts?.networkId}>
-      <div className="relative bg-white overflow-hidden" style={{ minWidth: 1400, minHeight: 600 }}>
-        <div className="relative w-full h-full min-h-screen mx-auto bg-no-repeat md:bg-contain bg-cover bg-gray-900"
-          style={{ backgroundImage: `url(${bgSvg})` }}>
-          {hash !== "#/" && <PixelsMetaverseHead />}
+    <div className="relative bg-white overflow-hidden" style={{ minWidth: 1400, minHeight: 600 }}>
+      <div className="relative w-full h-full min-h-screen mx-auto bg-no-repeat md:bg-contain bg-cover bg-gray-900"
+        style={{ backgroundImage: `url(${bgSvg})` }}>
+        <PixelsMetaverseContextProvider web3={accounts?.web3} networkId={accounts?.networkId}>
+          {pathname !== "/" && <PixelsMetaverseHead />}
           <Switch>
             <Route path="/app" component={PixelsMetaverse} />
             <Route path="/produced" component={Produced} />
             <Route path="/" component={Website} />
             <Route exact component={Website} />
           </Switch>
-        </div>
+        </PixelsMetaverseContextProvider>
       </div>
-    </PixelsMetaverseContextProvider>
+    </div>
   )
 }
 
 const App = () => {
   return (
-    <Web3jsProvider>
-      <HashRouter>
+    <HashRouter>
+      <Web3jsProvider>
         <Main />
-      </HashRouter>
-    </Web3jsProvider>
+      </Web3jsProvider>
+    </HashRouter>
   );
 }
 

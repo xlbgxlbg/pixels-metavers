@@ -1,8 +1,12 @@
-import React, { useCallback, useEffect, createContext, ReactNode, useState, useContext, Dispatch } from "react";
+import React, { useCallback, useEffect, createContext, ReactNode, useState, useContext, Dispatch, useRef, useMemo } from "react";
 import Web3 from "web3";
-import PixelsMetaverseContract from "./contracts/PixelsMetavers.json";
+import PixelsMetaverseContract from "./contracts/Todolist.json";
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
+import { IConfigOptions, IPixelsMetaverseImgByPositionData, TData, TPostions } from "./PixelsMetaversImg";
+import { Dictionary, isEmpty } from "lodash";
+import { useDealClick, useGetClickGradPosition } from "./canvasHook";
+import { stringRadixDeal } from "./utilities/radix";
 
 export const PixelsMetaverseContext = createContext(
   {} as {
@@ -81,34 +85,106 @@ export const PixelsMetaverseContextProvider = ({ children, web3, networkId }: { 
   )
 }
 
-export const useAdd = () => {
-  const { accounts, contract } = usePixelsMetaverseContract()
-  return useCallback(async (value: string) => {
-    if (!contract) return
-    await contract.methods.add(value).send({ from: accounts?.address });
-  }, [accounts, contract])
-}
-
-export const useDone = ({ accounts, contract }: { accounts: any, contract: any }) => {
-  return useCallback(async (value) => {
-    await contract.methods.done(Number(value)).send({ from: accounts[0] });
-  }, [])
-}
-
-export const useRemove = ({ accounts, contract }: { accounts: any, contract: any }) => {
-  return useCallback(async (value) => {
-    await contract.methods.remove(Number(value)).send({ from: accounts[0] });
-  }, [])
-}
-
-export const useGetListFun = () => {
-  return useCallback(async (contract: Contract, setValue: Dispatch<any>) => {
-    const len = await contract?.methods.getLength().call();
-    let list: any[] = [];
-    for (let i = 0; i < len; i++) {
-      let item = await contract?.methods.lists(i).call()
-      list.push(item)
+export const PixelsMetaverseHandleImgContext = createContext(
+  {} as {
+    canvasRef: React.RefObject<HTMLCanvasElement>;
+    canvas2Ref: React.RefObject<HTMLCanvasElement>;
+    config: IConfigOptions;
+    positions: TPostions;
+    positionsArr: number[];
+    setConfig: Dispatch<React.SetStateAction<IConfigOptions>>;
+    setPositions: Dispatch<React.SetStateAction<TPostions>>;
+    setPositionsArr: Dispatch<React.SetStateAction<number[]>>;
+    dealClick: {
+      value: Dictionary<string>;
+      add: (num: any, color: any) => void;
+      remove: (num: any) => void;
+      clear: () => void;
+      setValue: Dispatch<React.SetStateAction<Dictionary<string>>>
+    },
+    getGradPosition: (event: MouseEvent, canvas: HTMLCanvasElement | null) => {
+      x: number;
+      y: number;
     }
-    setValue(list)
-  }, [])
+  },
+);
+
+export const usePixelsMetaverseHandleImg = () => useContext(PixelsMetaverseHandleImgContext);
+
+export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGrid, handDraw }: { children: ReactNode } & IPixelsMetaverseImgByPositionData) => {
+  const [config, setConfig] = useState<IConfigOptions>({
+    imgSize: { width: size, height: size },
+    sizeGrid: data.size === "small" ? size / 48 : size / 24,
+    withGrid: !!showGrid,
+    bgImg: "",
+    bgColor: data.bgColor || "#638496",
+    gridColor: data.gridColor || "white",
+    isHandDraw: !!handDraw
+  });
+
+  const [positions, setPositions] = useState<TPostions>({})
+  const [positionsArr, setPositionsArr] = useState<number[]>([])
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const canvas2Ref = useRef<HTMLCanvasElement>(null)
+  const dealClick = useDealClick()
+  const getGradPosition = useGetClickGradPosition()
+
+  useEffect(() => {
+    if (!data.positions) return
+    if (!data.positions.includes("-")) return
+
+    const position = data.positions?.split("-")
+    let positionObj: Dictionary<string> = {}
+    let postionStr = ""
+    const len = position.length
+    const min = Number(position[len - 1])
+
+    for (let i = 0; i < len; i++) {
+      if (i === len - 1) continue
+
+      if (i % 2 === 0) {
+        postionStr = `${parseInt(position[i], 36).toString(16)}`
+        if (postionStr.length) {
+          let str = ""
+          for (let k = 0; k < 6 - postionStr.length; k++) {
+            str += "0"
+          }
+          postionStr = "#" + str + postionStr
+        }
+        continue
+      }
+
+      if (i % 2 === 1) {
+        const numArr = position[i].split("|")
+        for (let j = 0; j < numArr.length; j++) {
+          positionObj[Number(parseInt(numArr[j], 36)) + min] = postionStr
+        }
+        continue
+      }
+    }
+
+    setPositions(positionObj)
+  }, [data.positions])
+
+  useEffect(() => {
+    if (isEmpty(positions)) return
+    dealClick?.setValue(positions)
+  }, [positions])
+
+  return (
+    <PixelsMetaverseHandleImgContext.Provider value={{
+      config,
+      setConfig,
+      positions,
+      setPositions,
+      canvasRef,
+      dealClick,
+      canvas2Ref,
+      getGradPosition,
+      positionsArr,
+      setPositionsArr
+    }}>
+      {children}
+    </PixelsMetaverseHandleImgContext.Provider>
+  )
 }

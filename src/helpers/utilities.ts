@@ -5,7 +5,6 @@ import { apiGetGasPrices, apiGetAccountNonce } from "./api";
 import { convertAmountToRawNumber, convertStringToHex } from "./bignumber";
 import { message } from "antd";
 import { throttle } from "lodash";
-import { IPosition } from "../produced";
 
 export function capitalize(string: string): string {
   return string
@@ -223,15 +222,4 @@ export function getNums(number: number) {
     }
   }
   return nums;
-}
-
-export const positionToGrad = (point: IPosition, sizeGrid: number) => {
-  return {
-    x: Math.ceil((point.x / sizeGrid)),
-    y: Math.ceil((point.y / sizeGrid)),
-  }
-}
-
-export const gradToSort = (grad: IPosition, sizeGrid: number) => {
-  return grad.x + (grad.y - 1) * (480 / sizeGrid)
 }

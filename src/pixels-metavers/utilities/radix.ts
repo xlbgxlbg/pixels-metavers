@@ -2,6 +2,7 @@
 export const char = `0123456789abcdefghigklmnopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ/+)(*&^%$#@!{}><?;:"~=.,[]'·¥|`
 // char和char1必须严格相等，不然解析后就会出问题
 export const cha1 = `0123456789abcdefghigklmnopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ/+)(*&^%$#@!{}><?;:"~=.,[]'·¥|`
+
 export const stringRadixDeal = (strNumber: string, beforeRadix: number, afterRadix: number) => {
   let strRadix = ""
   try {
@@ -14,7 +15,6 @@ export const stringRadixDeal = (strNumber: string, beforeRadix: number, afterRad
       return strRadix
     }
     const get10Radix = String(stringOtherRadixTo10(strNumber, beforeRadix))
-    console.log(get10Radix, stringOtherRadixTo10(strNumber, beforeRadix),"fdasfdas")
     strRadix = string10ToOtherRadix(get10Radix, afterRadix)
   } catch (error) {
     console.error(error)

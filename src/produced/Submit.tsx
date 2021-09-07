@@ -1,17 +1,10 @@
 import React, { ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import { Form, Input, Button, Radio, Tooltip, Select, message, Modal } from 'antd';
-import { ExclamationCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { RequiredMark } from 'antd/lib/form/Form';
-import { Dictionary, keys, map, orderBy } from 'lodash';
-import { EHeader } from '../canvas';
-import { stringRadixDeal } from '../pixels-metavers/utilities.ts/radix';
-import { useAdd, usePixelsMetaverseContract } from '../pixels-metavers/PixelsMetaversProvider';
+import { Tooltip, Select, message, Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Dictionary, keys, map } from 'lodash';
+import { usePixelsMetaverseContract, usePixelsMetaverseHandleImg } from '../pixels-metavers/PixelsMetaversProvider';
+import { useAdd } from '../pixels-metavers/apiHook';
 const { Option } = Select;
-
-function handleChange(value: string) {
-  console.log(`selected ${value}`);
-}
-
 
 const Label = ({ children }: { children: ReactNode }) => {
   return <div className="pt-4">{children}<span className="text-red-500">&nbsp;*</span></div>
@@ -72,7 +65,8 @@ interface ISubmit {
   positions: number[];
 }
 
-export const SubminNFT = ({ value, positions }: ISubmit) => {
+export const SubminNFT = () => {
+  const { positionsArr, dealClick: { value } } = usePixelsMetaverseHandleImg()
   const [{
     name,
     category,
@@ -96,7 +90,7 @@ export const SubminNFT = ({ value, positions }: ISubmit) => {
     setIsModalVisible(false);
   }, [event])
 
-  const min = useMemo(() => Math.min(...positions), [positions])
+  const min = useMemo(() => Math.min(...positionsArr), [positionsArr])
 
   const handleOk = useCallback(() => {
     //const str17To92 = stringRadixDeal(positionData, 16, 36)
@@ -124,15 +118,15 @@ export const SubminNFT = ({ value, positions }: ISubmit) => {
 
   const colorsObj = useMemo(() => {
     const colors: Dictionary<number[]> = {}
-    map(positions, item => {
+    map(positionsArr, item => {
       colors[value[item]] ? colors[value[item]].push(item) : colors[value[item]] = [item]
     })
     return colors
-  }, [value, positions])
+  }, [value, positionsArr])
 
   const getPositionStr = useCallback(() => {
     let str = ""
-    let min = Math.min(...positions)
+    let min = Math.min(...positionsArr)
     const colorsArrBySort = keys(colorsObj).sort((a, b) => parseInt(a.slice(1), 16) - parseInt(b.slice(1), 16))
     console.log(colorsObj)
     for (let i = 0; i < colorsArrBySort.length; i++) {
@@ -143,7 +137,7 @@ export const SubminNFT = ({ value, positions }: ISubmit) => {
       //str += `${colorsArrBySort[i].slice(1)}${positions}`
     }
     return `${str}`
-  }, [value, positions, colorsObj, min])
+  }, [value, positionsArr, colorsObj, min])
 
   const checkData = useCallback(() => {
     /* if (!name) {
