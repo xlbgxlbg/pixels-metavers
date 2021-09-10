@@ -5,9 +5,6 @@ export default class SLIC {
         this.imageArray = Array.from(imageArray)
         this.width = width
         this.height = height
-        console.log("Total pixel :", this.width * this.height)
-        console.log("width :", width)
-        console.log("height: ", height)
     }
 
 
@@ -153,7 +150,6 @@ export default class SLIC {
     }
 
     computePixel() {
-        console.log("computing.............................")
         //Initialize cluster centers by sampling pixels at regualr grid step 
         this.clusterID = Array.from({ length: this.width * this.height }).map(item => item = -1)
         this.centers = new Array()
@@ -231,11 +227,9 @@ export default class SLIC {
                 }
             }
         }
-        console.log("compute done.............................")
     }
 
     pickPixel() {
-        console.log("paiting...................")
         // pick pixel 
         let row = Math.ceil(this.height / this.stride)
         let col = Math.ceil(this.width / this.stride)
@@ -280,7 +274,6 @@ export default class SLIC {
                 }
             }
         }
-        console.log("paiting done...................")
         return resultImage
     }
 
@@ -290,10 +283,6 @@ export default class SLIC {
         this.iters = iters
         this.stride = stride
         this.weight = weight
-        console.log("step :", step)
-        console.log("iters :", iters)
-        console.log("weight :", weight)
-        console.log("stride :", stride)
 
         //tranlate rgb to lab
         for (let i = 0; i < this.width * this.height; i += 4) {

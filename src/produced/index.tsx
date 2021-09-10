@@ -13,8 +13,6 @@ import { CanvasSlicImg } from "../pixels-metavers/CanvasSlicImg";
 export const Controller = () => {
   const { setConfig, config, canvasRef, setPositionsArr, dealClick: { clear, value } } = usePixelsMetaverseHandleImg()
 
-  console.log(config?.sizeGrid, config?.withGrid, isEmpty(value), value, "config?.sizeGrid !== 20 && config?.withGrid && isEmpty(value)")
-
   return (
     <div
       className="flex flex-col items-center text-gray-300 absolute py-4"
@@ -27,7 +25,7 @@ export const Controller = () => {
         boxShadow: "0px 0px 10px rgba(225,225,225,0.3)"
       }}
     >
-      <Tooltip placement="right" className="mb-4 cursor-pointer" title="大格子" color="#29303d">
+      {/* <Tooltip placement="right" className="mb-4 cursor-pointer" title="大格子" color="#29303d">
         <PlusCircleOutlined
           style={{
             color: config?.sizeGrid !== 20 && config?.withGrid && isEmpty(value) ? 'white' : "gray",
@@ -35,8 +33,8 @@ export const Controller = () => {
           }}
           onClick={() => { isEmpty(value) && setConfig((pre) => ({ ...pre, sizeGrid: 20 })) }}
         />
-      </Tooltip>
-      <Tooltip placement="right" className="mb-4 cursor-pointer" title="小格子" color="#29303d">
+      </Tooltip> */}
+      {/* <Tooltip placement="right" className="mb-4 cursor-pointer" title="小格子" color="#29303d">
         <MinusCircleOutlined
           style={{
             color: config?.sizeGrid !== 10 && config?.withGrid && isEmpty(value) ? 'white' : "gray",
@@ -44,7 +42,7 @@ export const Controller = () => {
           }}
           onClick={() => { isEmpty(value) && setConfig((pre) => ({ ...pre, sizeGrid: 10 })) }}
         />
-      </Tooltip>
+      </Tooltip> */}
       <Tooltip placement="right" className="mb-4 cursor-pointer" title={`${config?.withGrid ? "隐藏" : "显示"}辅助线`} color="#29303d" >
         <AppstoreOutlined style={{ color: config?.withGrid ? 'white' : "gray" }} onClick={() => {
           setConfig((pre) => ({ ...pre, withGrid: !config?.withGrid }))

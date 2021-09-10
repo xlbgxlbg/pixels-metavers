@@ -1,9 +1,9 @@
 import { ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { Tooltip, Select, message, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Dictionary, keys, map } from 'lodash';
+import { Dictionary, find, keys, map } from 'lodash';
 import { usePixelsMetaverseContract, usePixelsMetaverseHandleImg } from '../pixels-metavers/PixelsMetaversProvider';
-import { useAdd } from '../pixels-metavers/apiHook';
+import { useApplication, useGetGoodsList, usePostGoods } from '../pixels-metavers/apiHook';
 const { Option } = Select;
 
 const Label = ({ children }: { children: ReactNode }) => {
@@ -56,6 +56,7 @@ export interface IMerchandise {
   name: string;
   category: string,
   amount: string;
+  data?: string;
   price: string;
   weight?: string
 }
@@ -69,20 +70,26 @@ export const SubminNFT = () => {
     price,
     weight,
   }, setMerchandies] = useState<IMerchandise>({
-    name: "",
-    category: "",
-    amount: "",
-    price: "",
+    name: "卡姿兰大眼睛",
+    category: "eye",
+    amount: "10",
+    price: "0.01",
     weight: "",
   })
   const [positionData, setPostionData] = useState("")
+  const [shopName, setShopName] = useState("")
+  const [isMerchant, setIsMerchant] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { event } = usePixelsMetaverseContract()
+  const postGoods = usePostGoods()
+  const getShopList = useGetGoodsList()
+  const application = useApplication()
   //const radixFun = new (require("radix.js"));
 
   useEffect(() => {
-    console.log(event)
+    console.log(event, "submit")
     setIsModalVisible(false);
+    getShopList()
   }, [event])
 
   const min = useMemo(() => Math.min(...positionsArr), [positionsArr])
@@ -91,25 +98,25 @@ export const SubminNFT = () => {
     //const str17To92 = stringRadixDeal(positionData, 16, 36)
     //const str17 = stringRadixDeal(str17To92, 36, 16)
     const nftData = `${positionData}${min}`
-    console.log(nftData)
-    /* console.log(
-      {
-        name,
-        category,
-        amount,
-        price,
-        weight,
-      }
-    )
-    console.log(nftData) */
-    addd(nftData)
+    const data = {
+      name,
+      category,
+      amount,
+      price,
+      weight,
+      data: nftData
+    }
+    console.log(data)
+    let avatar = JSON.parse(localStorage.getItem("avatar") || "[]")
+    //find(avatar, item => item.data === nftData) || avatar.push(data)
+    //localStorage.setItem("avatar", JSON.stringify(avatar))
+    postGoods(avatar[0])
     //setIsModalVisible(false);
   }, [positionData, min]);
 
   const handleCancel = () => {
     setIsModalVisible(false);
   };
-  const addd = useAdd()
 
   const colorsObj = useMemo(() => {
     const colors: Dictionary<number[]> = {}
@@ -135,7 +142,7 @@ export const SubminNFT = () => {
   }, [value, positionsArr, colorsObj, min])
 
   const checkData = useCallback(() => {
-    /* if (!name) {
+    if (!name) {
       message.warn("请输入商品名称");
       return;
     }
@@ -150,7 +157,7 @@ export const SubminNFT = () => {
     if (!price) {
       message.warn("请输入商品价格");
       return;
-    } */
+    }
     return true;
   }, [name, category, amount, price]);
 
@@ -163,91 +170,115 @@ export const SubminNFT = () => {
         padding: 20
       }}>
       <div className="flex items-center text-2xl text-gray-300">发布商品&nbsp;
-      <Tooltip placement="right" className="cursor-pointer" title={`建议各部位分开创建，组合性更强。`} color="#29303d">
-          <ExclamationCircleOutlined />
-        </Tooltip></div>
-      <Label>商品名称</Label>
-      <input
-        className="search p-2 mt-1 pl-3 shangping"
-        style={{ width: "calc(300px - 40px)", background: "rgba(255, 255, 255, 0.2)", borderRadius: 4 }}
-        placeholder="请输入商品名称"
-        value={name}
-        maxLength={15}
-        onChange={(e) => { setMerchandies((pre) => ({ ...pre, name: e.target.value })) }}
-      />
-      <Label>商品种类</Label>
-      <Select
-        className="search select"
-        bordered={false}
-        dropdownClassName="bg-gray-300"
-        size="large"
-        style={{
-          width: "calc(300px - 40px)",
-          background: "rgba(255, 255, 255, 0.2)",
-          height: 40,
-          outline: "none", borderRadius: 4,
-          fontSize: 14,
-          color: "rgba(255, 255, 255, 0.1) !important",
-          paddingLeft: 0
-        }}
-        placeholder="请选择商品种类"
-        optionFilterProp="children"
-        onChange={(e: string) => { setMerchandies((pre) => ({ ...pre, category: e })) }}
-      >
-        {
-          map(categoryData, item => <Option key={item.value} value={item.value}>{item.label}</Option>)
-        }
-      </Select>
-      <Label>商品数量</Label>
-      <input
-        className="search p-2 mt-1 pl-3 shangping"
-        style={{ width: "calc(300px - 40px)", background: "rgba(255, 255, 255, 0.2)", borderRadius: 4 }}
-        placeholder="请输入商品数量"
-        value={amount}
-        maxLength={10}
-        onChange={(e) => { setMerchandies((pre) => ({ ...pre, amount: mustNum(e) })) }}
-      />
-      <Label>商品价格</Label>
-      <input
-        className="search p-2 mt-1 pl-3 shangping"
-        style={{ width: "calc(300px - 40px)", background: "rgba(255, 255, 255, 0.2)", borderRadius: 4 }}
-        placeholder="请输入商品价格"
-        value={price}
-        maxLength={18}
-        onChange={(e) => { setMerchandies((pre) => ({ ...pre, price: mustNum(e) })) }}
-      />
-      <div className="flex items-center mt-4 shangping">
-        <div>商品权重</div>
-        <Tooltip placement="top" className="cursor-pointer" title={`商品权重指当前商品在商家自己的商店中的排名，权重越高排名越靠前。`} color="#29303d">
+          <Tooltip placement="right" className="cursor-pointer" title={`建议各部位分开创建，组合性更强。`} color="#29303d">
           <ExclamationCircleOutlined />
         </Tooltip>
       </div>
-      <input
-        className="search p-2 mt-1 pl-3 shangping"
-        style={{ width: "calc(300px - 40px)", background: "rgba(255, 255, 255, 0.2)", borderRadius: 4 }}
-        placeholder="请输入商品权重"
-        value={weight}
-        maxLength={18}
-        onChange={(e) => { setMerchandies((pre) => ({ ...pre, weight: mustNum(e) })) }}
-      />
-      <div className="flex justify-center items-center h-10 mt-6 text-white cursor-pointer bg-red-500" style={{ width: "calc(300px - 40px)", borderRadius: 4 }}
-        onClick={() => {
-          const is = checkData()
-          if (!is) return
-          const positionData = getPositionStr()
-          setPostionData(positionData)
-          if (!positionData) {
-            message.warn("请绘制商品");
-            return;
+      {isMerchant ? <div>
+        <Label>商品名称</Label>
+        <input
+          className="search p-2 mt-1 pl-3 shangping"
+          style={{ width: "calc(300px - 40px)", background: "rgba(255, 255, 255, 0.2)", borderRadius: 4 }}
+          placeholder="请输入商品名称"
+          value={name}
+          maxLength={15}
+          onChange={(e) => { setMerchandies((pre) => ({ ...pre, name: e.target.value })) }}
+        />
+        <Label>商品种类</Label>
+        <Select
+          className="search select"
+          bordered={false}
+          dropdownClassName="bg-gray-300"
+          size="large"
+          style={{
+            width: "calc(300px - 40px)",
+            background: "rgba(255, 255, 255, 0.2)",
+            height: 40,
+            outline: "none", borderRadius: 4,
+            fontSize: 14,
+            color: "rgba(255, 255, 255, 0.1) !important",
+            paddingLeft: 0
+          }}
+          defaultValue={category}
+          placeholder="请选择商品种类"
+          optionFilterProp="children"
+          onChange={(e: string) => { setMerchandies((pre) => ({ ...pre, category: e })) }}
+        >
+          {
+            map(categoryData, item => <Option key={item.value} value={item.value}>{item.label}</Option>)
           }
-          setIsModalVisible(true);
-        }}
-      >发布</div>
+        </Select>
+        <Label>商品数量</Label>
+        <input
+          className="search p-2 mt-1 pl-3 shangping"
+          style={{ width: "calc(300px - 40px)", background: "rgba(255, 255, 255, 0.2)", borderRadius: 4 }}
+          placeholder="请输入商品数量"
+          value={amount}
+          maxLength={10}
+          onChange={(e) => { setMerchandies((pre) => ({ ...pre, amount: mustNum(e) })) }}
+        />
+        <Label>商品价格</Label>
+        <input
+          className="search p-2 mt-1 pl-3 shangping"
+          style={{ width: "calc(300px - 40px)", background: "rgba(255, 255, 255, 0.2)", borderRadius: 4 }}
+          placeholder="请输入商品价格"
+          value={price}
+          maxLength={18}
+          onChange={(e) => { setMerchandies((pre) => ({ ...pre, price: mustNum(e) })) }}
+        />
+        <div className="flex items-center mt-4 shangping">
+          <div>商品权重</div>
+          <Tooltip placement="top" className="cursor-pointer" title={`商品权重指当前商品在商家自己的商店中的排名，权重越高排名越靠前。`} color="#29303d">
+            <ExclamationCircleOutlined />
+          </Tooltip>
+        </div>
+        <input
+          className="search p-2 mt-1 pl-3 shangping"
+          style={{ width: "calc(300px - 40px)", background: "rgba(255, 255, 255, 0.2)", borderRadius: 4 }}
+          placeholder="请输入商品权重"
+          value={weight}
+          maxLength={18}
+          onChange={(e) => { setMerchandies((pre) => ({ ...pre, weight: mustNum(e) })) }}
+        />
+        <div className="flex justify-center items-center h-10 mt-6 text-white cursor-pointer bg-red-500" style={{ width: "100%", borderRadius: 4 }}
+          onClick={() => {
+            const is = checkData()
+            if (!is) return
+            const positionData = getPositionStr()
+            setPostionData(positionData)
+            if (!positionData) {
+              message.warn("请绘制商品");
+              return;
+            }
+            setIsModalVisible(true);
+          }}
+        >发布</div>
+      </div> : <div>
+        <Label>店铺名称</Label>
+        <input
+          className="search p-2 mt-1 pl-3 shangping"
+          style={{ width: "calc(300px - 40px)", background: "rgba(255, 255, 255, 0.2)", borderRadius: 4 }}
+          placeholder="请输入店铺名称"
+          value={shopName}
+          maxLength={15}
+          onChange={(e) => { setShopName(e.target.value) }}
+        />
+        <div className="flex justify-center items-center h-10 mt-6 text-white cursor-pointer bg-red-500" style={{ width: "100%", borderRadius: 4 }}
+          onClick={() => {
+            if (!shopName) {
+              message.warn("请输入店铺名称");
+              return;
+            }
+            application(shopName)
+          }}
+        >申请入驻</div>
+      </div>}
+
       <Modal title="是否发布商品" okText={positionData?.length >= 64 ? "资产多，我不担心，硬核提交" : "确认"} cancelText="取消" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <p>是否确认发布该商品？</p>
         {/* <p>{`ID${positionData}`}</p> */}
         <p>{positionData?.length >= 50 && "当前数据量较大，可能消耗的GAS较多，且有可能提交不成功，请问是否继续提交数据？"}</p>
       </Modal>
-    </div>
+    </div >
   );
 };

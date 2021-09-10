@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, createContext, ReactNode, useState, useContext, Dispatch, useRef } from "react";
 import Web3 from "web3";
-import PixelsMetaverseContract from "./contracts/Todolist.json";
+import PixelsMetaverseContract from "./contracts/PixelsMetavers.json";
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
 import { IConfigOptions, IPixelsMetaverseImgByPositionData, TPostions } from "./PixelsMetaversImg";
@@ -44,6 +44,7 @@ export const useGetContractInfo = (web3: Web3, networkId: number) => {
 
       contract.events.HandleList()
         .on("connected", (subscriptionId: string) => {
+          console.log(contract)
           console.log(subscriptionId, "Events 已连接");
         })
         .on('data', function (e: any) {
@@ -51,7 +52,7 @@ export const useGetContractInfo = (web3: Web3, networkId: number) => {
         })
     } else {
       setContract(undefined)
-      alert("暂无该网络像素元宇宙合约")
+      alert("暂无该网络像素元宇宙合约，请切换至Ropsten网络查看")
     }
   }, [web3, networkId])
 }
@@ -151,7 +152,6 @@ export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGri
           }
           postionStr = "#" + str + postionStr
         }
-        continue
       }
 
       if (i % 2 === 1) {
@@ -159,7 +159,6 @@ export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGri
         for (let j = 0; j < numArr.length; j++) {
           positionObj[Number(parseInt(numArr[j], 36)) + min] = postionStr
         }
-        continue
       }
     }
 
@@ -172,18 +171,20 @@ export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGri
   }, [positions])
 
   return (
-    <PixelsMetaverseHandleImgContext.Provider value={{
-      config,
-      setConfig,
-      positions,
-      setPositions,
-      canvasRef,
-      dealClick,
-      canvas2Ref,
-      getGradPosition,
-      positionsArr,
-      setPositionsArr
-    }}>
+    <PixelsMetaverseHandleImgContext.Provider
+      value={{
+        config,
+        setConfig,
+        positions,
+        setPositions,
+        canvasRef,
+        dealClick,
+        canvas2Ref,
+        getGradPosition,
+        positionsArr,
+        setPositionsArr
+      }}
+    >
       {children}
     </PixelsMetaverseHandleImgContext.Provider>
   )

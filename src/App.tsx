@@ -7,6 +7,7 @@ import PixelsMetaverseHead from './components/PixelsMetaverseHead';
 import { useWeb3js, Web3jsProvider } from './api/hook';
 import { PixelsMetaverseContextProvider } from './pixels-metavers/PixelsMetaversProvider';
 import bgSvg from "./image/bg.svg"
+import { Application } from './application';
 
 declare global {
   // tslint:disable-next-line

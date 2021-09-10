@@ -8,20 +8,19 @@ export const stringRadixDeal = (strNumber: string, beforeRadix: number, afterRad
   try {
     if (beforeRadix === 10) {
       strRadix = string10ToOtherRadix(strNumber, afterRadix)
-      return strRadix
-    }
-    if (afterRadix === 10) {
+    } else if (afterRadix === 10) {
       strRadix = String(stringOtherRadixTo10(strNumber, beforeRadix))
-      return strRadix
+    } else {
+      const get10Radix = String(stringOtherRadixTo10(strNumber, beforeRadix))
+      strRadix = string10ToOtherRadix(get10Radix, afterRadix)
     }
-    const get10Radix = String(stringOtherRadixTo10(strNumber, beforeRadix))
-    strRadix = string10ToOtherRadix(get10Radix, afterRadix)
   } catch (error) {
     console.error(error)
   }
   return strRadix
 }
 
+//将其他进制转换成10进制
 export const stringOtherRadixTo10 = (strNumber: string, beforeRadix: number) => {
   let res = BigInt(0), len = strNumber.length;
   const radixBig = BigInt(beforeRadix)
@@ -37,7 +36,7 @@ export const stringOtherRadixTo10 = (strNumber: string, beforeRadix: number) => 
   return res;
 }
 
-//将10进制数转换成92进制
+//将10进制数转换成其他
 export function string10ToOtherRadix(strNumber: string, afterRadix: number) {
   if (strNumber.length === 2) return ""
   let chars = char.slice(0, afterRadix).split(""),

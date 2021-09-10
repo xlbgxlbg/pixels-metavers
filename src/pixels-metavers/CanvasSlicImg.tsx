@@ -25,7 +25,6 @@ export const CanvasSlicImg = ({ img, sizeGrid }: { img: HTMLImageElement, sizeGr
       context = canvas.getContext("2d") as CanvasRenderingContext2D
     }
     if (canvas && context) {
-      console.log(344567)
       loadProduced({
         canvas,
         context,
@@ -51,7 +50,6 @@ export const CanvasSlicImg = ({ img, sizeGrid }: { img: HTMLImageElement, sizeGr
     const canvas2 = canvas2Ref.current
     if (canvas && canvas2) {
       const imgURL = canvas2.toDataURL("image/jpeg")
-      console.log(imgURL)
       if (!imgURL) return
       let img = new Image()
       img.src = imgURL

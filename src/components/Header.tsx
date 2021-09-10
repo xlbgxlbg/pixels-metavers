@@ -97,7 +97,7 @@ const menu = () => {
       </a>
       </Menu.Item>
       <Menu.Item>
-        <a rel="noopener noreferrer" href="/#/">
+        <a rel="noopener noreferrer" href="/#/application">
           申请入驻
       </a>
       </Menu.Item>
