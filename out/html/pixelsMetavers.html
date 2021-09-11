@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta http-equiv="content-type" content="text/html;charset=UTF-8" />   
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truffle Contract Page</title>
+    <script src="https://unpkg.com/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="../js/pixelsMetavers.js"></script>
+    <script src="../contract.js"></script>
+</head>
+
+<body>
+    <script>
+        getContract(pixelsMetavers)
+    </script>
+    <div>
+	
+        <script>
+            async function getassetsObjvalue() {
+              
+              const dom0 = document.getElementById("assetsObjparamas")
+              if(dom0.value === ""){
+                window.alert("assetsObj值为空")
+                return
+              }
+              
+              const dom1 = document.getElementById("assetsObjparamas")
+              if(dom1.value === ""){
+                window.alert("assetsObj值为空")
+                return
+              }
+              
+              const data = await contract.methods.assetsObj(dom0.value,dom1.value,).call();
+        const dom = document.getElementById("assetsObj");
+		dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data) 
+		getAllFunData()
+        console.log("assetsObj", data)
+      }
+        </script>
+  <button style="margin: 10px" onclick="getassetsObjvalue()">
+    assetsObj
+  </button>
+
+            <input id = "assetsObjparamas" placeholder="address" type="string"/>
+            
+            <input id = "assetsObjparamas" placeholder="uint256" type="number"/>
+            
+        <span id="assetsObj">
+                  </span>
+    </div >
+  
+    <div>
+	
+        <script>
+            async function getgoodsListvalue() {
+              
+              const dom0 = document.getElementById("goodsListparamas")
+              if(dom0.value === ""){
+                window.alert("goodsList值为空")
+                return
+              }
+              
+              const data = await contract.methods.goodsList(dom0.value,).call();
+        const dom = document.getElementById("goodsList");
+		dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data) 
+		getAllFunData()
+        console.log("goodsList", data)
+      }
+        </script>
+  <button style="margin: 10px" onclick="getgoodsListvalue()">
+    goodsList
+  </button>
+
+            <input id = "goodsListparamas" placeholder="uint256" type="number"/>
+            
+        <span id="goodsList">
+                  </span>
+    </div >
+  
+    <div>
+	
+        <script>
+            async function getgoodsObjvalue() {
+              
+              const dom0 = document.getElementById("goodsObjparamas")
+              if(dom0.value === ""){
+                window.alert("goodsObj值为空")
+                return
+              }
+              
+              const data = await contract.methods.goodsObj(dom0.value,).call();
+        const dom = document.getElementById("goodsObj");
+		dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data) 
+		getAllFunData()
+        console.log("goodsObj", data)
+      }
+        </script>
+  <button style="margin: 10px" onclick="getgoodsObjvalue()">
+    goodsObj
+  </button>
+
+            <input id = "goodsObjparamas" placeholder="uint256" type="number"/>
+            
+        <span id="goodsObj">
+                  </span>
+    </div >
+  
+    <div>
+	
+        <script>
+            async function getshopListvalue() {
+              
+              const dom0 = document.getElementById("shopListparamas")
+              if(dom0.value === ""){
+                window.alert("shopList值为空")
+                return
+              }
+              
+              const data = await contract.methods.shopList(dom0.value,).call();
+        const dom = document.getElementById("shopList");
+		dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data) 
+		getAllFunData()
+        console.log("shopList", data)
+      }
+        </script>
+  <button style="margin: 10px" onclick="getshopListvalue()">
+    shopList
+  </button>
+
+            <input id = "shopListparamas" placeholder="uint256" type="number"/>
+            
+        <span id="shopList">
+                  </span>
+    </div >
+  
+    <div>
+	
+        <script>
+            async function getshopObjvalue() {
+              
+              const dom0 = document.getElementById("shopObjparamas")
+              if(dom0.value === ""){
+                window.alert("shopObj值为空")
+                return
+              }
+              
+              const data = await contract.methods.shopObj(dom0.value,).call();
+        const dom = document.getElementById("shopObj");
+		dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data) 
+		getAllFunData()
+        console.log("shopObj", data)
+      }
+        </script>
+  <button style="margin: 10px" onclick="getshopObjvalue()">
+    shopObj
+  </button>
+
+            <input id = "shopObjparamas" placeholder="address" type="string"/>
+            
+        <span id="shopObj">
+                  </span>
+    </div >
+  
+    <div>
+	
+        <script>
+            async function getuserListvalue() {
+              
+              const dom0 = document.getElementById("userListparamas")
+              if(dom0.value === ""){
+                window.alert("userList值为空")
+                return
+              }
+              
+              const data = await contract.methods.userList(dom0.value,).call();
+        const dom = document.getElementById("userList");
+		dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data) 
+		getAllFunData()
+        console.log("userList", data)
+      }
+        </script>
+  <button style="margin: 10px" onclick="getuserListvalue()">
+    userList
+  </button>
+
+            <input id = "userListparamas" placeholder="uint256" type="number"/>
+            
+        <span id="userList">
+                  </span>
+    </div >
+  
+    <div>
+	
+        <script>
+            async function getuserObjvalue() {
+              
+              const dom0 = document.getElementById("userObjparamas")
+              if(dom0.value === ""){
+                window.alert("userObj值为空")
+                return
+              }
+              
+              const data = await contract.methods.userObj(dom0.value,).call();
+        const dom = document.getElementById("userObj");
+		dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data) 
+		getAllFunData()
+        console.log("userObj", data)
+      }
+        </script>
+  <button style="margin: 10px" onclick="getuserObjvalue()">
+    userObj
+  </button>
+
+            <input id = "userObjparamas" placeholder="address" type="string"/>
+            
+        <span id="userObj">
+                  </span>
+    </div >
+  
+    <div>
+	
+  <script>
+  async function getmintvalue() {
+  const data = await contract.methods.mint().send({ from: accounts[0] });
+  const dom = document.getElementById("mint");
+  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
+  console.log("mint", data)
+}
+        </script>
+  <button style="margin: 10px" onclick="getmintvalue()">
+    mint
+  </button>
+  <span id="mint">
+  </span>
+		
+    </div >
+  
+    <div>
+	
+  <script>
+  async function getregistervalue() {
+  const data = await contract.methods.register().send({ from: accounts[0] });
+  const dom = document.getElementById("register");
+  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
+  console.log("register", data)
+}
+        </script>
+  <button style="margin: 10px" onclick="getregistervalue()">
+    register
+  </button>
+  <span id="register">
+  </span>
+		
+    </div >
+  
+    <div>
+	
+        <script>
+            async function getsetConfigvalue() {
+              
+              const dom0 = document.getElementById("setConfigbgColorparamas")
+              if(dom0.value === ""){
+                window.alert("setConfig值为空")
+                return
+              }
+              
+              const dom1 = document.getElementById("setConfiggridColorparamas")
+              if(dom1.value === ""){
+                window.alert("setConfig值为空")
+                return
+              }
+              
+              const dom2 = document.getElementById("setConfigwithGridparamas")
+              if(dom2.value === ""){
+                window.alert("setConfig值为空")
+                return
+              }
+              
+              const dom3 = document.getElementById("setConfiguserIndexparamas")
+              if(dom3.value === ""){
+                window.alert("setConfig值为空")
+                return
+              }
+              
+              const data = await contract.methods.setConfig(dom0.value,dom1.value,dom2.value,dom3.value,).send({ from: accounts[0] });
+        const dom = document.getElementById("setConfig");
+		dom.innerHTML = true 
+		getAllFunData()
+        console.log("setConfig", data)
+      }
+        </script>
+  <button style="margin: 10px" onclick="getsetConfigvalue()">
+    setConfig
+  </button>
+
+            <input id = "setConfigbgColorparamas" placeholder="bgColor" type="string"/>
+            
+            <input id = "setConfiggridColorparamas" placeholder="gridColor" type="string"/>
+            
+            <input id = "setConfigwithGridparamas" placeholder="withGrid" type="string"/>
+            
+            <input id = "setConfiguserIndexparamas" placeholder="userIndex" type="number"/>
+            
+        <span id="setConfig">
+                  </span>
+    </div >
+  
+    <div>
+	
+        <script>
+            async function getapplicationvalue() {
+              
+              const dom0 = document.getElementById("applicationnameparamas")
+              if(dom0.value === ""){
+                window.alert("application值为空")
+                return
+              }
+              
+              const dom1 = document.getElementById("applicationuserIndexparamas")
+              if(dom1.value === ""){
+                window.alert("application值为空")
+                return
+              }
+              
+              const data = await contract.methods.application(dom0.value,dom1.value,).send({ from: accounts[0] });
+        const dom = document.getElementById("application");
+		dom.innerHTML = true 
+		getAllFunData()
+        console.log("application", data)
+      }
+        </script>
+  <button style="margin: 10px" onclick="getapplicationvalue()">
+    application
+  </button>
+
+            <input id = "applicationnameparamas" placeholder="name" type="string"/>
+            
+            <input id = "applicationuserIndexparamas" placeholder="userIndex" type="number"/>
+            
+        <span id="application">
+                  </span>
+    </div >
+  
+    <div>
+	
+  <script>
+  async function getgetUserLengthvalue() {
+  const data = await contract.methods.getUserLength().call();
+  const dom = document.getElementById("getUserLength");
+  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
+  console.log("getUserLength", data)
+}
+        </script>
+  <button style="margin: 10px" onclick="getgetUserLengthvalue()">
+    getUserLength
+  </button>
+  <span id="getUserLength">
+  </span>
+		
+    </div >
+  
+    <div>
+	
+  <script>
+  async function getgetShopLengthvalue() {
+  const data = await contract.methods.getShopLength().call();
+  const dom = document.getElementById("getShopLength");
+  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
+  console.log("getShopLength", data)
+}
+        </script>
+  <button style="margin: 10px" onclick="getgetShopLengthvalue()">
+    getShopLength
+  </button>
+  <span id="getShopLength">
+  </span>
+		
+    </div >
+  
+    <div>
+	
+  <script>
+  async function getgetGoodsLengthvalue() {
+  const data = await contract.methods.getGoodsLength().call();
+  const dom = document.getElementById("getGoodsLength");
+  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
+  console.log("getGoodsLength", data)
+}
+        </script>
+  <button style="margin: 10px" onclick="getgetGoodsLengthvalue()">
+    getGoodsLength
+  </button>
+  <span id="getGoodsLength">
+  </span>
+		
+    </div >
+  
+    <div>
+	
+        <script>
+            async function getpostGoodsvalue() {
+              
+              const dom0 = document.getElementById("postGoodsnameparamas")
+              if(dom0.value === ""){
+                window.alert("postGoods值为空")
+                return
+              }
+              
+              const dom1 = document.getElementById("postGoodscategoryparamas")
+              if(dom1.value === ""){
+                window.alert("postGoods值为空")
+                return
+              }
+              
+              const dom2 = document.getElementById("postGoodsdataparamas")
+              if(dom2.value === ""){
+                window.alert("postGoods值为空")
+                return
+              }
+              
+              const dom3 = document.getElementById("postGoodspriceparamas")
+              if(dom3.value === ""){
+                window.alert("postGoods值为空")
+                return
+              }
+              
+              const dom4 = document.getElementById("postGoodsamountparamas")
+              if(dom4.value === ""){
+                window.alert("postGoods值为空")
+                return
+              }
+              
+              const data = await contract.methods.postGoods(dom0.value,dom1.value,dom2.value,dom3.value,dom4.value,).send({ from: accounts[0] });
+        const dom = document.getElementById("postGoods");
+		dom.innerHTML = true 
+		getAllFunData()
+        console.log("postGoods", data)
+      }
+        </script>
+  <button style="margin: 10px" onclick="getpostGoodsvalue()">
+    postGoods
+  </button>
+
+            <input id = "postGoodsnameparamas" placeholder="name" type="string"/>
+            
+            <input id = "postGoodscategoryparamas" placeholder="category" type="string"/>
+            
+            <input id = "postGoodsdataparamas" placeholder="data" type="string"/>
+            
+            <input id = "postGoodspriceparamas" placeholder="price" type="number"/>
+            
+            <input id = "postGoodsamountparamas" placeholder="amount" type="number"/>
+            
+        <span id="postGoods">
+                  </span>
+    </div >
+  
+    <div>
+	
+        <script>
+            async function getbuyGoodsvalue() {
+              
+              const dom0 = document.getElementById("buyGoodsidparamas")
+              if(dom0.value === ""){
+                window.alert("buyGoods值为空")
+                return
+              }
+              
+              const dom1 = document.getElementById("buyGoodsgoodsIndexparamas")
+              if(dom1.value === ""){
+                window.alert("buyGoods值为空")
+                return
+              }
+              
+              const data = await contract.methods.buyGoods(dom0.value,dom1.value,).send({ from: accounts[0], value: 10000000000000000 });
+        const dom = document.getElementById("buyGoods");
+		dom.innerHTML = true 
+		getAllFunData()
+        console.log("buyGoods", data)
+      }
+        </script>
+  <button style="margin: 10px" onclick="getbuyGoodsvalue()">
+    buyGoods
+  </button>
+
+            <input id = "buyGoodsidparamas" placeholder="id" type="number"/>
+            
+            <input id = "buyGoodsgoodsIndexparamas" placeholder="goodsIndex" type="number"/>
+            
+        <span id="buyGoods">
+                  </span>
+    </div >
+  
+    <div>
+	
+        <script>
+            async function getsetPMT721value() {
+              
+              const dom0 = document.getElementById("setPMT721pmt721paramas")
+              if(dom0.value === ""){
+                window.alert("setPMT721值为空")
+                return
+              }
+              
+              const data = await contract.methods.setPMT721(dom0.value,).send({ from: accounts[0] });
+        const dom = document.getElementById("setPMT721");
+		dom.innerHTML = true 
+		getAllFunData()
+        console.log("setPMT721", data)
+      }
+        </script>
+  <button style="margin: 10px" onclick="getsetPMT721value()">
+    setPMT721
+  </button>
+
+            <input id = "setPMT721pmt721paramas" placeholder="pmt721" type="string"/>
+            
+        <span id="setPMT721">
+                  </span>
+    </div >
+  
+    <div>
+	
+  <script>
+  async function getgetContractAddressvalue() {
+  const data = await contract.methods.getContractAddress().call();
+  const dom = document.getElementById("getContractAddress");
+  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
+  console.log("getContractAddress", data)
+}
+        </script>
+  <button style="margin: 10px" onclick="getgetContractAddressvalue()">
+    getContractAddress
+  </button>
+  <span id="getContractAddress">
+  </span>
+		
+    </div >
+  
+    <div>
+	
+        <script>
+            async function gettransvalue() {
+              
+              const dom0 = document.getElementById("transidparamas")
+              if(dom0.value === ""){
+                window.alert("trans值为空")
+                return
+              }
+              
+              const data = await contract.methods.trans(dom0.value,).send({ from: accounts[0] });
+        const dom = document.getElementById("trans");
+		dom.innerHTML = true 
+		getAllFunData()
+        console.log("trans", data)
+      }
+        </script>
+  <button style="margin: 10px" onclick="gettransvalue()">
+    trans
+  </button>
+
+            <input id = "transidparamas" placeholder="id" type="number"/>
+            
+        <span id="trans">
+                  </span>
+    </div >
+  
+	<script>
+		let allFunArrList = [getgetUserLengthvalue,getgetShopLengthvalue,getgetGoodsLengthvalue,getgetContractAddressvalue,]
+	function getAllFunData(){
+		for(let i=0; i<allFunArrList.length; i++){
+			allFunArrList[i]()
+		}
+	}
+	</script>
+
+</body >
+  <html>

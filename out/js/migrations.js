@@ -1,4 +1,4 @@
-{
+const migrations = {
   "contractName": "Migrations",
   "abi": [
     {

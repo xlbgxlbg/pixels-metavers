@@ -69,7 +69,6 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
-
 开发计划
 8月30日 完成项目前端项目的搭建和完成首页开发
 8月31日 完成游戏页面包括图片面板，左侧装扮面板和右侧商家面板
@@ -158,3 +157,5 @@ NFT表：{
         }
     ]
 }
+
+商品id就是tokenID, tokenID跟着地址走 地址跟着私钥走

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta http-equiv="content-type" content="text/html;charset=UTF-8" />   
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truffle Contract Page</title>
+    <script src="https://unpkg.com/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="../js/migrations.js"></script>
+    <script src="../contract.js"></script>
+</head>
+
+<body>
+    <script>
+        getContract(migrations)
+    </script>
+    <div>
+	
+  <script>
+  async function getlast_completed_migrationvalue() {
+  const data = await contract.methods.last_completed_migration().call();
+  const dom = document.getElementById("last_completed_migration");
+  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
+  console.log("last_completed_migration", data)
+}
+        </script>
+  <button style="margin: 10px" onclick="getlast_completed_migrationvalue()">
+    last_completed_migration
+  </button>
+  <span id="last_completed_migration">
+  </span>
+		
+    </div >
+  
+    <div>
+	
+  <script>
+  async function getownervalue() {
+  const data = await contract.methods.owner().call();
+  const dom = document.getElementById("owner");
+  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
+  console.log("owner", data)
+}
+        </script>
+  <button style="margin: 10px" onclick="getownervalue()">
+    owner
+  </button>
+  <span id="owner">
+  </span>
+		
+    </div >
+  
+    <div>
+	
+        <script>
+            async function getsetCompletedvalue() {
+              
+              const dom0 = document.getElementById("setCompletedcompletedparamas")
+              if(dom0.value === ""){
+                window.alert("setCompleted值为空")
+                return
+              }
+              
+              const data = await contract.methods.setCompleted(dom0.value,).send({ from: accounts[0] });
+        const dom = document.getElementById("setCompleted");
+		dom.innerHTML = true 
+		getAllFunData()
+        console.log("setCompleted", data)
+      }
+        </script>
+  <button style="margin: 10px" onclick="getsetCompletedvalue()">
+    setCompleted
+  </button>
+
+            <input id = "setCompletedcompletedparamas" placeholder="completed" type="number"/>
+            
+        <span id="setCompleted">
+                  </span>
+    </div >
+  
+	<script>
+		let allFunArrList = [getlast_completed_migrationvalue,getownervalue,]
+	function getAllFunData(){
+		for(let i=0; i<allFunArrList.length; i++){
+			allFunArrList[i]()
+		}
+	}
+	</script>
+
+</body >
+  <html>

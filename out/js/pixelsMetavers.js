@@ -1,4 +1,4 @@
-{
+const pixelsMetavers = {
   "contractName": "PixelsMetavers",
   "abi": [
     {

@@ -1,48 +1,48 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
+import "./IPMT721.sol";
+
 contract PixelsMetavers {
-    uint256 _goodsIds;
+    IPMT721 PMT721;
 
     struct AssetsStruct {
         string category;
         string data;
         uint256 id;
         bool isOutfit; //衣服, 装备, 服装, 外套, 行头, 打扮
+        uint256 index;
     }
-    mapping(address => mapping(uint256 => AssetsStruct[])) public assetsObj;
+    mapping(address => AssetsStruct[]) public assetsObj;
 
     struct UserStruct {
         address account;
         string bgColor;
-        string size;
         string gridColor;
         bool withGrid;
         bool isMerchant;
-        AssetsStruct[] assets;
+        uint256 index;
     }
     mapping(address => UserStruct) public userObj;
     UserStruct[] public userList;
 
     struct ShopStruct {
-        address merchant;
+        address owner;
         string name;
-        AssetsStruct[] assets;
-        GoodsStruct[] goods;
+        uint256 index;
     }
     ShopStruct[] public shopList;
     mapping(address => ShopStruct) public shopObj;
 
     struct GoodsStruct {
-        address merchant;
+        address owner;
         string name;
         string category;
         string data;
-        uint256 amount;
         uint256 price;
-        uint256 weight;
         uint256 id;
-        uint256 saleAmount;
+        bool isSale;
+        uint256 index;
     }
     mapping(uint256 => GoodsStruct) public goodsObj;
     GoodsStruct[] public goodsList;
@@ -50,69 +50,87 @@ contract PixelsMetavers {
     event HandleList(string types); // outfit application post buy
 
     modifier MustMerchant(address from) {
-        UserStruct memory user = userObj[from];
-        require(user.isMerchant == false, "Only Merchant Can Do It!");
+        ShopStruct memory shop = shopObj[from];
+        require(shop.owner != address(0), "Only Merchant Can Do It!");
         _;
     }
 
-    modifier CheckGoodsIsExist(uint256 id) {
-        require(goodsObj[id].merchant == address(0), "The product does exist!");
+    modifier MustUser(address from) {
+        UserStruct memory user = userObj[from];
+        require(user.account != address(0), "Only User Can Do It!");
         _;
     }
 
     modifier MustGoodsIsExist(uint256 id) {
         require(
-            goodsObj[id].merchant != address(0),
+            IPMT721(PMT721).exits(id),
             "The product does not exist!"
         );
         _;
     }
 
+    uint256 private unlocked = 1;
+    modifier Lock() {
+        require(unlocked == 1, "The Function: LOCKED");
+        unlocked = 0;
+        _;
+        unlocked = 1;
+    }
+
     constructor() {}
 
-    function mint(uint256[] memory ids) public {
-        UserStruct memory user = userObj[msg.sender];
-        require(
-            user.account != address(0),
-            "You are already a platform merchant!"
-        );
+    /* function mint(uint256[] memory ids) public MustUser(msg.sender) {
         for (uint256 i; i < ids.length - 1; i++) {
+            require(
+                msg.sender == IPMT721(PMT721).ownerOf(ids[i]),
+                "The product is not your asset!"
+            );
             _outfit(ids[i], i, true);
         }
+    } */
+
+    function mint() public MustUser(msg.sender) {
+        IPMT721(PMT721).mint();
+    }
+
+    function register() public {
+        UserStruct memory user = userObj[msg.sender];
+        require(user.account == address(0), "You are already a platform user!");
         userObj[msg.sender].account = msg.sender;
+        userObj[msg.sender].index = userList.length;
+        userList.push(userObj[msg.sender]);
     }
 
     function setConfig(
         string memory bgColor,
-        string memory size,
         string memory gridColor,
-        bool withGrid
-    ) public {
+        bool withGrid,
+        uint userIndex
+    ) public MustUser(msg.sender) {
         UserStruct memory user = userObj[msg.sender];
-        require(
-            user.account != address(0),
-            "You are already a platform merchant!"
-        );
         user.bgColor = bgColor;
-        user.size = size;
         user.gridColor = gridColor;
         user.withGrid = withGrid;
         userObj[msg.sender] = user;
+        userList[userIndex] = user;
     }
 
-    function application(string memory name) public {
+    function application(string memory name, uint userIndex) public MustUser(msg.sender) {
         UserStruct memory user = userObj[msg.sender];
-        require(user.isMerchant, "You are already a platform merchant!");
+        require(!user.isMerchant, "You are already a platform merchant!");
         shopObj[msg.sender].name = name;
-        shopObj[msg.sender].merchant = msg.sender;
-    }
-
-    function getShopLength() public view returns (uint256) {
-        return shopList.length;
+        shopObj[msg.sender].owner = msg.sender;
+        userObj[msg.sender].isMerchant = true;
+        userList[userIndex].isMerchant = true;
+        shopList.push(shopObj[msg.sender]);
     }
 
     function getUserLength() public view returns (uint256) {
         return userList.length;
+    }
+
+    function getShopLength() public view returns (uint256) {
+        return shopList.length;
     }
 
     function getGoodsLength() public view returns (uint256) {
@@ -122,38 +140,61 @@ contract PixelsMetavers {
     function postGoods(
         string memory name,
         string memory category,
-        uint256 amount,
+        string memory data,
         uint256 price,
-        uint256 weight,
-        string memory data
-    ) public MustMerchant(msg.sender) {
-        uint256 id = _goodsIds++;
-        GoodsStruct memory goods = GoodsStruct(
-            msg.sender,
-            name,
-            category,
-            data,
-            amount,
-            price,
-            weight,
-            id,
-            0
-        );
+        uint256 amount
+    ) public MustMerchant(msg.sender) Lock {
+        for (uint256 i; i < amount; i++) {
+            IPMT721(PMT721).mint();
+            uint256 currentID = IPMT721(PMT721).getCurrentID();
 
-        shopObj[msg.sender].goods.push(goods);
+            GoodsStruct memory goods = GoodsStruct(
+                msg.sender,
+                name,
+                category,
+                data,
+                price,
+                currentID,
+                true,
+                goodsList.length
+            );
 
-        goodsObj[id] = goods;
-        goodsList.push(goods);
+            goodsObj[currentID] = goods;
+            goodsList.push(goods);
+        }
     }
 
-    function buyGoods(uint256 id) public MustGoodsIsExist(id) {
+    function buyGoods(uint256 id, uint256 goodsIndex)
+        public
+        payable
+        MustGoodsIsExist(id)
+        MustUser(msg.sender)
+        Lock
+    {
         GoodsStruct memory goods = goodsObj[id];
-        uint256 surplusAmount = goods.amount - goods.saleAmount;
-        require(surplusAmount <= 0, "The item is out of stock!");
-        goods.saleAmount = goods.saleAmount + 1;
-        userObj[msg.sender].assets.push(
-            AssetsStruct(goods.category, goods.data, id, false)
+        require(
+            msg.sender != goods.owner,
+            "Cannot be produced and sold on their own!"
         );
+        require(
+            msg.value >= goods.price,
+            "The amount paid is lower than the price of the commodity!"
+        );
+        IPMT721(PMT721).safeTransferFrom(address(this), msg.sender, id);
+        assetsObj[msg.sender].push(
+            AssetsStruct(
+                goodsObj[id].category,
+                goodsObj[id].data,
+                id,
+                false,
+                assetsObj[msg.sender].length
+            )
+        );
+        _safeTransferETH(goodsObj[id].owner, msg.value);
+        goodsObj[id].owner = msg.sender;
+        goodsObj[id].isSale = false;
+        goodsList[goodsIndex].owner = msg.sender;
+        goodsList[goodsIndex].isSale = false;
     }
 
     function _outfit(
@@ -161,16 +202,30 @@ contract PixelsMetavers {
         uint256 index,
         bool isOutfit
     ) internal MustGoodsIsExist(id) {
-        AssetsStruct[] memory assets = userObj[msg.sender].assets;
-        require(assets[index].id != id, "The current item is not your asset!");
-        userObj[msg.sender].assets[index].isOutfit = isOutfit;
+        require(
+            msg.sender == IPMT721(PMT721).ownerOf(id),
+            "The current item is not your asset!"
+        );
+        assetsObj[msg.sender][index].isOutfit = isOutfit;
     }
 
     function outfit(
         uint256 id,
         uint256 index,
         bool isOutfit
-    ) internal MustGoodsIsExist(id) {
+    ) internal MustGoodsIsExist(id) Lock {
         _outfit(id, index, isOutfit);
+    }
+
+    function _safeTransferETH(address to, uint256 value) internal {
+        (bool success, ) = to.call{value: value}(new bytes(0));
+        require(
+            success,
+            "TransferHelper::safeTransferETH: ETH transfer failed"
+        );
+    }
+
+    function setPMT721(address pmt721) public {
+        PMT721 = IPMT721(pmt721);
     }
 }

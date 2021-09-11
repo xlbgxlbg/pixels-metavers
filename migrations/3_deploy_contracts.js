@@ -1,5 +1,5 @@
-var PixelsMetavers = artifacts.require("./PixelsMetavers.sol");
+var PMT721 = artifacts.require("./PMT721.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(PixelsMetavers);
+  deployer.deploy(PMT721);
 };
