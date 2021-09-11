@@ -2,12 +2,36 @@ import { Dispatch, useCallback } from "react";
 import { usePixelsMetaverseContract } from "./PixelsMetaversProvider";
 import { Contract } from 'web3-eth-contract';
 import { IMerchandise } from "../produced/Submit";
+import { useLoading } from "../components/Loading";
 
 export const useGetUserInfo = () => {
   const { contract } = usePixelsMetaverseContract()
-  return useCallback(async (address: string) => {
+  const { closeDelayLoading, openLoading } = useLoading()
+  return useCallback(async (address: string, setUserInfo: Dispatch<any>) => {
+    openLoading()
     if (!contract) return
-    await contract.methods.userObj(address).call();
+    const info = await contract.methods.userObj(address).call();
+    setUserInfo((pre: any) => ({
+      ...pre,
+      user: info
+    }))
+    closeDelayLoading()
+  }, [contract])
+}
+
+export const useGetUserAssets = () => {
+  const { contract } = usePixelsMetaverseContract()
+  const { closeDelayLoading, openLoading } = useLoading()
+  return useCallback(async (address: string, setUserInfo: Dispatch<any>) => {
+    openLoading()
+    if (!contract) return
+    const list = await contract?.methods.getUserAssets(address).call();
+    console.log(list)
+    setUserInfo((pre: any) => ({
+      ...pre,
+      assets: list
+    }))
+    closeDelayLoading()
   }, [contract])
 }
 
@@ -79,9 +103,23 @@ export const useMint = () => {
 
 export const useSetConfig = () => {
   const { accounts, contract } = usePixelsMetaverseContract()
+  const { closeDelayLoading, openLoading } = useLoading()
   return useCallback(async (value: any) => {
     if (!contract) return
-    await contract.methods.setConfig(value.bgColor, value.size, value.gridColor, value.withGrid).send({ from: accounts?.address });
+    openLoading()
+    await contract.methods.setConfig(value.bgColor, value.gridColor, value.withGrid, value.index).send({ from: accounts?.address });
+    closeDelayLoading()
+  }, [accounts, contract])
+}
+
+export const useRegister = () => {
+  const { accounts, contract } = usePixelsMetaverseContract()
+  const { closeDelayLoading, openLoading } = useLoading()
+  return useCallback(async () => {
+    if (!contract) return
+    openLoading()
+    await contract.methods.register().send({ from: accounts?.address });
+    closeDelayLoading()
   }, [accounts, contract])
 }
 
@@ -118,9 +156,12 @@ export const useBuyGoods = () => {
 
 export const useOutfit = () => {
   const { accounts, contract } = usePixelsMetaverseContract()
+  const { closeDelayLoading, openLoading } = useLoading()
   return useCallback(async (value: any) => {
     if (!contract) return
+    openLoading()
     await contract.methods.outfit(value.id, value.index, value.isOutfit).send({ from: accounts?.address });
+    closeDelayLoading()
   }, [accounts, contract])
 }
 

@@ -8,6 +8,7 @@ contract PixelsMetavers {
 
     struct AssetsStruct {
         string category;
+        string name;
         string data;
         uint256 id;
         bool isOutfit; //衣服, 装备, 服装, 外套, 行头, 打扮
@@ -45,6 +46,7 @@ contract PixelsMetavers {
         uint256 index;
     }
     mapping(uint256 => GoodsStruct) public goodsObj;
+    mapping(address => GoodsStruct[]) public goodsListBuyShop;
     GoodsStruct[] public goodsList;
 
     event HandleList(string types); // outfit application post buy
@@ -62,10 +64,7 @@ contract PixelsMetavers {
     }
 
     modifier MustGoodsIsExist(uint256 id) {
-        require(
-            IPMT721(PMT721).exits(id),
-            "The product does not exist!"
-        );
+        require(IPMT721(PMT721).exits(id), "The product does not exist!");
         _;
     }
 
@@ -101,7 +100,7 @@ contract PixelsMetavers {
         string memory bgColor,
         string memory gridColor,
         bool withGrid,
-        uint userIndex
+        uint256 userIndex
     ) public MustUser(msg.sender) {
         UserStruct memory user = userObj[msg.sender];
         user.bgColor = bgColor;
@@ -111,11 +110,15 @@ contract PixelsMetavers {
         userList[userIndex] = user;
     }
 
-    function application(string memory name, uint userIndex) public MustUser(msg.sender) {
+    function application(string memory name, uint256 userIndex)
+        public
+        MustUser(msg.sender)
+    {
         UserStruct memory user = userObj[msg.sender];
         require(!user.isMerchant, "You are already a platform merchant!");
         shopObj[msg.sender].name = name;
         shopObj[msg.sender].owner = msg.sender;
+        shopObj[msg.sender].index = shopList.length;
         userObj[msg.sender].isMerchant = true;
         userList[userIndex].isMerchant = true;
         shopList.push(shopObj[msg.sender]);
@@ -133,8 +136,8 @@ contract PixelsMetavers {
         return goodsList.length;
     }
 
-    function getUserAssetsLength() public view returns (uint256) {
-        return assetsObj[msg.sender].length;
+    function getUserAssetsLength(address user) public view returns (uint256) {
+        return assetsObj[user].length;
     }
 
     function getUserAssets(address user)
@@ -143,6 +146,14 @@ contract PixelsMetavers {
         returns (AssetsStruct[] memory)
     {
         return assetsObj[user];
+    }
+
+    function getShopGoods(address shop)
+        public
+        view
+        returns (GoodsStruct[] memory)
+    {
+        return goodsListBuyShop[shop];
     }
 
     function postGoods(
@@ -181,24 +192,29 @@ contract PixelsMetavers {
     {
         GoodsStruct memory goods = goodsObj[id];
         require(
-            msg.sender != goods.owner,
+            msg.sender != IPMT721(PMT721).ownerOf(id),
             "Cannot be produced and sold on their own!"
         );
         require(
             msg.value >= goods.price,
             "The amount paid is lower than the price of the commodity!"
         );
+        if (address(this) == IPMT721(PMT721).ownerOf(id)) {
+            _safeTransferETH(goodsObj[id].owner, msg.value);
+        } else {
+            _safeTransferETH(IPMT721(PMT721).ownerOf(id), msg.value);
+        }
         IPMT721(PMT721).safeTransferFrom(address(this), msg.sender, id);
         assetsObj[msg.sender].push(
             AssetsStruct(
                 goodsObj[id].category,
+                goodsObj[id].name,
                 goodsObj[id].data,
                 id,
                 false,
                 assetsObj[msg.sender].length
             )
         );
-        _safeTransferETH(goodsObj[id].owner, msg.value);
         goodsObj[id].owner = msg.sender;
         goodsObj[id].isSale = false;
         goodsList[goodsIndex].owner = msg.sender;

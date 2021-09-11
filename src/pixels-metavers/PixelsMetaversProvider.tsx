@@ -5,7 +5,8 @@ import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
 import { IConfigOptions, IPixelsMetaverseImgByPositionData, TPostions } from "./PixelsMetaversImg";
 import { Dictionary, isEmpty } from "lodash";
-import { useDealClick, useGetClickGradPosition } from "./canvasHook";
+import { useConvertedPostion, useDealClick, useGetClickGradPosition } from "./canvasHook";
+import { LoadingProvider } from "../components/Loading";
 
 export const PixelsMetaverseContext = createContext(
   {} as {
@@ -57,7 +58,7 @@ export const useGetContractInfo = (web3: Web3, networkId: number) => {
   }, [web3, networkId])
 }
 
-export const PixelsMetaverseContextProvider = ({ children, web3, networkId }: { children: ReactNode, web3: Web3, networkId: number }) => {
+export const PixelsMetaverseContextProvider = ({ children, web3, networkId, currentAddress }: { children: ReactNode, web3: Web3, networkId: number, currentAddress: string }) => {
   const [accounts, setAccounts] = useState<any>({});
   const [contract, setContract] = useState<Contract | undefined>();
   const [event, setEvent] = useState<any[]>([]);
@@ -69,9 +70,10 @@ export const PixelsMetaverseContextProvider = ({ children, web3, networkId }: { 
     if (!networkId) return
     setAccounts((pre: any) => ({
       ...pre,
-      web3: web3
+      web3: web3,
+      address: currentAddress
     }))
-  }, [web3, networkId])
+  }, [web3, networkId, currentAddress])
 
   useEffect(() => {
     if (isNaN(networkID)) return
@@ -80,7 +82,9 @@ export const PixelsMetaverseContextProvider = ({ children, web3, networkId }: { 
 
   return (
     <PixelsMetaverseContext.Provider value={{ accounts, contract, setAccounts, setContract, event, setEvent }}>
-      {children}
+      <LoadingProvider>
+        {children}
+      </LoadingProvider>
     </PixelsMetaverseContext.Provider>
   )
 }
@@ -118,7 +122,7 @@ export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGri
     withGrid: !!showGrid,
     bgImg: "",
     bgImgUp: "",
-    bgColor: data.bgColor || "#638496",
+    bgColor: data.bgColor || "#e1e1e1",
     gridColor: data.gridColor || "white",
     isHandDraw: !!handDraw
   });
@@ -129,39 +133,12 @@ export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGri
   const canvas2Ref = useRef<HTMLCanvasElement>(null)
   const dealClick = useDealClick()
   const getGradPosition = useGetClickGradPosition()
+  const getPositionData = useConvertedPostion()
 
   useEffect(() => {
     if (!data.positions) return
     if (!data.positions.includes("-")) return
-
-    const position = data.positions?.split("-")
-    let positionObj: Dictionary<string> = {}
-    let postionStr = ""
-    const len = position.length
-    const min = Number(position[len - 1])
-
-    for (let i = 0; i < len; i++) {
-      if (i === len - 1) continue
-
-      if (i % 2 === 0) {
-        postionStr = `${parseInt(position[i], 36).toString(16)}`
-        if (postionStr.length) {
-          let str = ""
-          for (let k = 0; k < 6 - postionStr.length; k++) {
-            str += "0"
-          }
-          postionStr = "#" + str + postionStr
-        }
-      }
-
-      if (i % 2 === 1) {
-        const numArr = position[i].split("|")
-        for (let j = 0; j < numArr.length; j++) {
-          positionObj[Number(parseInt(numArr[j], 36)) + min] = postionStr
-        }
-      }
-    }
-
+    const positionObj = getPositionData(data)
     setPositions(positionObj)
   }, [data.positions])
 

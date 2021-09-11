@@ -1,7 +1,7 @@
 import React, { DetailedHTMLProps, RefObject, useEffect, useMemo, useRef } from "react"
 import { cloneDeep, Dictionary } from "lodash";
 import { stringRadixDeal } from "./utilities/radix";
-import { useClearCanvas, useDealImg, useDisplayGrad, useDrawImgColor, useGetPositionData, useSetCanvasSize } from "./canvasHook";
+import { useClearCanvas, useConvertedPostion, useDealImg, useDisplayGrad, useDrawImgColor, useGetPositionData, useSetCanvasSize } from "./canvasHook";
 import { usePixelsMetaverseHandleImg } from "./PixelsMetaversProvider";
 import { get16Color } from "./utilities";
 import { gradToSort, positionToGrad } from "./utilities/position";
@@ -79,36 +79,14 @@ export const PixelsMetaverseImgByPositionData = ({ data, size, showGrid, ...prop
       gridColor: data.gridColor || "white"
     } as IConfigOptions
   }, [data])
+  const getPositionData = useConvertedPostion()
 
   const postionData = useMemo(() => {
 
     if (!data.positions) return {}
     if (!data.positions.includes("-")) return {}
 
-    const position = data.positions?.split("-")
-    const str17 = stringRadixDeal(position[0], 90, 17)
-
-    let positionObg: Dictionary<string> = {}
-    let postionStr = ""
-
-    const splitArr = str17.split("|")
-    console.log(splitArr)
-
-    for (let i = 0; i < splitArr.length; i++) {
-      if (splitArr[i] === "") {
-        postionStr = "#000000"
-        continue
-      }
-
-      if (splitArr[i].length === 6) {
-        postionStr = `#${splitArr[i]}`
-        continue
-      }
-
-      positionObg[Number(splitArr[i]) + Number(position[1])] = postionStr
-    }
-
-    return positionObg
+    return getPositionData(data)
   }, [data.positions])
 
   return (
@@ -116,6 +94,7 @@ export const PixelsMetaverseImgByPositionData = ({ data, size, showGrid, ...prop
       config={config}
       data={postionData}
       canvasRef={canvasRef}
+      showGridColor
       style={{
         backgroundColor: config?.bgColor
       }}
@@ -219,7 +198,7 @@ export const PixelsMetaverseCanvas = ({
 
   useEffect(() => {
     const canvas = canvasRef?.current
-    if (!canvas || config.imgSize.width <= 0 || ( config?.withGrid && config.sizeGrid <= 0 )) return
+    if (!canvas || config.imgSize.width <= 0 || (config?.withGrid && config.sizeGrid <= 0)) return
     console.log("绘制数据", data)
     const context = canvas.getContext("2d") as CanvasRenderingContext2D
     setSize(canvas, config.imgSize)

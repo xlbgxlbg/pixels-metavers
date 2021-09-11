@@ -8,6 +8,11 @@ import { useWeb3js, Web3jsProvider } from './api/hook';
 import { PixelsMetaverseContextProvider } from './pixels-metavers/PixelsMetaversProvider';
 import bgSvg from "./image/bg.svg"
 import { Application } from './application';
+import React from 'react';
+import { Loading, LoadingProvider } from './components/Loading';
+import { UserInfoProvider } from './components/UserProvider';
+import { PersonCenter } from './person-center';
+import { Mall } from './mall';
 
 declare global {
   // tslint:disable-next-line
@@ -30,14 +35,19 @@ export const Main = () => {
     <div className="relative bg-white overflow-hidden" style={{ minWidth: 1400, minHeight: 600 }}>
       <div className="relative w-full h-full min-h-screen mx-auto bg-no-repeat md:bg-contain bg-cover bg-gray-900"
         style={{ backgroundImage: `url(${bgSvg})` }}>
-        <PixelsMetaverseContextProvider web3={accounts?.web3} networkId={accounts?.networkId}>
-          {pathname !== "/" && <PixelsMetaverseHead />}
-          <Switch>
-            <Route path="/app" component={PixelsMetaverse} />
-            <Route path="/produced" component={Produced} />
-            <Route path="/" component={Website} />
-            <Route exact component={Website} />
-          </Switch>
+        <PixelsMetaverseContextProvider web3={accounts?.web3} networkId={accounts?.networkId} currentAddress={accounts?.address}>
+          <UserInfoProvider>
+            {pathname !== "/" && <PixelsMetaverseHead />}
+            <Switch>
+              <Route path="/app" component={PixelsMetaverse} />
+              <Route path="/produced" component={Produced} />
+              <Route path="/person-center" component={PersonCenter} />
+              <Route path="/mall" component={Mall} />
+              <Route path="/" component={Website} />
+              <Route exact component={Website} />
+            </Switch>
+            <Loading />
+          </UserInfoProvider>
         </PixelsMetaverseContextProvider>
       </div>
     </div>

@@ -78,42 +78,11 @@ interface IHeaderProps {
   networkId: number
 }
 
-const menu = () => {
-  return (
-    <Menu>
-      <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-          个人中心
-      </a>
-      </Menu.Item>
-      <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-          平台用户
-      </a>
-      </Menu.Item>
-      <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-          平台商家
-      </a>
-      </Menu.Item>
-      <Menu.Item>
-        <a rel="noopener noreferrer" href="/#/application">
-          申请入驻
-      </a>
-      </Menu.Item>
-      <Menu.Item>
-        <a rel="noopener noreferrer" href="/#/produced">
-          发布商品
-        </a>
-      </Menu.Item>
-    </Menu>
-  )
-}
-
 const nav = [
   { label: "首页", path: "/app" },
-  { label: "个人中心", path: "/" },
-  { label: "合约商城", path: "" },
+  { label: "发布商品", path: "/produced" },
+  { label: "合约商城", path: "/mall" },
+  { label: "个人中心", path: "/person-center" },
 ]
 
 const Header = (props: IHeaderProps) => {
@@ -172,9 +141,9 @@ const Header = (props: IHeaderProps) => {
           }
         </div>
       </SHeader>
-      <Dropdown overlay={menu} placement="bottomLeft">
+      {/* <Dropdown overlay={menu} placement="bottomLeft">
         <div className="flex items-center justify-center rounded-md cursor-pointer contect ml-4" style={{ height: 40, width: 40, marginTop: -1 }}>···</div>
-      </Dropdown>
+      </Dropdown> */}
     </div>
   );
 };

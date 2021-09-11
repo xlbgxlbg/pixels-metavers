@@ -14,11 +14,11 @@ export const PixelsMetaverse = () => {
   }, [value])
 
   return (
-    <PixelsMetaverseHandleImgProvider size={240} data={{
+    <PixelsMetaverseHandleImgProvider size={480} showGrid data={{
       positions: postions,
-      size: 'small',
-      bgColor: "rgba(225,225,225,0.2)",
-      gridColor: "rgba(225,225,225,0.7)",
+      size: 'large',
+      bgColor: "transparent",
+      gridColor: "rgba(225,225,225,0.5)",
     }}>
       <div className="flex justify-between bg-transparent flex-1 mt-4">
         <PersonCenter />

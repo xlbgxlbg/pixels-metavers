@@ -139,3 +139,36 @@ export const useGetPositionData = (address: string) => {
 
   return value
 }
+
+export const useConvertedPostion = () => {
+  return useCallback((data: TData) => {
+    const position = data.positions?.split("-")
+    let positionObj: Dictionary<string> = {}
+    let postionStr = ""
+    const len = position.length
+    const min = Number(position[len - 1])
+
+    for (let i = 0; i < len; i++) {
+      if (i === len - 1) continue
+
+      if (i % 2 === 0) {
+        postionStr = `${parseInt(position[i], 36).toString(16)}`
+        if (postionStr.length) {
+          let str = ""
+          for (let k = 0; k < 6 - postionStr.length; k++) {
+            str += "0"
+          }
+          postionStr = "#" + str + postionStr
+        }
+      }
+
+      if (i % 2 === 1) {
+        const numArr = position[i].split("|")
+        for (let j = 0; j < numArr.length; j++) {
+          positionObj[Number(parseInt(numArr[j], 36)) + min] = postionStr
+        }
+      }
+    }
+    return positionObj
+  }, [])
+}
