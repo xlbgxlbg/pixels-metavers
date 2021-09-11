@@ -79,7 +79,7 @@ contract PixelsMetavers {
 
     constructor() {}
 
-    /* function mint(uint256[] memory ids) public MustUser(msg.sender) {
+    function mint(uint256[] memory ids) public MustUser(msg.sender) {
         for (uint256 i; i < ids.length - 1; i++) {
             require(
                 msg.sender == IPMT721(PMT721).ownerOf(ids[i]),
@@ -87,10 +87,6 @@ contract PixelsMetavers {
             );
             _outfit(ids[i], i, true);
         }
-    } */
-
-    function mint() public MustUser(msg.sender) {
-        IPMT721(PMT721).mint();
     }
 
     function register() public {
@@ -135,6 +131,18 @@ contract PixelsMetavers {
 
     function getGoodsLength() public view returns (uint256) {
         return goodsList.length;
+    }
+
+    function getUserAssetsLength() public view returns (uint256) {
+        return assetsObj[msg.sender].length;
+    }
+
+    function getUserAssets(address user)
+        public
+        view
+        returns (AssetsStruct[] memory)
+    {
+        return assetsObj[user];
     }
 
     function postGoods(
@@ -199,21 +207,21 @@ contract PixelsMetavers {
 
     function _outfit(
         uint256 id,
-        uint256 index,
+        uint256 assetsIndex,
         bool isOutfit
     ) internal MustGoodsIsExist(id) {
         require(
             msg.sender == IPMT721(PMT721).ownerOf(id),
             "The current item is not your asset!"
         );
-        assetsObj[msg.sender][index].isOutfit = isOutfit;
+        assetsObj[msg.sender][assetsIndex].isOutfit = isOutfit;
     }
 
     function outfit(
         uint256 id,
         uint256 index,
         bool isOutfit
-    ) internal MustGoodsIsExist(id) Lock {
+    ) public MustGoodsIsExist(id) Lock {
         _outfit(id, index, isOutfit);
     }
 

@@ -221,20 +221,30 @@
   
     <div>
 	
-  <script>
-  async function getmintvalue() {
-  const data = await contract.methods.mint().send({ from: accounts[0] });
-  const dom = document.getElementById("mint");
-  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
-  console.log("mint", data)
-}
+        <script>
+            async function getmintvalue() {
+              
+              const dom0 = document.getElementById("mintidsparamas")
+              if(dom0.value === ""){
+                window.alert("mint值为空")
+                return
+              }
+              
+              const data = await contract.methods.mint(dom0.value,).send({ from: accounts[0] });
+        const dom = document.getElementById("mint");
+		dom.innerHTML = true 
+		getAllFunData()
+        console.log("mint", data)
+      }
         </script>
   <button style="margin: 10px" onclick="getmintvalue()">
     mint
   </button>
-  <span id="mint">
-  </span>
-		
+
+            <input id = "mintidsparamas" placeholder="ids" type="number"/>
+            
+        <span id="mint">
+                  </span>
     </div >
   
     <div>
@@ -399,6 +409,52 @@
   
     <div>
 	
+  <script>
+  async function getgetUserAssetsLengthvalue() {
+  const data = await contract.methods.getUserAssetsLength().call();
+  const dom = document.getElementById("getUserAssetsLength");
+  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
+  console.log("getUserAssetsLength", data)
+}
+        </script>
+  <button style="margin: 10px" onclick="getgetUserAssetsLengthvalue()">
+    getUserAssetsLength
+  </button>
+  <span id="getUserAssetsLength">
+  </span>
+		
+    </div >
+  
+    <div>
+	
+        <script>
+            async function getgetUserAssetsvalue() {
+              
+              const dom0 = document.getElementById("getUserAssetsuserparamas")
+              if(dom0.value === ""){
+                window.alert("getUserAssets值为空")
+                return
+              }
+              
+              const data = await contract.methods.getUserAssets(dom0.value,).call();
+        const dom = document.getElementById("getUserAssets");
+		dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data) 
+		getAllFunData()
+        console.log("getUserAssets", data)
+      }
+        </script>
+  <button style="margin: 10px" onclick="getgetUserAssetsvalue()">
+    getUserAssets
+  </button>
+
+            <input id = "getUserAssetsuserparamas" placeholder="user" type="string"/>
+            
+        <span id="getUserAssets">
+                  </span>
+    </div >
+  
+    <div>
+	
         <script>
             async function getpostGoodsvalue() {
               
@@ -521,54 +577,8 @@
                   </span>
     </div >
   
-    <div>
-	
-  <script>
-  async function getgetContractAddressvalue() {
-  const data = await contract.methods.getContractAddress().call();
-  const dom = document.getElementById("getContractAddress");
-  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
-  console.log("getContractAddress", data)
-}
-        </script>
-  <button style="margin: 10px" onclick="getgetContractAddressvalue()">
-    getContractAddress
-  </button>
-  <span id="getContractAddress">
-  </span>
-		
-    </div >
-  
-    <div>
-	
-        <script>
-            async function gettransvalue() {
-              
-              const dom0 = document.getElementById("transidparamas")
-              if(dom0.value === ""){
-                window.alert("trans值为空")
-                return
-              }
-              
-              const data = await contract.methods.trans(dom0.value,).send({ from: accounts[0] });
-        const dom = document.getElementById("trans");
-		dom.innerHTML = true 
-		getAllFunData()
-        console.log("trans", data)
-      }
-        </script>
-  <button style="margin: 10px" onclick="gettransvalue()">
-    trans
-  </button>
-
-            <input id = "transidparamas" placeholder="id" type="number"/>
-            
-        <span id="trans">
-                  </span>
-    </div >
-  
 	<script>
-		let allFunArrList = [getgetUserLengthvalue,getgetShopLengthvalue,getgetGoodsLengthvalue,getgetContractAddressvalue,]
+		let allFunArrList = [getgetUserLengthvalue,getgetShopLengthvalue,getgetGoodsLengthvalue,getgetUserAssetsLengthvalue,]
 	function getAllFunData(){
 		for(let i=0; i<allFunArrList.length; i++){
 			allFunArrList[i]()
