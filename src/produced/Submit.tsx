@@ -1,11 +1,9 @@
 import { ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { Tooltip, Select, message, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Dictionary, find, isEmpty, keys, map } from 'lodash';
+import { Dictionary, isEmpty, keys, map } from 'lodash';
 import { usePixelsMetaverseContract, usePixelsMetaverseHandleImg } from '../pixels-metavers/PixelsMetaversProvider';
-import { fetchApplication, fetchPostGoods, fetchRegister, fetchUserBaseInfo, fetchUserInfo, useApplication, useGetGoodsList, usePostGoods, useRegister, useRequest } from '../pixels-metavers/apiHook';
-import { useUserInfo } from '../components/UserProvider';
-import { config } from 'rxjs';
+import { fetchApplication, fetchPostGoods, fetchRegister, fetchUserBaseInfo, useRequest } from '../pixels-metavers/apiHook';
 const { Option } = Select;
 
 const Label = ({ children }: { children: ReactNode }) => {
@@ -76,42 +74,34 @@ export const SubminNFT = () => {
     price,
     weight,
   }, setMerchandies] = useState<IMerchandise>({
-    name: "卡姿兰大眼睛",
-    category: "eye",
-    amount: "10",
-    price: "0.01",
+    name: "",
+    category: "",
+    amount: "",
+    price: "",
     weight: "",
   })
   const [positionData, setPostionData] = useState("")
   const [shopName, setShopName] = useState("")
-  const [isMerchant, setIsMerchant] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const { event } = usePixelsMetaverseContract()
-  //const postGoods = usePostGoods()
-  const getShopList = useGetGoodsList()
-  //const application = useApplication()
-  const { userInfo } = useUserInfo()
   const { accounts, contract } = usePixelsMetaverseContract()
   const [userBaseInfo, setUserBaseInfo] = useState<Dictionary<any>>({})
-  //const register = useRegister()
-  const getUserInfo = useRequest(fetchUserInfo)
+  const getInfo = () => {
+    if (isEmpty(accounts?.address)) return
+    getUserBaseInfo({ address: accounts?.address, setUserBaseInfo })
+  }
 
   const application = useRequest(fetchApplication, {
     onSuccess: () => {
-      getUserInfo({
-        address: userBaseInfo?.account
-      })
+      message.success("入驻成功！")
+      getInfo()
     }
   }, [userBaseInfo?.account])
-
 
   const getUserBaseInfo = useRequest(fetchUserBaseInfo)
 
   useEffect(() => {
-    if (isEmpty(accounts?.address)) return
-    getUserBaseInfo({ address: accounts?.address, setUserBaseInfo })
+    getInfo()
   }, [accounts?.address, contract])
-
 
   const postGoods = useRequest(fetchPostGoods, {
     onSuccess: () => {
@@ -127,7 +117,7 @@ export const SubminNFT = () => {
       clear()
       setPositionsArr([])
     },
-    onFail: ()=>{
+    onFail: () => {
       setIsModalVisible(false)
     }
   }, [
@@ -142,24 +132,13 @@ export const SubminNFT = () => {
 
   const register = useRequest(fetchRegister, {
     onSuccess: () => {
-      getUserInfo({
-        address: userBaseInfo?.account
-      })
+      getInfo()
     }
   }, [userBaseInfo?.account])
-  //const radixFun = new (require("radix.js"));
-
-  useEffect(() => {
-    console.log(event, "submit")
-    setIsModalVisible(false);
-    getShopList()
-  }, [event])
 
   const min = useMemo(() => Math.min(...positionsArr), [positionsArr])
 
   const handleOk = useCallback(() => {
-    //const str17To92 = stringRadixDeal(positionData, 16, 36)
-    //const str17 = stringRadixDeal(str17To92, 36, 16)
     const nftData = `${positionData}${min}`
     const data = {
       name,
@@ -172,13 +151,11 @@ export const SubminNFT = () => {
     }
     console.log(data)
     let avatar = JSON.parse(localStorage.getItem("avatar") || "[]")
-    //find(avatar, item => item.data === nftData) || avatar.push(data)
-    //localStorage.setItem("avatar", JSON.stringify(avatar))
     console.log(avatar[0])
     postGoods({
       value: data
     })
-    //setIsModalVisible(false);
+    setIsModalVisible(false)
   }, [positionData, min]);
 
   const handleCancel = () => {
@@ -201,9 +178,7 @@ export const SubminNFT = () => {
     for (let i = 0; i < colorsArrBySort.length; i++) {
       //再对颜色排个序 小的放前面
       const position = map(colorsObj[colorsArrBySort[i]], ite => (ite - min).toString(36)).join("|")
-      //const positions = orderBy(colorsObj[colorsArrBySort[i]]).join("")
       str += `${parseInt(colorsArrBySort[i].slice(1), 16).toString(36)}-${position}-`
-      //str += `${colorsArrBySort[i].slice(1)}${positions}`
     }
     return `${str}`
   }, [value, positionsArr, colorsObj, min])
@@ -228,7 +203,7 @@ export const SubminNFT = () => {
     return true;
   }, [name, category, amount, price]);
 
-  console.log(userInfo, "userInfo")
+  console.log(userBaseInfo, "userBaseInfo")
 
   return (
     <div className="p-4 rounded-md text-gray-300"
@@ -286,13 +261,13 @@ export const SubminNFT = () => {
           maxLength={1}
           onChange={(e) => { setMerchandies((pre) => ({ ...pre, amount: mustNum(e) })) }}
         />
-        <Label>商品价格</Label>
+        <Label>商品价格(ETH)</Label>
         <input
           className="search p-2 mt-1 pl-3 shangping"
           style={{ width: "calc(300px - 40px)", background: "rgba(255, 255, 255, 0.2)", borderRadius: 4 }}
           placeholder="请输入商品价格"
           value={price}
-          maxLength={18}
+          maxLength={5}
           onChange={(e) => { setMerchandies((pre) => ({ ...pre, price: mustNum(e) })) }}
         />
         <div className="flex items-center mt-4 shangping">
@@ -306,7 +281,7 @@ export const SubminNFT = () => {
           style={{ width: "calc(300px - 40px)", background: "rgba(255, 255, 255, 0.2)", borderRadius: 4 }}
           placeholder="请输入商品权重"
           value={weight}
-          maxLength={18}
+          maxLength={10}
           onChange={(e) => { setMerchandies((pre) => ({ ...pre, weight: mustNum(e) })) }}
         />
         <div className="flex justify-center items-center h-10 mt-6 text-white cursor-pointer bg-red-500" style={{ width: "100%", borderRadius: 4 }}
@@ -353,7 +328,6 @@ export const SubminNFT = () => {
 
       <Modal title="是否发布商品" okText={positionData?.length >= 64 ? "资产多，我不担心，硬核提交" : "确认"} cancelText="取消" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <p>是否确认发布该商品？</p>
-        {/* <p>{`ID${positionData}`}</p> */}
         <p>{positionData?.length >= 50 && "当前数据量较大，可能消耗的GAS较多，且有可能提交不成功，请问是否继续提交数据？"}</p>
       </Modal>
     </div >

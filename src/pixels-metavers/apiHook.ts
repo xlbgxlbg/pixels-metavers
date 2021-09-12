@@ -74,7 +74,7 @@ export const fetchGetUserAssets = () => {
   return async (argContract: IArgContract, arg: { address: string, setAssetsInfo: Dispatch<any> }) => {
     const list = await argContract?.contract?.methods.getUserAssets(arg?.address).call();
     console.log(list, 'fetchGetUserAssets')
-    arg?.setAssetsInfo && arg?.setAssetsInfo([ ...list ])
+    arg?.setAssetsInfo && arg?.setAssetsInfo([...list])
   }
 }
 
@@ -82,7 +82,7 @@ export const fetchGetShopGoods = () => {
   return async (argContract: IArgContract, arg: { address: string, setShopGoods: Dispatch<any> }) => {
     const list = await argContract?.contract?.methods.getShopGoods(arg?.address).call();
     console.log(list, 'fetchGetShopGoods')
-    arg?.setShopGoods && arg?.setShopGoods([ ...list ])
+    arg?.setShopGoods && arg?.setShopGoods([...list])
   }
 }
 
@@ -159,7 +159,7 @@ export const fetchPostGoods = () => {
       arg?.value?.name,
       arg?.value?.category,
       arg?.value?.data,
-      Number(arg?.value?.price) * (10 ** 10),
+      String(Number(arg?.value?.price) * (10 ** 18)),
       Number(arg?.value?.amount),
       arg?.value?.bgColor
     ).send({ from: argContract?.accounts?.address });

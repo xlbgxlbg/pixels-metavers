@@ -8,11 +8,14 @@ import { useEffect, useMemo, useState } from "react";
 import { useUserInfo } from "../components/UserProvider";
 import { fetchGetUserAssets, fetchUserBaseInfo, useRequest } from "../pixels-metavers/apiHook";
 import React from "react";
+import { useLocation } from "react-router-dom";
 
 export const PixelsMetaverse = () => {
   const { accounts, contract } = usePixelsMetaverseContract()
   const [userBaseInfo, setUserBaseInfo] = useState<Dictionary<any>>({})
   const [userAssetsInfo, setAssetsInfo] = useState<any[]>([])
+  const { search } = useLocation()
+  const address = search ? search.split("=")[1] : accounts?.address
 
   const getUserBaseInfo = useRequest(fetchUserBaseInfo)
   const getUserAssetsInfo = useRequest(fetchGetUserAssets)
@@ -20,10 +23,10 @@ export const PixelsMetaverse = () => {
   const convertedPostion = useConvertedPostion()
 
   useEffect(() => {
-    if (isEmpty(accounts?.address)) return
-    getUserBaseInfo({ address: accounts?.address, setUserBaseInfo })
-    getUserAssetsInfo({ address: accounts?.address, setAssetsInfo })
-  }, [accounts?.address, contract])
+    if (isEmpty(address)) return
+    getUserBaseInfo({ address: address, setUserBaseInfo })
+    getUserAssetsInfo({ address: address, setAssetsInfo })
+  }, [address, contract])
 
   const { noOutfitEdList, outfitEdList } = useMemo(() => {
     if (isEmpty(userAssetsInfo)) return {
@@ -60,16 +63,16 @@ export const PixelsMetaverse = () => {
   }, [outfitEdList])
 
   return (
-    !isEmpty(userBaseInfo) ? <PixelsMetaverseHandleImgProvider size={480} showGrid data={{
+    !isEmpty(userBaseInfo) ? <PixelsMetaverseHandleImgProvider size={480} showGrid={userBaseInfo?.withGrid} data={{
       positions: positions,
       size: 'large',
       bgColor: userBaseInfo?.bgColor,
       gridColor: userBaseInfo?.gridColor,
     }}>
       <div className="flex justify-between bg-transparent flex-1 mt-4">
-        <PersonCenter outfitEdList={outfitEdList} noOutfitEdList={noOutfitEdList} />
+        <PersonCenter outfitEdList={outfitEdList} noOutfitEdList={noOutfitEdList} setAssetsInfo={setAssetsInfo}/>
         <Avatar />
-        <Merchants />
+        <Merchants setAssetsInfo={setAssetsInfo}/>
       </div>
     </PixelsMetaverseHandleImgProvider> : <div></div>
   )

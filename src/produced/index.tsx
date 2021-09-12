@@ -1,9 +1,7 @@
 import CloseCircleOutlined from "@ant-design/icons/lib/icons/CloseCircleOutlined"
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { isEmpty } from "lodash";
 import { Tooltip } from "antd";
-import PlusCircleOutlined from "@ant-design/icons/lib/icons/PlusCircleOutlined";
-import MinusCircleOutlined from "@ant-design/icons/lib/icons/MinusCircleOutlined";
 import { AppstoreOutlined, ClearOutlined, DeleteOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { SubminNFT } from "./Submit";
 import { PixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversImg";
@@ -69,12 +67,10 @@ export const Controller = () => {
       </Tooltip>
       <Tooltip placement="right" className="mb-4 cursor-pointer" title={() => {
         return (<div style={{ fontSize: 12 }}>
-          <div>1.格子大小只能在清除绘制画布数据后调整</div>
-          <div>2.清除画布数据会导致之前所有绘制丢失</div>
-          <div>3.选择了绘制颜色后，将不会从当前选中地方取色</div>
-          <div>4.丢弃当前选中色后，绘制的颜色将是点击处颜色</div>
-          <div>5.背景色仅仅为了方便查看，不会提交至区块链</div>
-          <div>6.双击即可删除当前位置数据</div>
+          <div>1.清除画布数据会导致之前所有绘制丢失</div>
+          <div>2.选择了绘制颜色后，将不会从当前选中地方取色，除非丢弃该颜色</div>
+          <div>3.丢弃当前选中色后，绘制的颜色将是点击处颜色</div>
+          <div>4.双击即可删除当前位置数据</div>
         </div>)
       }} color="#29303d">
         <ExclamationCircleOutlined />

@@ -1,85 +1,52 @@
-import CloseCircleOutlined from "@ant-design/icons/lib/icons/CloseCircleOutlined"
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { Dictionary, filter, find, isEmpty, map } from "lodash";
-import { message, Tooltip } from "antd";
-import PlusCircleOutlined from "@ant-design/icons/lib/icons/PlusCircleOutlined";
-import MinusCircleOutlined from "@ant-design/icons/lib/icons/MinusCircleOutlined";
-import { AppstoreOutlined, ClearOutlined, DeleteOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
-import { PixelsMetaverseHandleImg, PixelsMetaverseImgByPositionData } from "../pixels-metavers/PixelsMetaversImg";
+import React, { Dispatch, useEffect, useMemo, useState } from "react"
+import { Dictionary, filter, isEmpty, map } from "lodash";
+import { message } from "antd";
+import { AppstoreOutlined } from "@ant-design/icons";
+import { PixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversImg";
 import { PixelsMetaverseHandleImgProvider, usePixelsMetaverseContract, usePixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversProvider";
-import { CanvasSlicImg } from "../pixels-metavers/CanvasSlicImg";
-import { useUserInfo } from "../components/UserProvider";
-import { fetchBuyGoods, fetchGetShopGoods, fetchGetUserAssets, fetchRegister, fetchSetConfig, fetchUserBaseInfo, fetchUserInfo, useOutfit, useRegister, useRequest, useSetConfig } from "../pixels-metavers/apiHook";
+import { fetchGetShopGoods, fetchGetUserAssets, fetchRegister, fetchSetConfig, fetchUserBaseInfo, useRequest } from "../pixels-metavers/apiHook";
 import { AvatarCard, NoData } from "../play/PersonCenter";
 import { useGetPositionStr } from "../pixels-metavers/canvasHook";
+import { useLocation } from "react-router";
 
-export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo }: { noOutfitEdList: any[], outfitEdList: any[], userBaseInfo: any }) => {
-  const { setConfig, config, canvasRef, canvas2Ref, dealClick: { setValue } } = usePixelsMetaverseHandleImg()
-  const filedomRef = useRef<HTMLInputElement>(null)
+export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo, setUserBaseInfo, setAssetsInfo }: {
+  noOutfitEdList: any[], outfitEdList: any[], userBaseInfo: any, setUserBaseInfo: Dispatch<React.SetStateAction<Dictionary<any>>>, setAssetsInfo: Dispatch<React.SetStateAction<any[]>>
+}) => {
+  const { setConfig, config, canvas2Ref } = usePixelsMetaverseHandleImg()
   const { accounts, contract } = usePixelsMetaverseContract()
-  const [src, setSrc] = useState(localStorage.getItem("imgUrl") || "")
-  const [url, setUrl] = useState(src)
   const [shopGoods, setShopGoods] = useState<any[]>([])
+  const getUserBaseInfo = useRequest(fetchUserBaseInfo)
+  const { search } = useLocation()
+  const address = search ? search.split("=")[1] : accounts.address
   const goSetConfig = useRequest(fetchSetConfig, {
     onSuccess: () => {
       message.success("更新信息成功！")
+      if (isEmpty(address)) return
+      getUserBaseInfo({ address: address, setUserBaseInfo })
     }
-  }, [config])
+  }, [config, setUserBaseInfo, address])
 
   const fetch = useRequest(fetchRegister, {
     onSuccess: () => {
       message.success("激活账户成功！")
+      if (isEmpty(address)) return
+      getUserBaseInfo({ address: address, setUserBaseInfo })
     }
-  })
+  }, [setUserBaseInfo, address])
 
   const getShopGoods = useRequest(fetchGetShopGoods)
 
   useEffect(() => {
-    if (!accounts?.address) return
+    if (!address) return
     getShopGoods({
-      address: accounts?.address,
+      address: address,
       setShopGoods
     })
-  }, [contract, accounts?.address])
+  }, [contract, address])
 
-  //上传图片
-  const fileOnChange = useCallback(() => {
-    const filedom = filedomRef.current
-    if (filedom && filedom?.files) {
-      const file = filedom?.files[0];
-      if (!file.type.match("image.*")) {
-        return
-      }
-      let reader = new FileReader()
-      reader.onload = function () {
-        let bytes = this.result
-        let img = new Image()
-        img.src = "" + bytes
-        img.onload = function () {
-          setValue({})
-          setConfig((pre) => ({ ...pre, bgImg: img }))
-        }
-      }
-      reader.readAsDataURL(file)
-    }
-  }, [filedomRef])
+  console.log(address === accounts?.address, address, accounts?.address)
 
-  const onLoadImg = (src: string) => {
-    let img = new Image()
-    img.src = src
-    img.crossOrigin = ""
-    img.onload = function () {
-      setValue({})
-      setConfig((pre) => ({ ...pre, bgImg: img }))
-    }
-  }
-
-  useEffect(() => {
-    localStorage.setItem("imgUrl", url)
-    onLoadImg(src)
-  }, [src])
-
-  console.log(shopGoods, "shopGoods")
+  console.log(shopGoods, "shopGoods shopGoods")
 
   return (
     <div className="flex justify-between m-auto p-6 mt-4 rounded-md" style={{
@@ -130,7 +97,7 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo }:
           </div>
           <button className="flex items-center mt-4 justify-center bg-red-500 cursor-pointer h-10 w-full hover:text-white"
             style={{ borderRadius: 4 }}
-            disabled={accounts?.address !== userBaseInfo?.account}
+            disabled={address?.toUpperCase() !== accounts?.address?.toUpperCase()}
             onClick={() => {
               goSetConfig({
                 value: {
@@ -141,7 +108,7 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo }:
                 }
               })
             }}
-          >{accounts?.address === userBaseInfo?.account ? "更新设置" : "非当前连接账户"}</button>
+          >{address?.toUpperCase() === accounts?.address?.toUpperCase() ? "更新设置" : "不可更新设置"}</button>
         </div>
       </div>
       { (!isEmpty(outfitEdList) || !isEmpty(noOutfitEdList) || !isEmpty(shopGoods)) ? <div className="flex-1 flex justify-between">
@@ -150,7 +117,7 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo }:
             <div className="">已使用</div>
             {
               map(outfitEdList, item => {
-                return <AvatarCard key={item?.id} item={item} type="assets" />
+                return <AvatarCard key={item?.id} item={item} type="assets" setAssetsInfo={setAssetsInfo}/>
               })
             }
           </div>}
@@ -158,7 +125,7 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo }:
             <div className="">未使用</div>
             {
               map(noOutfitEdList, item => {
-                return (<AvatarCard key={item?.id} item={item} type="assets" />)
+                return (<AvatarCard key={item?.id} item={item} type="assets" setAssetsInfo={setAssetsInfo}/>)
               })
             }
           </div>}
@@ -168,7 +135,7 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo }:
             <div className="">店铺商品</div>
             {
               map(shopGoods, item => {
-                return (<AvatarCard key={item?.id} item={item} type="buyGoods" />)
+                return (<AvatarCard key={item?.id} item={item} type="buyGoods" setAssetsInfo={setAssetsInfo} setGoodsInfo={setShopGoods}/>)
               })
             }
           </div>
@@ -185,12 +152,14 @@ export const PersonCenter = () => {
 
   const getUserBaseInfo = useRequest(fetchUserBaseInfo)
   const getUserAssetsInfo = useRequest(fetchGetUserAssets)
+  const { search } = useLocation()
+  const address = search ? search.split("=")[1] : accounts.address
 
   React.useEffect(() => {
-    if (isEmpty(accounts?.address)) return
-    getUserBaseInfo({ address: accounts?.address, setUserBaseInfo })
-    getUserAssetsInfo({ address: accounts?.address, setAssetsInfo })
-  }, [accounts?.address, contract, setUserBaseInfo, setAssetsInfo])
+    if (isEmpty(address)) return
+    getUserBaseInfo({ address: address, setUserBaseInfo })
+    getUserAssetsInfo({ address: address, setAssetsInfo })
+  }, [address, contract, setUserBaseInfo, setAssetsInfo])
 
   const { noOutfitEdList, outfitEdList } = useMemo(() => {
     if (isEmpty(userAssetsInfo)) return {
@@ -205,14 +174,14 @@ export const PersonCenter = () => {
   const positions = useGetPositionStr(outfitEdList)
 
   return (
-    !isEmpty(userBaseInfo) && positions ? <PixelsMetaverseHandleImgProvider size={240} showGrid data={{
+    !isEmpty(userBaseInfo) && positions ? <PixelsMetaverseHandleImgProvider size={240} showGrid={userBaseInfo?.withGrid} data={{
       positions: positions,
       size: 'large',
       bgColor: userBaseInfo?.bgColor,
       gridColor: userBaseInfo?.gridColor,
     }}>
       <div className="flex w-full">
-        <PersonCenterCore outfitEdList={outfitEdList} noOutfitEdList={noOutfitEdList} userBaseInfo={userBaseInfo} />
+        <PersonCenterCore outfitEdList={outfitEdList} noOutfitEdList={noOutfitEdList} userBaseInfo={userBaseInfo} setUserBaseInfo={setUserBaseInfo} setAssetsInfo={setAssetsInfo}/>
       </div>
     </PixelsMetaverseHandleImgProvider> : <div></div>
   )

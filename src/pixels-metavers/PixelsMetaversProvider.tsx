@@ -122,8 +122,8 @@ export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGri
     withGrid: !!showGrid,
     bgImg: "",
     bgImgUp: "",
-    bgColor: data.bgColor || "#e1e1e1",
-    gridColor: data.gridColor || "#ffffff",
+    bgColor: data.bgColor || "transparent",
+    gridColor: data.gridColor || "#e1e1e1",
     isHandDraw: !!handDraw
   });
 

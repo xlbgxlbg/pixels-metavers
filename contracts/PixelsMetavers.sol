@@ -39,7 +39,7 @@ contract PixelsMetavers {
     mapping(address => ShopStruct) public shopObj;
 
     struct GoodsStruct {
-        address payable owner;
+        address owner;
         string name;
         string shopName;
         string category;
@@ -197,7 +197,10 @@ contract PixelsMetavers {
         );
         require(goodsObj[id].isSale, "The goods saled!");
 
-        goodsObj[id].owner.transfer(msg.value);
+        (bool success, ) = goodsObj[id].owner.call{value: msg.value}(
+            new bytes(0)
+        );
+        require(success, "Transfer failed.");
         IPMT721(PMT721).safeTransferFrom(address(this), msg.sender, id);
 
         assetsObj[msg.sender].push(
@@ -212,12 +215,12 @@ contract PixelsMetavers {
                 assetsObj[msg.sender].length
             )
         );
-        goodsObj[id].owner = payable(msg.sender);
+        goodsListBuyShop[goodsObj[id].owner][shopIndex].owner = msg.sender;
+        goodsListBuyShop[goodsObj[id].owner][shopIndex].isSale = false;
+        goodsObj[id].owner = msg.sender;
         goodsObj[id].isSale = false;
-        goodsList[goodsIndex].owner = payable(msg.sender);
+        goodsList[goodsIndex].owner = msg.sender;
         goodsList[goodsIndex].isSale = false;
-        goodsListBuyShop[msg.sender][shopIndex].owner = payable(msg.sender);
-        goodsListBuyShop[msg.sender][shopIndex].isSale = false;
     }
 
     function outfit(

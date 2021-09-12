@@ -6,7 +6,7 @@ import { Dropdown, Menu } from 'antd';
 import { useHistory } from "react-router";
 import { useLocation } from "react-router-dom";
 import { useWeb3js } from "../api/hook";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const SHeader = styled.div`
   margin-bottom: 1px;
@@ -88,8 +88,8 @@ const nav = [
 const Header = (props: IHeaderProps) => {
   const { connected, address, chainId, killSession, toConnect, web3, networkId } = props;
   const chainData = chainId ? getChainData(chainId) : null;
-  const onSearch = () => console.log("value");
   const history = useHistory()
+  const [ inputStr, setInputStr] = useState("")
   const { pathname } = useLocation()
   const { setAccounts } = useWeb3js()
 
@@ -118,10 +118,13 @@ const Header = (props: IHeaderProps) => {
             <input
               className="py-2 pl-4 mr-2 bg-transparent search"
               placeholder="请输入以太坊钱包地址"
+              onChange={(e)=>{setInputStr(e.target.value)}}
             />
             <div className="flex items-center justify-center h-full w-20 bg-red-500 cursor-pointer hover:text-white"
               style={{ borderTopRightRadius: 20, borderBottomRightRadius: 20 }}
-              onClick={onSearch}>查询</div>
+              onClick={()=>{
+                history.push(`/app${inputStr ? "?address="+inputStr : ""}`)
+              }}>查询</div>
           </div>
 
           {address && chainData ? (
