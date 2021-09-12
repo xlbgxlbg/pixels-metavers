@@ -3,7 +3,7 @@ import { Tooltip, Select, message, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Dictionary, find, keys, map } from 'lodash';
 import { usePixelsMetaverseContract, usePixelsMetaverseHandleImg } from '../pixels-metavers/PixelsMetaversProvider';
-import { useApplication, useGetGoodsList, usePostGoods, useRegister } from '../pixels-metavers/apiHook';
+import { fetchApplication, fetchPostGoods, fetchRegister, fetchUserInfo, useApplication, useGetGoodsList, usePostGoods, useRegister, useRequest } from '../pixels-metavers/apiHook';
 import { useUserInfo } from '../components/UserProvider';
 const { Option } = Select;
 
@@ -66,7 +66,7 @@ export interface IMerchandise {
 }
 
 export const SubminNFT = () => {
-  const { positionsArr, dealClick: { value } } = usePixelsMetaverseHandleImg()
+  const { positionsArr, setPositionsArr, dealClick: { value, clear } } = usePixelsMetaverseHandleImg()
   const [{
     name,
     category,
@@ -85,11 +85,56 @@ export const SubminNFT = () => {
   const [isMerchant, setIsMerchant] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { event } = usePixelsMetaverseContract()
-  const postGoods = usePostGoods()
+  //const postGoods = usePostGoods()
   const getShopList = useGetGoodsList()
-  const application = useApplication()
+  //const application = useApplication()
   const { userInfo } = useUserInfo()
-  const register = useRegister()
+  const { accounts } = usePixelsMetaverseContract()
+  //const register = useRegister()
+  const getUserInfo = useRequest(fetchUserInfo)
+
+  const application = useRequest(fetchApplication, {
+    onSuccess: () => {
+      getUserInfo({
+        address: userInfo?.user?.account
+      })
+    }
+  }, [userInfo?.user?.account])
+
+
+  const postGoods = useRequest(fetchPostGoods, {
+    onSuccess: () => {
+      message.success("商品发布成功！")
+      setIsModalVisible(false)
+      setMerchandies({
+        name: "",
+        category: "",
+        amount: "",
+        price: "",
+        weight: "",
+      })
+      clear()
+      setPositionsArr([])
+    },
+    onFail: ()=>{
+      setIsModalVisible(false)
+    }
+  }, [
+    userInfo?.user?.account,
+    name,
+    category,
+    amount,
+    price,
+    weight
+  ])
+
+  const register = useRequest(fetchRegister, {
+    onSuccess: () => {
+      getUserInfo({
+        address: userInfo?.user?.account
+      })
+    }
+  }, [userInfo?.user?.account])
   //const radixFun = new (require("radix.js"));
 
   useEffect(() => {
@@ -116,7 +161,10 @@ export const SubminNFT = () => {
     let avatar = JSON.parse(localStorage.getItem("avatar") || "[]")
     //find(avatar, item => item.data === nftData) || avatar.push(data)
     //localStorage.setItem("avatar", JSON.stringify(avatar))
-    postGoods(avatar[0])
+    console.log(avatar[0])
+    postGoods({
+      value: data
+    })
     //setIsModalVisible(false);
   }, [positionData, min]);
 
@@ -167,6 +215,8 @@ export const SubminNFT = () => {
     return true;
   }, [name, category, amount, price]);
 
+  console.log(userInfo, "userInfo")
+
   return (
     <div className="p-4 rounded-md text-gray-300"
       style={{
@@ -180,7 +230,7 @@ export const SubminNFT = () => {
           <ExclamationCircleOutlined />
         </Tooltip>
       </div>
-      { !userInfo?.user?.account?.includes("0000000000000000000000000") ? <div>
+      { !userInfo?.user?.account?.includes("0000000000000000000000000") && userInfo?.user?.isMerchant ? <div>
         <Label>商品名称</Label>
         <input
           className="search p-2 mt-1 pl-3 shangping"
@@ -214,13 +264,13 @@ export const SubminNFT = () => {
             map(categoryData, item => <Option key={item.value} value={item.value}>{item.label}</Option>)
           }
         </Select>
-        <Label>商品数量</Label>
+        <Label>商品数量(最多可发行9个)</Label>
         <input
           className="search p-2 mt-1 pl-3 shangping"
           style={{ width: "calc(300px - 40px)", background: "rgba(255, 255, 255, 0.2)", borderRadius: 4 }}
           placeholder="请输入商品数量"
           value={amount}
-          maxLength={10}
+          maxLength={1}
           onChange={(e) => { setMerchandies((pre) => ({ ...pre, amount: mustNum(e) })) }}
         />
         <Label>商品价格</Label>
@@ -269,13 +319,16 @@ export const SubminNFT = () => {
           maxLength={15}
           onChange={(e) => { setShopName(e.target.value) }}
         />
-        <button className="flex justify-center items-center h-10 mt-6 text-white cursor-pointer bg-red-500" style={{ width: "100%", borderRadius: 4, cursor: "no-drop" }}
+        <button className="flex justify-center items-center h-10 mt-6 text-white cursor-pointer bg-red-500" style={{ width: "100%", borderRadius: 4, cursor: userInfo?.user?.account?.includes("0000000000000000000000000") ? "no-drop" : "pointer" }}
           onClick={() => {
             if (!shopName) {
               message.warn("请输入店铺名称");
               return;
             }
-            application(shopName)
+            application({
+              name: shopName,
+              index: Number(userInfo?.user?.index)
+            })
           }}
           disabled={userInfo?.user?.account?.includes("0000000000000000000000000")}
         >申请入驻</button>

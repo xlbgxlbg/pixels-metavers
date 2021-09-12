@@ -1,6 +1,6 @@
 import CloseCircleOutlined from "@ant-design/icons/lib/icons/CloseCircleOutlined"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { filter, find, isEmpty, map } from "lodash";
+import { Dictionary, filter, find, isEmpty, map } from "lodash";
 import { message, Tooltip } from "antd";
 import PlusCircleOutlined from "@ant-design/icons/lib/icons/PlusCircleOutlined";
 import MinusCircleOutlined from "@ant-design/icons/lib/icons/MinusCircleOutlined";
@@ -9,34 +9,48 @@ import { PixelsMetaverseHandleImg, PixelsMetaverseImgByPositionData } from "../p
 import { PixelsMetaverseHandleImgProvider, usePixelsMetaverseContract, usePixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversProvider";
 import { CanvasSlicImg } from "../pixels-metavers/CanvasSlicImg";
 import { useUserInfo } from "../components/UserProvider";
-import { fetchRegister, useOutfit, useRegister, useRequest, useSetConfig } from "../pixels-metavers/apiHook";
+import { fetchGetUserAssets, fetchRegister, fetchSetConfig, fetchUserBaseInfo, fetchUserInfo, useOutfit, useRegister, useRequest, useSetConfig } from "../pixels-metavers/apiHook";
 import { AvatarCard } from "../play/PersonCenter";
 
 export const PersonCenterCore = () => {
   const { setConfig, config, canvasRef, canvas2Ref, dealClick: { setValue } } = usePixelsMetaverseHandleImg()
   const filedomRef = useRef<HTMLInputElement>(null)
-  const { accounts } = usePixelsMetaverseContract()
+  const { accounts, contract } = usePixelsMetaverseContract()
   const [src, setSrc] = useState(localStorage.getItem("imgUrl") || "")
   const [url, setUrl] = useState(src)
-  const goSetConfig = useSetConfig()
+  const [userBaseInfo, setUserBaseInfo] = useState<Dictionary<any>>({})
+  const [userAssetsInfo, setAssetsInfo] = useState<any[]>([])
+  const goSetConfig = useRequest(fetchSetConfig, {
+    onSuccess: () => {
+      message.success("更新信息成功！")
+    }
+  }, [config])
+
   const fetch = useRequest(fetchRegister, {
     onSuccess: () => {
       message.success("激活账户成功！")
     }
   })
 
-  const { userInfo } = useUserInfo()
+  const getUserBaseInfo = useRequest(fetchUserBaseInfo)
+  const getUserAssetsInfo = useRequest(fetchGetUserAssets)
+
+  React.useEffect(() => {
+    if (isEmpty(accounts?.address)) return
+    getUserBaseInfo({ address: accounts?.address, setUserBaseInfo })
+    getUserAssetsInfo({ address: accounts?.address, setAssetsInfo })
+  }, [accounts?.address, contract])
 
   const { noOutfitEdList, outfitEdList } = useMemo(() => {
-    if (isEmpty(userInfo?.assets)) return {
+    if (isEmpty(userAssetsInfo)) return {
       outfitEdList: [],
       noOutfitEdList: [],
     }
     return {
-      outfitEdList: filter(userInfo?.assets, item => item?.isOutfit),
-      noOutfitEdList: filter(userInfo?.assets, item => !item?.isOutfit)
+      outfitEdList: filter(userAssetsInfo, item => item?.isOutfit),
+      noOutfitEdList: filter(userAssetsInfo, item => !item?.isOutfit)
     }
-  }, [userInfo?.assets])
+  }, [userAssetsInfo])
 
 
   //上传图片
@@ -98,12 +112,12 @@ export const PersonCenterCore = () => {
         <div className="overflow-y-scroll" style={{ height: "calc(100% - 240px)" }}>
           <div className="flex justify-between items-center mt-8">
             <div>账户</div>
-            <div className="overflow-x-scroll" style={{ width: 180 }}>{userInfo?.user?.account}</div>
+            <div className="overflow-x-scroll" style={{ width: 180 }}>{userBaseInfo?.account || "0x000000000000000000000000000000000000000000000000000"}</div>
           </div>
           <div className="flex justify-between items-center mt-3">
             <div>类型</div>
-            {!userInfo?.user?.account?.includes("0000000000000000000000000") && <div>{userInfo?.user?.isMerchant ? "商户" : "用户"}</div>}
-            {userInfo?.user?.account?.includes("0000000000000000000000000") && <div className="cursor-pointer text-red-500" onClick={fetch}>去激活账户</div>}
+            {!userBaseInfo?.account?.includes("0000000000000000000000000") && <div>{userBaseInfo?.isMerchant ? "商户" : "用户"}</div>}
+            {userBaseInfo?.account?.includes("0000000000000000000000000") && <div className="cursor-pointer text-red-500" onClick={fetch}>去激活账户</div>}
           </div>
           <div className="flex justify-between items-center mt-3">
             <div>显示辅助线</div>
@@ -125,16 +139,18 @@ export const PersonCenterCore = () => {
           </div>
           <button className="flex items-center mt-4 justify-center bg-red-500 cursor-pointer h-10 w-full hover:text-white"
             style={{ borderRadius: 4 }}
-            disabled={accounts?.address !== userInfo?.user?.account}
+            disabled={accounts?.address !== userBaseInfo?.account}
             onClick={() => {
               goSetConfig({
-                bgColor: config?.bgColor,
-                gridColor: config?.gridColor,
-                withGrid: config?.withGrid,
-                index: userInfo?.user?.index
+                value: {
+                  bgColor: config?.bgColor,
+                  gridColor: config?.gridColor,
+                  withGrid: config?.withGrid,
+                  index: userBaseInfo?.index
+                }
               })
             }}
-          >{accounts?.address === userInfo?.user?.account ? "更新设置" : "非当前连接账户"}</button>
+          >{accounts?.address === userBaseInfo?.account ? "更新设置" : "非当前连接账户"}</button>
         </div>
       </div>
       <div className="flex-1 flex justify-between">
@@ -143,7 +159,7 @@ export const PersonCenterCore = () => {
             <div className="">已使用</div>
             {
               map(outfitEdList, item => {
-                return <AvatarCard key={item?.id} item={item} />
+                return <AvatarCard key={item?.id} item={item} type="assets" />
               })
             }
           </div>}
@@ -151,20 +167,18 @@ export const PersonCenterCore = () => {
             <div className="">未使用</div>
             {
               map(noOutfitEdList, item => {
-                return (<AvatarCard key={item?.id} item={item} />)
+                return (<AvatarCard key={item?.id} item={item} type="assets" />)
               })
             }
           </div>}
         </div>}
-        {userInfo?.user?.isMerchant && <div className="flex-1">
+        {userBaseInfo?.isMerchant && <div className="flex-1">
           <div>
             <div className="">店铺商品</div>
             {
               map(noOutfitEdList, item => {
                 //item.data?.split("-").pop()
-                return (<div key={item?.id} className="mt-2 item-avatar p-2">
-                  <PixelsMetaverseImgByPositionData data={{ ...item, positions: item.data }} size={96} style={{ borderRadius: 4, background: "#638496" }} />
-                </div>)
+                return (<AvatarCard key={item?.id} item={item} type="buyGoods" />)
               })
             }
           </div>

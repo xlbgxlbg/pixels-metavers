@@ -1,6 +1,6 @@
 import CloseCircleOutlined from "@ant-design/icons/lib/icons/CloseCircleOutlined"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { filter, find, isEmpty, map } from "lodash";
+import { filter, find, isEmpty, map, reverse } from "lodash";
 import { Tooltip } from "antd";
 import PlusCircleOutlined from "@ant-design/icons/lib/icons/PlusCircleOutlined";
 import MinusCircleOutlined from "@ant-design/icons/lib/icons/MinusCircleOutlined";
@@ -9,7 +9,7 @@ import { PixelsMetaverseHandleImg, PixelsMetaverseImgByPositionData } from "../p
 import { PixelsMetaverseHandleImgProvider, usePixelsMetaverseContract, usePixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversProvider";
 import { CanvasSlicImg } from "../pixels-metavers/CanvasSlicImg";
 import { useUserInfo } from "../components/UserProvider";
-import { useOutfit, useSetConfig } from "../pixels-metavers/apiHook";
+import { fetchGetGoodsList, fetchGetShopList, useOutfit, useRequest, useSetConfig } from "../pixels-metavers/apiHook";
 import { AvatarCard } from "../play/PersonCenter";
 import { categoryData } from "../produced/Submit";
 
@@ -89,14 +89,20 @@ export const Controller = () => {
 export const MallCore = () => {
   const { setConfig, config, canvasRef, canvas2Ref, dealClick: { setValue } } = usePixelsMetaverseHandleImg()
   const filedomRef = useRef<HTMLInputElement>(null)
-  const { accounts } = usePixelsMetaverseContract()
+  const { accounts, contract } = usePixelsMetaverseContract()
   const [src, setSrc] = useState(localStorage.getItem("imgUrl") || "")
   const [url, setUrl] = useState(src)
   const goSetConfig = useSetConfig()
   const outfit = useOutfit()
+  const [data, setData] = useState<any[]>([])
+
+  const getGoodsList = useRequest(fetchGetGoodsList)
 
   const { userInfo } = useUserInfo()
-  console.log(userInfo)
+
+  useEffect(() => {
+    getGoodsList({ setValue: setData })
+  }, [setValue, contract])
 
   const { noOutfitEdList, outfitEdList } = useMemo(() => {
     if (isEmpty(userInfo?.assets)) return {
@@ -155,12 +161,12 @@ export const MallCore = () => {
       color: "rgba(225, 225, 225, 0.8)"
     }}>
       <div className="flex-1 flex justify-between">
-        {userInfo?.user?.isMerchant && <div className="flex-1">
+        <div className="flex-1">
           <div>
             <div className="mb-4">商城商品</div>
             <div className="flex flex-wrap overflow-y-scroll" style={{ height: "calc(100vh - 170px)" }}>
               {
-                map(noOutfitEdList, (item, i) => {
+                map(data, (item, i) => {
                   return (
                     <div key={item?.id} className="p-2 mb-4 flex-col flex" style={{
                       background: "rgba(225,225,225, 0.1)",
@@ -186,12 +192,12 @@ export const MallCore = () => {
                         </div>
                         {item?.name && <div className="p rounded-sm mt-2 overflow-x-scroll" style={{ height: 20, textOverflow: "ellipsis", overflow: "hidden" }}>{item?.name}</div>}
                       </div>
-                    </div>)
+                  </div>)
                 })
               }
             </div>
           </div>
-        </div>}
+        </div>
       </div>
     </div>
   )

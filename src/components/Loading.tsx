@@ -45,10 +45,11 @@ export const Loading = () => {
       setTimeout(() => {
         setShow(true)
         clearTimeout(timer)
-      }, 3000)
+      }, 2000)
     }
 
     return () => {
+      setShow(false)
       clearTimeout(timer)
     }
   }, [loading])
