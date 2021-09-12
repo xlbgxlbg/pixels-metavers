@@ -1,7 +1,7 @@
 import CloseCircleOutlined from "@ant-design/icons/lib/icons/CloseCircleOutlined"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { filter, find, isEmpty, map } from "lodash";
-import { Tooltip } from "antd";
+import { message, Tooltip } from "antd";
 import PlusCircleOutlined from "@ant-design/icons/lib/icons/PlusCircleOutlined";
 import MinusCircleOutlined from "@ant-design/icons/lib/icons/MinusCircleOutlined";
 import { AppstoreOutlined, ClearOutlined, DeleteOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
@@ -9,7 +9,7 @@ import { PixelsMetaverseHandleImg, PixelsMetaverseImgByPositionData } from "../p
 import { PixelsMetaverseHandleImgProvider, usePixelsMetaverseContract, usePixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversProvider";
 import { CanvasSlicImg } from "../pixels-metavers/CanvasSlicImg";
 import { useUserInfo } from "../components/UserProvider";
-import { useOutfit, useRegister, useSetConfig } from "../pixels-metavers/apiHook";
+import { fetchRegister, useOutfit, useRegister, useRequest, useSetConfig } from "../pixels-metavers/apiHook";
 import { AvatarCard } from "../play/PersonCenter";
 
 export const PersonCenterCore = () => {
@@ -19,11 +19,13 @@ export const PersonCenterCore = () => {
   const [src, setSrc] = useState(localStorage.getItem("imgUrl") || "")
   const [url, setUrl] = useState(src)
   const goSetConfig = useSetConfig()
-  const outfit = useOutfit()
-  const register = useRegister()
+  const fetch = useRequest(fetchRegister, {
+    onSuccess: () => {
+      message.success("激活账户成功！")
+    }
+  })
 
   const { userInfo } = useUserInfo()
-  console.log(userInfo)
 
   const { noOutfitEdList, outfitEdList } = useMemo(() => {
     if (isEmpty(userInfo?.assets)) return {
@@ -100,8 +102,8 @@ export const PersonCenterCore = () => {
           </div>
           <div className="flex justify-between items-center mt-3">
             <div>类型</div>
-            { !userInfo?.user?.account?.includes("0000000000000000000000000") && <div>{userInfo?.user?.isMerchant ? "商户" : "用户"}</div> }
-            { userInfo?.user?.account?.includes("0000000000000000000000000") && <div className="cursor-pointer text-red-500" onClick={register}>去激活账户</div> }
+            {!userInfo?.user?.account?.includes("0000000000000000000000000") && <div>{userInfo?.user?.isMerchant ? "商户" : "用户"}</div>}
+            {userInfo?.user?.account?.includes("0000000000000000000000000") && <div className="cursor-pointer text-red-500" onClick={fetch}>去激活账户</div>}
           </div>
           <div className="flex justify-between items-center mt-3">
             <div>显示辅助线</div>

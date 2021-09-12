@@ -3,7 +3,8 @@ import { Tooltip, Select, message, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Dictionary, find, keys, map } from 'lodash';
 import { usePixelsMetaverseContract, usePixelsMetaverseHandleImg } from '../pixels-metavers/PixelsMetaversProvider';
-import { useApplication, useGetGoodsList, usePostGoods } from '../pixels-metavers/apiHook';
+import { useApplication, useGetGoodsList, usePostGoods, useRegister } from '../pixels-metavers/apiHook';
+import { useUserInfo } from '../components/UserProvider';
 const { Option } = Select;
 
 const Label = ({ children }: { children: ReactNode }) => {
@@ -43,6 +44,9 @@ export const categoryData = [
   }, {
     label: "脖子",
     value: "neck"
+  }, {
+    label: "胡子",
+    value: "beard"
   }, {
     label: "饰品",
     value: "accessories"
@@ -84,6 +88,8 @@ export const SubminNFT = () => {
   const postGoods = usePostGoods()
   const getShopList = useGetGoodsList()
   const application = useApplication()
+  const { userInfo } = useUserInfo()
+  const register = useRegister()
   //const radixFun = new (require("radix.js"));
 
   useEffect(() => {
@@ -174,7 +180,7 @@ export const SubminNFT = () => {
           <ExclamationCircleOutlined />
         </Tooltip>
       </div>
-      {isMerchant ? <div>
+      { !userInfo?.user?.account?.includes("0000000000000000000000000") ? <div>
         <Label>商品名称</Label>
         <input
           className="search p-2 mt-1 pl-3 shangping"
@@ -263,7 +269,7 @@ export const SubminNFT = () => {
           maxLength={15}
           onChange={(e) => { setShopName(e.target.value) }}
         />
-        <div className="flex justify-center items-center h-10 mt-6 text-white cursor-pointer bg-red-500" style={{ width: "100%", borderRadius: 4 }}
+        <button className="flex justify-center items-center h-10 mt-6 text-white cursor-pointer bg-red-500" style={{ width: "100%", borderRadius: 4, cursor: "no-drop" }}
           onClick={() => {
             if (!shopName) {
               message.warn("请输入店铺名称");
@@ -271,7 +277,12 @@ export const SubminNFT = () => {
             }
             application(shopName)
           }}
-        >申请入驻</div>
+          disabled={userInfo?.user?.account?.includes("0000000000000000000000000")}
+        >申请入驻</button>
+        {userInfo?.user?.account?.includes("0000000000000000000000000") && <div className="mt-4">你还不是宇宙创始居民，请
+        <span className="text-red-500 cursor-pointer" onClick={() => {
+            register()
+          }}>激活</span>自己的元宇宙身份！</div>}
       </div>}
 
       <Modal title="是否发布商品" okText={positionData?.length >= 64 ? "资产多，我不担心，硬核提交" : "确认"} cancelText="取消" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>

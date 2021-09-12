@@ -3,6 +3,116 @@ import { usePixelsMetaverseContract } from "./PixelsMetaversProvider";
 import { Contract } from 'web3-eth-contract';
 import { IMerchandise } from "../produced/Submit";
 import { useLoading } from "../components/Loading";
+import { message } from "antd";
+
+export interface IHandle {
+  onSuccess?: () => void,
+  onFail?: () => void
+}
+
+export interface IArgContract { contract: Contract, accounts: any }
+
+export const useRequest = (
+  fetch: () => (argContract: IArgContract, arg?: any) => Promise<void>,
+  {
+    onSuccess,
+    onFail
+  }: IHandle = {},
+  delay: any[] = []
+) => {
+  const { accounts, contract } = usePixelsMetaverseContract()
+  const { closeDelayLoading, openLoading, closeLoading } = useLoading()
+  return useCallback(async (arg?: any) => {
+    if (!contract || !accounts) return
+    try {
+      openLoading()
+      fetch()({ accounts, contract }, arg).then(() => {
+        closeDelayLoading()
+        onSuccess && onSuccess()
+      }).catch((error) => {
+        closeLoading()
+        onFail && onFail()
+        error?.message && message.warning(error?.message)
+      })
+    } catch (error) {
+      closeLoading()
+      onFail && onFail()
+      error?.message && message.warning(error?.message)
+    }
+  }, [contract, accounts, openLoading, ...delay])
+}
+
+export const fetchUserInfo = () => {
+  return async (argContract: IArgContract, arg: { address: string, setUserInfo: Dispatch<any> }) => {
+    const info = await argContract?.contract?.methods.userObj(arg.address).call();
+    arg.setUserInfo && arg.setUserInfo((pre: any) => ({
+      ...pre,
+      user: info
+    }))
+  }
+}
+
+export const fetchRegister = () => {
+  return async (argContract: IArgContract) => {
+    await argContract?.contract.methods.register().send({ from: argContract?.accounts?.address });
+  }
+}
+
+export const fetchGetUserAssets = () => {
+  return async (argContract: IArgContract, arg: { address: string, setUserInfo: Dispatch<any> }) => {
+    const list = await argContract?.contract?.methods.getUserAssets(arg?.address).call();
+    console.log(list)
+    arg?.setUserInfo && arg?.setUserInfo((pre: any) => ({
+      ...pre,
+      assets: list
+    }))
+  }
+}
+
+export const fetchGetShopInfo = () => {
+  return async (argContract: IArgContract, arg: { address: string }) => {
+    await argContract?.contract.methods.shopObj(arg?.address).call();
+  }
+}
+
+export const fetchGetGoodsInfo = () => {
+  return async (argContract: IArgContract, arg: { id: number }) => {
+    await argContract?.contract.methods.goodsObj(arg?.id).call();
+  }
+}
+
+export const fetchGetUserList = () => {
+  return async (argContract: IArgContract, arg: {}) => {
+    const len = await argContract?.contract?.methods.getUserLength().call();
+    let list: any[] = [];
+    for (let i = 0; i < len; i++) {
+      let item = await argContract?.contract?.methods.userList(i).call()
+      list.push(item)
+    }
+  }
+}
+
+export const fetchGetShopList = () => {
+  return async (argContract: IArgContract) => {
+    const len = await argContract?.contract?.methods.getShopLength().call();
+    let list: any[] = [];
+    for (let i = 0; i < len; i++) {
+      let item = await argContract?.contract?.methods.shopList(i).call()
+      list.push(item)
+    }
+  }
+}
+
+export const fetchGetGoodsList = () => {
+  return async (argContract: IArgContract) => {
+    const len = await argContract?.contract?.methods.getGoodsLength().call();
+    let list: any[] = [];
+    for (let i = 0; i < len; i++) {
+      let item = await argContract?.contract?.methods.goodsList(i).call()
+      list.push(item)
+    }
+  }
+}
 
 export const useGetUserInfo = () => {
   const { contract } = usePixelsMetaverseContract()
@@ -114,20 +224,33 @@ export const useSetConfig = () => {
 
 export const useRegister = () => {
   const { accounts, contract } = usePixelsMetaverseContract()
-  const { closeDelayLoading, openLoading } = useLoading()
+  const { closeDelayLoading, openLoading, closeLoading } = useLoading()
   return useCallback(async () => {
     if (!contract) return
-    openLoading()
-    await contract.methods.register().send({ from: accounts?.address });
-    closeDelayLoading()
+    try {
+      openLoading()
+      await contract.methods.register().send({ from: accounts?.address });
+      closeDelayLoading()
+    } catch (error) {
+      closeLoading()
+      error?.message && message.warning(error?.message)
+    }
   }, [accounts, contract])
 }
 
 export const useApplication = () => {
   const { accounts, contract } = usePixelsMetaverseContract()
+  const { closeDelayLoading, openLoading, closeLoading } = useLoading()
   return useCallback(async (name: string) => {
     if (!contract) return
-    await contract.methods.application(name).send({ from: accounts?.address });
+    try {
+      openLoading()
+      await contract.methods.application(name).send({ from: accounts?.address });
+      closeDelayLoading()
+    } catch (error) {
+      closeLoading()
+      error?.message && message.warning(error?.message)
+    }
   }, [accounts, contract])
 }
 
