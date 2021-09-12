@@ -73,8 +73,8 @@ export const fetchRegister = () => {
 export const fetchGetUserAssets = () => {
   return async (argContract: IArgContract, arg: { address: string, setAssetsInfo: Dispatch<any> }) => {
     const list = await argContract?.contract?.methods.getUserAssets(arg?.address).call();
-    console.log(list)
-    arg?.setAssetsInfo && arg?.setAssetsInfo(list)
+    console.log(list, 'fetchGetUserAssets')
+    arg?.setAssetsInfo && arg?.setAssetsInfo([ ...list ])
   }
 }
 
@@ -115,9 +115,10 @@ export const fetchGetShopList = () => {
 
 export const fetchGetGoodsList = () => {
   return async (argContract: IArgContract, arg?: { setValue: Dispatch<React.SetStateAction<any[]>>, to?: number }) => {
-    const len = await argContract?.contract?.methods.getGoodsLength().call();
+    const lenght = await argContract?.contract?.methods.getGoodsLength().call();
     let list: any[] = [];
-    for (let i = len - 1; i >= len - (arg?.to || len); i--) {
+    let count = arg?.to ? (arg?.to < lenght ? arg?.to : lenght) : lenght
+    for (let i = lenght - 1; i >= lenght - count; i--) {
       let item = await argContract?.contract?.methods.goodsList(i).call()
       list.push(item)
     }
@@ -151,14 +152,15 @@ export const fetchPostGoods = () => {
       arg?.value?.category,
       arg?.value?.data,
       Number(arg?.value?.price) * (10 ** 10),
-      Number(arg?.value?.amount)
+      Number(arg?.value?.amount),
+      arg?.value?.bgColor
     ).send({ from: argContract?.accounts?.address });
   }
 }
 
 export const fetchBuyGoods = () => {
-  return async (argContract: IArgContract, arg: { id: number, goodsIndex: number }) => {
-    await argContract?.contract.methods.buyGoods(arg.id, arg?.goodsIndex).send({ from: argContract?.accounts?.address });
+  return async (argContract: IArgContract, arg: { id: number, goodsIndex: number, shopIndex: number, price: number }) => {
+    await argContract?.contract.methods.buyGoods(arg.id, arg?.goodsIndex, arg?.shopIndex).send({ from: argContract?.accounts?.address, value: arg.price });
   }
 }
 
@@ -167,7 +169,6 @@ export const fetchOutfit = () => {
     await argContract?.contract.methods.outfit(arg?.value.id, arg?.value.index, arg?.value.isOutfit).send({ from: argContract?.accounts?.address });
   }
 }
-
 
 export const useGetUserInfo = () => {
   const { contract } = usePixelsMetaverseContract()

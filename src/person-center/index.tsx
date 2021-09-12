@@ -10,16 +10,15 @@ import { PixelsMetaverseHandleImgProvider, usePixelsMetaverseContract, usePixels
 import { CanvasSlicImg } from "../pixels-metavers/CanvasSlicImg";
 import { useUserInfo } from "../components/UserProvider";
 import { fetchGetUserAssets, fetchRegister, fetchSetConfig, fetchUserBaseInfo, fetchUserInfo, useOutfit, useRegister, useRequest, useSetConfig } from "../pixels-metavers/apiHook";
-import { AvatarCard } from "../play/PersonCenter";
+import { AvatarCard, NoData } from "../play/PersonCenter";
+import { useGetPositionStr } from "../pixels-metavers/canvasHook";
 
-export const PersonCenterCore = () => {
+export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo }: { noOutfitEdList: any[], outfitEdList: any[], userBaseInfo: any }) => {
   const { setConfig, config, canvasRef, canvas2Ref, dealClick: { setValue } } = usePixelsMetaverseHandleImg()
   const filedomRef = useRef<HTMLInputElement>(null)
   const { accounts, contract } = usePixelsMetaverseContract()
   const [src, setSrc] = useState(localStorage.getItem("imgUrl") || "")
   const [url, setUrl] = useState(src)
-  const [userBaseInfo, setUserBaseInfo] = useState<Dictionary<any>>({})
-  const [userAssetsInfo, setAssetsInfo] = useState<any[]>([])
   const goSetConfig = useRequest(fetchSetConfig, {
     onSuccess: () => {
       message.success("更新信息成功！")
@@ -31,27 +30,6 @@ export const PersonCenterCore = () => {
       message.success("激活账户成功！")
     }
   })
-
-  const getUserBaseInfo = useRequest(fetchUserBaseInfo)
-  const getUserAssetsInfo = useRequest(fetchGetUserAssets)
-
-  React.useEffect(() => {
-    if (isEmpty(accounts?.address)) return
-    getUserBaseInfo({ address: accounts?.address, setUserBaseInfo })
-    getUserAssetsInfo({ address: accounts?.address, setAssetsInfo })
-  }, [accounts?.address, contract])
-
-  const { noOutfitEdList, outfitEdList } = useMemo(() => {
-    if (isEmpty(userAssetsInfo)) return {
-      outfitEdList: [],
-      noOutfitEdList: [],
-    }
-    return {
-      outfitEdList: filter(userAssetsInfo, item => item?.isOutfit),
-      noOutfitEdList: filter(userAssetsInfo, item => !item?.isOutfit)
-    }
-  }, [userAssetsInfo])
-
 
   //上传图片
   const fileOnChange = useCallback(() => {
@@ -153,7 +131,7 @@ export const PersonCenterCore = () => {
           >{accounts?.address === userBaseInfo?.account ? "更新设置" : "非当前连接账户"}</button>
         </div>
       </div>
-      <div className="flex-1 flex justify-between">
+      { (!isEmpty(outfitEdList) || !isEmpty(noOutfitEdList)) ? <div className="flex-1 flex justify-between">
         {(!isEmpty(outfitEdList) || !isEmpty(noOutfitEdList)) && <div className="overflow-y-scroll flex-1 pr-4 border-r mr-4" style={{ borderColor: "rgba(225,225,225, 0.3" }}>
           {!isEmpty(outfitEdList) && <div className="pb-8">
             <div className="">已使用</div>
@@ -172,7 +150,7 @@ export const PersonCenterCore = () => {
             }
           </div>}
         </div>}
-        {userBaseInfo?.isMerchant && <div className="flex-1">
+        {userBaseInfo?.isMerchant && !isEmpty(noOutfitEdList) && <div className="flex-1">
           <div>
             <div className="">店铺商品</div>
             {
@@ -183,22 +161,47 @@ export const PersonCenterCore = () => {
             }
           </div>
         </div>}
-      </div>
+      </div> : <NoData />}
     </div>
   )
 }
 
 export const PersonCenter = () => {
+  const { accounts, contract } = usePixelsMetaverseContract()
+  const [userBaseInfo, setUserBaseInfo] = useState<Dictionary<any>>({})
+  const [userAssetsInfo, setAssetsInfo] = useState<any[]>([])
+
+  const getUserBaseInfo = useRequest(fetchUserBaseInfo)
+  const getUserAssetsInfo = useRequest(fetchGetUserAssets)
+
+  React.useEffect(() => {
+    if (isEmpty(accounts?.address)) return
+    getUserBaseInfo({ address: accounts?.address, setUserBaseInfo })
+    getUserAssetsInfo({ address: accounts?.address, setAssetsInfo })
+  }, [accounts?.address, contract, setUserBaseInfo, setAssetsInfo])
+
+  const { noOutfitEdList, outfitEdList } = useMemo(() => {
+    if (isEmpty(userAssetsInfo)) return {
+      outfitEdList: [],
+      noOutfitEdList: [],
+    }
+    return {
+      outfitEdList: filter(userAssetsInfo, item => item?.isOutfit),
+      noOutfitEdList: filter(userAssetsInfo, item => !item?.isOutfit)
+    }
+  }, [userAssetsInfo])
+  const positions = useGetPositionStr(outfitEdList)
+
   return (
-    <PixelsMetaverseHandleImgProvider size={240} showGrid data={{
-      positions: [],
+    !isEmpty(userBaseInfo) && positions ? <PixelsMetaverseHandleImgProvider size={240} showGrid data={{
+      positions: positions,
       size: 'large',
-      bgColor: "#083f35",
-      gridColor: "#ffffff",
+      bgColor: userBaseInfo?.bgColor,
+      gridColor: userBaseInfo?.gridColor,
     }}>
       <div className="flex w-full">
-        <PersonCenterCore />
+        <PersonCenterCore outfitEdList={outfitEdList} noOutfitEdList={noOutfitEdList} userBaseInfo={userBaseInfo} />
       </div>
-    </PixelsMetaverseHandleImgProvider>
+    </PixelsMetaverseHandleImgProvider> : <div></div>
   )
 }

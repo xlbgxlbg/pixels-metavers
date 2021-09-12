@@ -39,9 +39,9 @@ let contract, accounts;
 async function getContract(contractData) {
   try {
     const web3 = await getWeb3();
-    const networkId = await web3.eth.net.getId();
+    //const networkId = await web3.eth.net.getId();
     accounts = await web3.eth.getAccounts();
-    const deployedNetwork = contractData?.networks[networkId];
+    const deployedNetwork = contractData?.networks[5777];
     contract = new web3.eth.Contract(contractData?.abi, deployedNetwork && deployedNetwork?.address);
   } catch (error) {
     console.error(error);

@@ -9,8 +9,8 @@ import { PixelsMetaverseHandleImg, PixelsMetaverseImgByPositionData } from "../p
 import { PixelsMetaverseHandleImgProvider, usePixelsMetaverseContract, usePixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversProvider";
 import { CanvasSlicImg } from "../pixels-metavers/CanvasSlicImg";
 import { useUserInfo } from "../components/UserProvider";
-import { fetchGetGoodsList, fetchGetShopList, useOutfit, useRequest, useSetConfig } from "../pixels-metavers/apiHook";
-import { AvatarCard } from "../play/PersonCenter";
+import { fetchBuyGoods, fetchGetGoodsList, fetchGetShopList, useOutfit, useRequest, useSetConfig } from "../pixels-metavers/apiHook";
+import { AvatarCard, NoData } from "../play/PersonCenter";
 import { categoryData } from "../produced/Submit";
 
 export const Controller = () => {
@@ -90,14 +90,10 @@ export const MallCore = () => {
   const { setConfig, config, canvasRef, canvas2Ref, dealClick: { setValue } } = usePixelsMetaverseHandleImg()
   const filedomRef = useRef<HTMLInputElement>(null)
   const { accounts, contract } = usePixelsMetaverseContract()
-  const [src, setSrc] = useState(localStorage.getItem("imgUrl") || "")
-  const [url, setUrl] = useState(src)
-  const goSetConfig = useSetConfig()
-  const outfit = useOutfit()
   const [data, setData] = useState<any[]>([])
+  const buyGoods = useRequest(fetchBuyGoods)
 
   const getGoodsList = useRequest(fetchGetGoodsList)
-
   const { userInfo } = useUserInfo()
 
   useEffect(() => {
@@ -115,44 +111,6 @@ export const MallCore = () => {
     }
   }, [userInfo?.assets])
 
-
-  //上传图片
-  const fileOnChange = useCallback(() => {
-    const filedom = filedomRef.current
-    if (filedom && filedom?.files) {
-      const file = filedom?.files[0];
-      if (!file.type.match("image.*")) {
-        return
-      }
-      let reader = new FileReader()
-      reader.onload = function () {
-        let bytes = this.result
-        let img = new Image()
-        img.src = "" + bytes
-        img.onload = function () {
-          setValue({})
-          setConfig((pre) => ({ ...pre, bgImg: img }))
-        }
-      }
-      reader.readAsDataURL(file)
-    }
-  }, [filedomRef])
-
-  const onLoadImg = (src: string) => {
-    let img = new Image()
-    img.src = src
-    img.crossOrigin = ""
-    img.onload = function () {
-      setValue({})
-      setConfig((pre) => ({ ...pre, bgImg: img }))
-    }
-  }
-
-  useEffect(() => {
-    localStorage.setItem("imgUrl", url)
-    onLoadImg(src)
-  }, [src])
-
   return (
     <div className="flex justify-between m-auto p-6 mt-4 rounded-md" style={{
       width: 1200,
@@ -162,9 +120,9 @@ export const MallCore = () => {
     }}>
       <div className="flex-1 flex justify-between">
         <div className="flex-1">
-          <div>
+          <div className="h-full">
             <div className="mb-4">商城商品</div>
-            <div className="flex flex-wrap overflow-y-scroll" style={{ height: "calc(100vh - 170px)" }}>
+            {!isEmpty(data) ? <div className="flex flex-wrap overflow-y-scroll" style={{ height: "calc(100vh - 170px)" }}>
               {
                 map(data, (item, i) => {
                   return (
@@ -175,27 +133,30 @@ export const MallCore = () => {
                       width: 216,
                       marginRight: i % 5 === 4 ? 0 : 17
                     }}>
-                      <PixelsMetaverseImgByPositionData data={{ ...item, positions: item.data }} size={200} style={{ borderRadius: 4, background: "#e1e1e11a", cursor: "pointer" }} />
+                      <PixelsMetaverseImgByPositionData data={{ ...item, positions: item.data }} size={200} style={{ borderRadius: 4, background: item?.bgColor || "#e1e1e11a", cursor: "pointer", boxShadow: "0px 0px 5px rgba(225,225,225,0.3)" }} />
                       <div className="flex flex-col justify-between flex-1 mt-4" style={{ fontSize: 12, width: 200 }}>
                         <div className="text-right flex-1" style={{ height: 40, textOverflow: "ellipsis", overflow: "hidden" }}>{item?.name || "卡姿兰大眼睛，你值得拥有,还在等什么，快点装备我吧"}</div>
                         <div className="flex justify-between items-center mt-2">
                           <div className="flex justify-between items-center">
                             <div className="p px-2 rounded-sm mr-2" style={{ background: "rgba(225, 225, 225, 0.1)" }}>ID: {item?.id}</div>
                             <div className="p px-2 rounded-sm" style={{ background: "rgba(225, 225, 225, 0.1)" }}>{(find(categoryData, ite => ite?.value === item?.category) || {})?.label}</div>
-                          </div>{accounts?.address === userInfo?.user?.account && <div className="p px-2 bg-red-500 rounded-sm cursor-pointer" onClick={() => {
-                            outfit({
-                              id: [Number(item?.id)],
-                              index: item?.index,
-                              isOutfit: true
+                          </div>
+                          <button className="p px-4 bg-red-500 rounded-sm cursor-pointer" onClick={() => {
+                            buyGoods({
+                              id: Number(item?.id),
+                              goodsIndex: Number(item?.index),
+                              shopIndex: Number(item?.shopIndex),
+                              price: Number(item?.price)
                             })
-                          }}>{"购买"}</div>}
+                          }}
+                            disabled={!item?.isSale}>{item?.isSale ? "购买" : "已出售"}</button>
                         </div>
                         {item?.name && <div className="p rounded-sm mt-2 overflow-x-scroll" style={{ height: 20, textOverflow: "ellipsis", overflow: "hidden" }}>{item?.name}</div>}
                       </div>
-                  </div>)
+                    </div>)
                 })
               }
-            </div>
+            </div> : <NoData />}
           </div>
         </div>
       </div>
@@ -205,15 +166,6 @@ export const MallCore = () => {
 
 export const Mall = () => {
   return (
-    <PixelsMetaverseHandleImgProvider size={240} showGrid data={{
-      positions: [],
-      size: 'large',
-      bgColor: "#083f35",
-      gridColor: "#ffffff",
-    }}>
-      <div className="flex w-full">
-        <MallCore />
-      </div>
-    </PixelsMetaverseHandleImgProvider>
+    <MallCore />
   )
 }

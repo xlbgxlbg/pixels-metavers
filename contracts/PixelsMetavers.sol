@@ -14,6 +14,7 @@ contract PixelsMetavers {
         string data;
         uint256 id;
         bool isOutfit;
+        string bgColor;
         uint256 index;
     }
     mapping(address => AssetsStruct[]) public assetsObj;
@@ -38,8 +39,9 @@ contract PixelsMetavers {
     mapping(address => ShopStruct) public shopObj;
 
     struct GoodsStruct {
-        address owner;
+        address payable owner;
         string name;
+        string shopName;
         string category;
         string data;
         uint256 price;
@@ -78,7 +80,10 @@ contract PixelsMetavers {
     }
 
     function register() public {
-        require(userObj[msg.sender].account == address(0), "You are already a platform user!");
+        require(
+            userObj[msg.sender].account == address(0),
+            "You are already a platform user!"
+        );
         userObj[msg.sender].account = msg.sender;
         userObj[msg.sender].index = userList.length;
         userList.push(userObj[msg.sender]);
@@ -101,7 +106,10 @@ contract PixelsMetavers {
         public
         MustUser(msg.sender)
     {
-        require(!userObj[msg.sender].isMerchant, "You are already a platform merchant!");
+        require(
+            !userObj[msg.sender].isMerchant,
+            "You are already a platform merchant!"
+        );
         shopObj[msg.sender].name = name;
         shopObj[msg.sender].owner = msg.sender;
         shopObj[msg.sender].index = shopList.length;
@@ -150,14 +158,18 @@ contract PixelsMetavers {
         uint256 amount,
         string memory bgColor
     ) public Lock {
-        require(shopObj[msg.sender].owner != address(0), "Only Merchant Can Do It!");
+        require(
+            shopObj[msg.sender].owner != address(0),
+            "Only Merchant Can Do It!"
+        );
         for (uint256 i; i < amount; i++) {
             IPMT721(PMT721).mint();
             uint256 currentID = IPMT721(PMT721).getCurrentID();
 
             GoodsStruct memory goods = GoodsStruct(
-                msg.sender,
+                payable(msg.sender),
                 name,
+                shopObj[msg.sender].name,
                 category,
                 data,
                 price,
@@ -189,17 +201,9 @@ contract PixelsMetavers {
         );
         require(goodsObj[id].isSale, "The goods saled!");
 
-        if (address(this) == IPMT721(PMT721).ownerOf(id)) {
-            _safeTransferETH(goodsObj[id].owner, msg.value);
-            IPMT721(PMT721).safeTransferFrom(address(this), msg.sender, id);
-        } else {
-            _safeTransferETH(IPMT721(PMT721).ownerOf(id), msg.value);
-            IPMT721(PMT721).safeTransferFrom(
-                IPMT721(PMT721).ownerOf(id),
-                msg.sender,
-                id
-            );
-        }
+        goodsObj[id].owner.transfer(msg.value);
+        IPMT721(PMT721).safeTransferFrom(address(this), msg.sender, id);
+
         assetsObj[msg.sender].push(
             AssetsStruct(
                 msg.sender,
@@ -208,14 +212,15 @@ contract PixelsMetavers {
                 goodsObj[id].data,
                 id,
                 false,
+                goodsObj[id].bgColor,
                 assetsObj[msg.sender].length
             )
         );
-        goodsObj[id].owner = msg.sender;
+        goodsObj[id].owner = payable(msg.sender);
         goodsObj[id].isSale = false;
-        goodsList[goodsIndex].owner = msg.sender;
+        goodsList[goodsIndex].owner = payable(msg.sender);
         goodsList[goodsIndex].isSale = false;
-        goodsListBuyShop[msg.sender][shopIndex].owner = msg.sender;
+        goodsListBuyShop[msg.sender][shopIndex].owner = payable(msg.sender);
         goodsListBuyShop[msg.sender][shopIndex].isSale = false;
     }
 
@@ -229,14 +234,6 @@ contract PixelsMetavers {
             "The current item is not your asset!"
         );
         assetsObj[msg.sender][assetsIndex].isOutfit = isOutfit;
-    }
-
-    function _safeTransferETH(address to, uint256 value) internal {
-        (bool success, ) = to.call{value: value}(new bytes(0));
-        require(
-            success,
-            "TransferHelper::safeTransferETH: ETH transfer failed"
-        );
     }
 
     function setPMT721(address pmt721) public {

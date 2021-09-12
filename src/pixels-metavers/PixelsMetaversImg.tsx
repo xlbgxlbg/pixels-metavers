@@ -33,9 +33,9 @@ export type TCanvasHTMLAttributes = DetailedHTMLProps<React.CanvasHTMLAttributes
 
 export type TData = {
   positions: any;
-  size: string;
-  bgColor: string;
-  gridColor: string
+  size?: string;
+  bgColor?: string;
+  gridColor?: string
 }
 
 export type IPixelsMetaverseImgByAddress = {
@@ -151,6 +151,8 @@ export const PixelsMetaverseHandleImg = ({ canvasRef, showBgImg, showGridColor, 
       return positionss
     })
   }
+
+  console.log(value, "value", value)
 
   return (
     <PixelsMetaverseCanvas

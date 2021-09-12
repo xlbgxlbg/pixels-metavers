@@ -1,10 +1,11 @@
 import { ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { Tooltip, Select, message, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Dictionary, find, keys, map } from 'lodash';
+import { Dictionary, find, isEmpty, keys, map } from 'lodash';
 import { usePixelsMetaverseContract, usePixelsMetaverseHandleImg } from '../pixels-metavers/PixelsMetaversProvider';
-import { fetchApplication, fetchPostGoods, fetchRegister, fetchUserInfo, useApplication, useGetGoodsList, usePostGoods, useRegister, useRequest } from '../pixels-metavers/apiHook';
+import { fetchApplication, fetchPostGoods, fetchRegister, fetchUserBaseInfo, fetchUserInfo, useApplication, useGetGoodsList, usePostGoods, useRegister, useRequest } from '../pixels-metavers/apiHook';
 import { useUserInfo } from '../components/UserProvider';
+import { config } from 'rxjs';
 const { Option } = Select;
 
 const Label = ({ children }: { children: ReactNode }) => {
@@ -62,11 +63,12 @@ export interface IMerchandise {
   amount: string;
   data?: string;
   price: string;
-  weight?: string
+  weight?: string;
+  bgColor?: string
 }
 
 export const SubminNFT = () => {
-  const { positionsArr, setPositionsArr, dealClick: { value, clear } } = usePixelsMetaverseHandleImg()
+  const { positionsArr, setPositionsArr, config, dealClick: { value, clear } } = usePixelsMetaverseHandleImg()
   const [{
     name,
     category,
@@ -89,17 +91,26 @@ export const SubminNFT = () => {
   const getShopList = useGetGoodsList()
   //const application = useApplication()
   const { userInfo } = useUserInfo()
-  const { accounts } = usePixelsMetaverseContract()
+  const { accounts, contract } = usePixelsMetaverseContract()
+  const [userBaseInfo, setUserBaseInfo] = useState<Dictionary<any>>({})
   //const register = useRegister()
   const getUserInfo = useRequest(fetchUserInfo)
 
   const application = useRequest(fetchApplication, {
     onSuccess: () => {
       getUserInfo({
-        address: userInfo?.user?.account
+        address: userBaseInfo?.account
       })
     }
-  }, [userInfo?.user?.account])
+  }, [userBaseInfo?.account])
+
+
+  const getUserBaseInfo = useRequest(fetchUserBaseInfo)
+
+  useEffect(() => {
+    if (isEmpty(accounts?.address)) return
+    getUserBaseInfo({ address: accounts?.address, setUserBaseInfo })
+  }, [accounts?.address, contract])
 
 
   const postGoods = useRequest(fetchPostGoods, {
@@ -120,21 +131,22 @@ export const SubminNFT = () => {
       setIsModalVisible(false)
     }
   }, [
-    userInfo?.user?.account,
+    userBaseInfo?.account,
     name,
     category,
     amount,
     price,
-    weight
+    weight,
+    config?.bgColor
   ])
 
   const register = useRequest(fetchRegister, {
     onSuccess: () => {
       getUserInfo({
-        address: userInfo?.user?.account
+        address: userBaseInfo?.account
       })
     }
-  }, [userInfo?.user?.account])
+  }, [userBaseInfo?.account])
   //const radixFun = new (require("radix.js"));
 
   useEffect(() => {
@@ -155,7 +167,8 @@ export const SubminNFT = () => {
       amount,
       price,
       weight,
-      data: nftData
+      data: nftData,
+      bgColor: config?.bgColor || ""
     }
     console.log(data)
     let avatar = JSON.parse(localStorage.getItem("avatar") || "[]")
@@ -230,7 +243,7 @@ export const SubminNFT = () => {
           <ExclamationCircleOutlined />
         </Tooltip>
       </div>
-      { !userInfo?.user?.account?.includes("0000000000000000000000000") && userInfo?.user?.isMerchant ? <div>
+      { !userBaseInfo?.account?.includes("0000000000000000000000000") && userBaseInfo?.isMerchant ? <div>
         <Label>商品名称</Label>
         <input
           className="search p-2 mt-1 pl-3 shangping"
@@ -319,7 +332,7 @@ export const SubminNFT = () => {
           maxLength={15}
           onChange={(e) => { setShopName(e.target.value) }}
         />
-        <button className="flex justify-center items-center h-10 mt-6 text-white cursor-pointer bg-red-500" style={{ width: "100%", borderRadius: 4, cursor: userInfo?.user?.account?.includes("0000000000000000000000000") ? "no-drop" : "pointer" }}
+        <button className="flex justify-center items-center h-10 mt-6 text-white cursor-pointer bg-red-500" style={{ width: "100%", borderRadius: 4, cursor: userBaseInfo?.account?.includes("0000000000000000000000000") ? "no-drop" : "pointer" }}
           onClick={() => {
             if (!shopName) {
               message.warn("请输入店铺名称");
@@ -327,12 +340,12 @@ export const SubminNFT = () => {
             }
             application({
               name: shopName,
-              index: Number(userInfo?.user?.index)
+              index: Number(userBaseInfo?.index)
             })
           }}
-          disabled={userInfo?.user?.account?.includes("0000000000000000000000000")}
+          disabled={userBaseInfo?.account?.includes("0000000000000000000000000")}
         >申请入驻</button>
-        {userInfo?.user?.account?.includes("0000000000000000000000000") && <div className="mt-4">你还不是宇宙创始居民，请
+        {userBaseInfo?.account?.includes("0000000000000000000000000") && <div className="mt-4">你还不是宇宙创始居民，请
         <span className="text-red-500 cursor-pointer" onClick={() => {
             register()
           }}>激活</span>自己的元宇宙身份！</div>}

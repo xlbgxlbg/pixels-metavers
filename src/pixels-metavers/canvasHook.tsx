@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react"
-import { cloneDeep, Dictionary } from "lodash";
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { cloneDeep, Dictionary, map } from "lodash";
 import { IConfigOptions, IImgSize, TData } from "./PixelsMetaversImg";
 import { usePixelsMetaverseContract } from "./PixelsMetaversProvider";
 import { useGetListFun } from "./apiHook";
@@ -171,4 +171,30 @@ export const useConvertedPostion = () => {
     }
     return positionObj
   }, [])
+}
+
+export const useGetPositionStr = (outfitEdList: any[]) => {
+  const convertedPostion = useConvertedPostion()
+  return useMemo(() => {
+    let data: Dictionary<any> = {}
+    map(outfitEdList, item => {
+      const positionsData = convertedPostion({
+        positions: item?.data
+      })
+      data = { ...data, ...positionsData }
+    })
+
+    const colors: Dictionary<number[]> = {}
+    for (let i in data) {
+      colors[data[i]] ? colors[data[i]].push(Number(i)) : colors[data[i]] = [Number(i)]
+    }
+
+    let str = ""
+    let min = 1
+    for (let i in colors) {
+      const position = map(colors[i], ite => (ite - min).toString(36)).join("|")
+      str += `${parseInt(i.slice(1), 16).toString(36)}-${position}-`
+    }
+    return `${str}${min}`
+  }, [outfitEdList])
 }

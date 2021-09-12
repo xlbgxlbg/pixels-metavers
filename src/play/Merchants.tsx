@@ -1,9 +1,9 @@
-import { map, reverse } from "lodash";
+import { isEmpty, map, reverse } from "lodash";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { fetchBuyGoods, fetchGetGoodsList, useRequest } from "../pixels-metavers/apiHook";
 import { usePixelsMetaverseContract } from "../pixels-metavers/PixelsMetaversProvider";
-import { AvatarCard } from "./PersonCenter";
+import { AvatarCard, NoData } from "./PersonCenter";
 
 export const Merchants = () => {
   const history = useHistory()
@@ -22,14 +22,15 @@ export const Merchants = () => {
         <div>热门商品</div>
         <div className="cursor-pointer hover:text-red-500" onClick={() => { history.push("/mall") }}>查看更多</div>
       </div>
-      <div className="overflow-y-scroll" style={{ height: "calc(100% - 30px)" }}>
+      { !isEmpty(data) ? <div className="overflow-y-scroll" style={{ height: "calc(100% - 30px)" }}>
         {
           map(data, item => {
             //item.data?.split("-").pop()
+            if(!item?.isSale) return null
             return <AvatarCard key={item?.id} item={item} type={"buyGoods"} />
           })
         }
-      </div>
+      </div> : <NoData />}
     </div>
   );
 };

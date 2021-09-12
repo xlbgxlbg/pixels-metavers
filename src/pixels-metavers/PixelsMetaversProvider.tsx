@@ -123,7 +123,7 @@ export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGri
     bgImg: "",
     bgImgUp: "",
     bgColor: data.bgColor || "#e1e1e1",
-    gridColor: data.gridColor || "white",
+    gridColor: data.gridColor || "#ffffff",
     isHandDraw: !!handDraw
   });
 
@@ -144,8 +144,9 @@ export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGri
 
   useEffect(() => {
     if (isEmpty(positions)) return
-    dealClick?.setValue(positions)
-  }, [positions])
+    console.log({ ...positions }, "positions-PixelsMetaverseHandleImgProvider")
+    dealClick?.setValue({ ...positions })
+  }, [positions, dealClick?.setValue])
 
   return (
     <PixelsMetaverseHandleImgContext.Provider
