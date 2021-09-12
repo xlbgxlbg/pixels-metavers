@@ -192,10 +192,6 @@ contract PixelsMetavers {
         uint256 shopIndex
     ) public payable MustGoodsIsExist(id) MustUser(msg.sender) Lock {
         require(
-            msg.sender != IPMT721(PMT721).ownerOf(id),
-            "Cannot be produced and sold on their own!"
-        );
-        require(
             msg.value >= goodsObj[id].price,
             "The amount paid is lower than the price of the commodity!"
         );

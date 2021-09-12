@@ -78,6 +78,14 @@ export const fetchGetUserAssets = () => {
   }
 }
 
+export const fetchGetShopGoods = () => {
+  return async (argContract: IArgContract, arg: { address: string, setShopGoods: Dispatch<any> }) => {
+    const list = await argContract?.contract?.methods.getShopGoods(arg?.address).call();
+    console.log(list, 'fetchGetShopGoods')
+    arg?.setShopGoods && arg?.setShopGoods([ ...list ])
+  }
+}
+
 export const fetchGetShopInfo = () => {
   return async (argContract: IArgContract, arg: { address: string }) => {
     await argContract?.contract.methods.shopObj(arg?.address).call();

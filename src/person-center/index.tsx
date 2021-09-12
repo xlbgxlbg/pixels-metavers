@@ -9,7 +9,7 @@ import { PixelsMetaverseHandleImg, PixelsMetaverseImgByPositionData } from "../p
 import { PixelsMetaverseHandleImgProvider, usePixelsMetaverseContract, usePixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversProvider";
 import { CanvasSlicImg } from "../pixels-metavers/CanvasSlicImg";
 import { useUserInfo } from "../components/UserProvider";
-import { fetchGetUserAssets, fetchRegister, fetchSetConfig, fetchUserBaseInfo, fetchUserInfo, useOutfit, useRegister, useRequest, useSetConfig } from "../pixels-metavers/apiHook";
+import { fetchBuyGoods, fetchGetShopGoods, fetchGetUserAssets, fetchRegister, fetchSetConfig, fetchUserBaseInfo, fetchUserInfo, useOutfit, useRegister, useRequest, useSetConfig } from "../pixels-metavers/apiHook";
 import { AvatarCard, NoData } from "../play/PersonCenter";
 import { useGetPositionStr } from "../pixels-metavers/canvasHook";
 
@@ -19,6 +19,7 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo }:
   const { accounts, contract } = usePixelsMetaverseContract()
   const [src, setSrc] = useState(localStorage.getItem("imgUrl") || "")
   const [url, setUrl] = useState(src)
+  const [shopGoods, setShopGoods] = useState<any[]>([])
   const goSetConfig = useRequest(fetchSetConfig, {
     onSuccess: () => {
       message.success("更新信息成功！")
@@ -30,6 +31,16 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo }:
       message.success("激活账户成功！")
     }
   })
+
+  const getShopGoods = useRequest(fetchGetShopGoods)
+
+  useEffect(() => {
+    if (!accounts?.address) return
+    getShopGoods({
+      address: accounts?.address,
+      setShopGoods
+    })
+  }, [contract, accounts?.address])
 
   //上传图片
   const fileOnChange = useCallback(() => {
@@ -67,6 +78,8 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo }:
     localStorage.setItem("imgUrl", url)
     onLoadImg(src)
   }, [src])
+
+  console.log(shopGoods, "shopGoods")
 
   return (
     <div className="flex justify-between m-auto p-6 mt-4 rounded-md" style={{
@@ -131,7 +144,7 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo }:
           >{accounts?.address === userBaseInfo?.account ? "更新设置" : "非当前连接账户"}</button>
         </div>
       </div>
-      { (!isEmpty(outfitEdList) || !isEmpty(noOutfitEdList)) ? <div className="flex-1 flex justify-between">
+      { (!isEmpty(outfitEdList) || !isEmpty(noOutfitEdList) || !isEmpty(shopGoods)) ? <div className="flex-1 flex justify-between">
         {(!isEmpty(outfitEdList) || !isEmpty(noOutfitEdList)) && <div className="overflow-y-scroll flex-1 pr-4 border-r mr-4" style={{ borderColor: "rgba(225,225,225, 0.3" }}>
           {!isEmpty(outfitEdList) && <div className="pb-8">
             <div className="">已使用</div>
@@ -150,12 +163,11 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo }:
             }
           </div>}
         </div>}
-        {userBaseInfo?.isMerchant && !isEmpty(noOutfitEdList) && <div className="flex-1">
+        {!isEmpty(shopGoods) && <div className="flex-1 overflow-y-scroll">
           <div>
             <div className="">店铺商品</div>
             {
-              map(noOutfitEdList, item => {
-                //item.data?.split("-").pop()
+              map(shopGoods, item => {
                 return (<AvatarCard key={item?.id} item={item} type="buyGoods" />)
               })
             }
