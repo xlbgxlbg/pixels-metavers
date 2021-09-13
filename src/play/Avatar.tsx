@@ -1,9 +1,5 @@
-import { isEmpty } from "lodash";
-import { useEffect } from "react";
-import { useUserInfo } from "../components/UserProvider";
-import { useGetUserInfo } from "../pixels-metavers/apiHook";
 import { PixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversImg";
-import { usePixelsMetaverseContract, usePixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversProvider";
+import { usePixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversProvider";
 
 export const Avatar = () => {
   const { config, canvas2Ref } = usePixelsMetaverseHandleImg()

@@ -1,35 +1,30 @@
-import { divide, filter, find, isEmpty, last, map } from "lodash";
-import React, { Dispatch, useEffect, useMemo, useState } from "react";
+import message from "antd/lib/message";
+import { find, isEmpty, map } from "lodash";
 import { useHistory, useLocation } from "react-router-dom";
+import { createReturn } from "typescript";
 import { useUserInfo } from "../components/UserProvider";
-import { fetchBuyGoods, fetchGetGoodsList, fetchGetShopGoods, fetchGetUserAssets, fetchOutfit, useOutfit, useRequest } from "../pixels-metavers/apiHook";
+import { fetchBuyGoods, fetchGetGoodsInfo, fetchOutfit, useRequest } from "../pixels-metavers/apiHook";
 import { PixelsMetaverseImgByPositionData } from "../pixels-metavers/PixelsMetaversImg";
 import { usePixelsMetaverseContract } from "../pixels-metavers/PixelsMetaversProvider";
 import { categoryData } from "../produced/Submit";
 
-export const AvatarCard = ({ item, type, setAssetsInfo, setGoodsInfo }: {
-  item: any, type: string,
-  setAssetsInfo?: Dispatch<React.SetStateAction<any[]>>,
-  setGoodsInfo?: Dispatch<React.SetStateAction<any[]>>
+export const AvatarCard = ({ item, type }: {
+  item: any, type: string
 }) => {
   const { accounts } = usePixelsMetaverseContract()
-
   const { search } = useLocation()
   const address = search ? search.split("=")[1] : accounts?.address
-  const getUserAssetsInfo = useRequest(fetchGetUserAssets)
+  const { setGoodsList } = useUserInfo()
 
   const outfit = useRequest(fetchOutfit, {
     onSuccess: () => {
-      getUserAssetsInfo({ address: address, setAssetsInfo })
+      message.success("设置成功！")
     }
-  }, [setAssetsInfo, address])
-
-  const getShopGoods = useRequest(fetchGetShopGoods)
+  }, [address])
 
   const buyGoods = useRequest(fetchBuyGoods, {
     onSuccess: () => {
-      getShopGoods({ address: address, setGoodsInfo })
-      getUserAssetsInfo({ address: address, setAssetsInfo })
+      message.success("购买成功！")
     }
   }, [address])
   const { userInfo } = useUserInfo()
@@ -51,8 +46,9 @@ export const AvatarCard = ({ item, type, setAssetsInfo, setGoodsInfo }: {
               value: {
                 id: Number(item?.id),
                 index: item?.index,
-                isOutfit: !item?.isOutfit
-              }
+                isOutfit: !item?.isOutfit,
+              },
+              setGoodsList
             })
           }}>{item?.isOutfit ? "移除" : "配置"}</div>}
 
@@ -63,9 +59,8 @@ export const AvatarCard = ({ item, type, setAssetsInfo, setGoodsInfo }: {
               onClick={() => {
                 buyGoods({
                   id: Number(item?.id),
-                  goodsIndex: Number(item?.index),
-                  shopIndex: Number(item?.shopIndex),
-                  price: Number(item?.price)
+                  price: Number(item?.price),
+                  setGoodsList
                 })
               }}
               disabled={!item?.isSale}>{item?.isSale ? "购买" : "已出售"}</button>
@@ -82,7 +77,7 @@ export const NoData = () => {
 </div>
 }
 
-export const PersonCenter = ({ outfitEdList, noOutfitEdList, setAssetsInfo }: { noOutfitEdList: any[], outfitEdList: any[], setAssetsInfo: Dispatch<React.SetStateAction<any[]>> }) => {
+export const PersonCenter = ({ outfitEdList, noOutfitEdList }: { noOutfitEdList: any[], outfitEdList: any[] }) => {
   const history = useHistory()
   const { search } = useLocation()
   const address = search ? search.split("=")[1] : ""
@@ -98,7 +93,7 @@ export const PersonCenter = ({ outfitEdList, noOutfitEdList, setAssetsInfo }: { 
           <div className="">已使用</div>
           {
             map(outfitEdList, item => {
-              return <AvatarCard key={item?.id} item={item} type="assets" setAssetsInfo={setAssetsInfo} />
+              return <AvatarCard key={item?.id} item={item} type="assets" />
             })
           }
         </div>
@@ -106,7 +101,7 @@ export const PersonCenter = ({ outfitEdList, noOutfitEdList, setAssetsInfo }: { 
           <div className="">未使用</div>
           {
             map(noOutfitEdList, item => {
-              return <AvatarCard key={item?.id} item={item} type="assets" setAssetsInfo={setAssetsInfo} />
+              return <AvatarCard key={item?.id} item={item} type="assets" />
             })
           }
         </div>

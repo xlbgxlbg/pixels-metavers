@@ -43,14 +43,14 @@ export const useGetContractInfo = (web3: Web3, networkId: number) => {
 
       setContract(contract)
 
-      contract.events.HandleList()
+      /* contract.events.HandleList()
         .on("connected", (subscriptionId: string) => {
           console.log(contract)
           console.log(subscriptionId, "Events 已连接");
         })
         .on('data', function (e: any) {
           setEvent(e)
-        })
+        }) */
     } else {
       setContract(undefined)
       alert("暂无该网络像素元宇宙合约，请切换至Ropsten网络查看")
@@ -137,14 +137,15 @@ export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGri
 
   useEffect(() => {
     if (!data.positions) return
+    if (data.positions === "empty") {
+      setPositions({})
+    }
     if (!data.positions.includes("-")) return
     const positionObj = getPositionData(data)
     setPositions(positionObj)
   }, [data.positions])
 
   useEffect(() => {
-    if (isEmpty(positions)) return
-    console.log({ ...positions }, "positions-PixelsMetaverseHandleImgProvider")
     dealClick?.setValue({ ...positions })
   }, [positions, dealClick?.setValue])
 

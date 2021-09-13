@@ -4,6 +4,7 @@ import { Contract } from 'web3-eth-contract';
 import { IMerchandise } from "../produced/Submit";
 import { useLoading } from "../components/Loading";
 import { message } from "antd";
+import { cloneDeep, map } from "lodash";
 
 export interface IHandle {
   onSuccess?: () => void,
@@ -12,10 +13,8 @@ export interface IHandle {
 
 export interface IArgContract { contract: Contract, accounts: any }
 
-export type TFun<T> = (argContract: IArgContract, arg?: T) => Promise<void>
-
 export const useRequest = (
-  fetch: () => TFun<any>,
+  fetch: (argContract: IArgContract, arg?: any) => Promise<void>,
   {
     onSuccess,
     onFail
@@ -24,12 +23,12 @@ export const useRequest = (
 ) => {
   const { accounts, contract } = usePixelsMetaverseContract()
   const { closeDelayLoading, openLoading, closeLoading } = useLoading()
+
   return useCallback(async (arg?: any) => {
     if (!contract || !accounts) return
-    console.log(arg, "arg")
     try {
-      openLoading()
-      fetch()({ accounts, contract }, arg).then(() => {
+      !arg?.closeLoading && openLoading()
+      fetch({ accounts, contract }, arg).then(() => {
         closeDelayLoading()
         onSuccess && onSuccess()
       }).catch((error) => {
@@ -45,7 +44,76 @@ export const useRequest = (
   }, [contract, accounts, openLoading, ...delay])
 }
 
-export const fetchUserInfo = () => {
+export const fetchUserInfo = async (argContract: IArgContract, arg: { address: string, setUserInfo: Dispatch<any> }) => {
+  const info = await argContract?.contract?.methods.user(arg.address).call();
+  arg.setUserInfo && arg.setUserInfo(info)
+}
+
+export const fetchUserBaseInfo = async (argContract: IArgContract, arg: { address: string, setUserBaseInfo: Dispatch<any> }) => {
+  const info = await argContract?.contract?.methods.user(arg.address).call();
+  arg.setUserBaseInfo && arg.setUserBaseInfo(info)
+}
+
+export const fetchRegister = async (argContract: IArgContract) => {
+  await argContract?.contract.methods.register().send({ from: argContract?.accounts?.address });
+}
+
+export const fetchGetGoodsInfo = async (argContract: IArgContract, arg: { id: number, setGoodsList: Dispatch<React.SetStateAction<any[]>> }) => {
+  const goods = await argContract?.contract.methods.goods(arg?.id).call();
+  arg?.setGoodsList && arg?.setGoodsList((pre) => {
+    const list = cloneDeep(pre)
+    return map(list, item => {
+      if (item?.id == goods.id) {
+        return goods
+      }
+      return item
+    })
+  })
+}
+
+export const fetchGetGoodsIdList = async (argContract: IArgContract, arg?: { setValue: Dispatch<React.SetStateAction<any[]>>, newNumber?: number }) => {
+  const idList = await argContract?.contract?.methods.getGoodsList().call();
+  const len = idList.length || 0;
+  //let list: any[] = [];
+  for (let i = len - 1; i >= len - (arg?.newNumber || len); i--) {
+    console.log(Number(idList[i]))
+    let item = await argContract?.contract?.methods.goods(Number(idList[i])).call()
+    arg?.setValue && !arg.newNumber && arg?.setValue((pre) => ([...pre, item]))
+    arg?.setValue && arg.newNumber && arg?.setValue((pre) => ([item, ...pre]))
+    //list.push()
+  }
+}
+
+export const fetchSetConfig = async (argContract: IArgContract, arg: { value: any }) => {
+  await argContract?.contract.methods.setConfig(arg.value.bgColor, arg.value.gridColor, arg.value.withGrid).send({ from: argContract?.accounts?.address });
+}
+
+export const fetchApplication = async (argContract: IArgContract, arg: { name: string }) => {
+  await argContract?.contract.methods.application(arg?.name).send({ from: argContract?.accounts?.address });
+}
+
+export const fetchPostGoods = async (argContract: IArgContract, arg: { value: IMerchandise }) => {
+  await argContract?.contract.methods.postGoods(
+    arg?.value?.name,
+    arg?.value?.category,
+    arg?.value?.data,
+    String(Number(arg?.value?.price) * (10 ** 18)),
+    Number(arg?.value?.amount),
+    arg?.value?.bgColor
+  ).send({ from: argContract?.accounts?.address });
+}
+
+export const fetchBuyGoods = async (argContract: IArgContract, arg: { id: number, price: number, setGoodsList: Dispatch<React.SetStateAction<any[]>> }) => {
+  await argContract?.contract.methods.buyGoods(arg.id).send({ from: argContract?.accounts?.address, value: arg.price });
+  fetchGetGoodsInfo(argContract, { id: arg?.id, setGoodsList: arg?.setGoodsList })
+}
+
+export const fetchOutfit = async (argContract: IArgContract, arg: { value: any, setGoodsList: Dispatch<React.SetStateAction<any[]>> }) => {
+  await argContract?.contract.methods.outfit(arg?.value.id, arg?.value.isOutfit).send({ from: argContract?.accounts?.address });
+  fetchGetGoodsInfo(argContract, { id: arg?.value.id, setGoodsList: arg?.setGoodsList })
+}
+
+export const fetchUserInfo1 = () => {
   return async (argContract: IArgContract, arg: { address: string, setUserInfo: Dispatch<any> }) => {
     const info = await argContract?.contract?.methods.userObj(arg.address).call();
     console.log(info, "info")
@@ -56,7 +124,7 @@ export const fetchUserInfo = () => {
   }
 }
 
-export const fetchUserBaseInfo = () => {
+export const fetchUserBaseInfo1 = () => {
   return async (argContract: IArgContract, arg: { address: string, setUserBaseInfo: Dispatch<any> }) => {
     const info = await argContract?.contract?.methods.userObj(arg.address).call();
     console.log(info, "info")
@@ -64,13 +132,13 @@ export const fetchUserBaseInfo = () => {
   }
 }
 
-export const fetchRegister = () => {
+export const fetchRegister1 = () => {
   return async (argContract: IArgContract) => {
     await argContract?.contract.methods.register().send({ from: argContract?.accounts?.address });
   }
 }
 
-export const fetchGetUserAssets = () => {
+export const fetchGetUserAssets1 = () => {
   return async (argContract: IArgContract, arg: { address: string, setAssetsInfo: Dispatch<any> }) => {
     const list = await argContract?.contract?.methods.getUserAssets(arg?.address).call();
     console.log(list, 'fetchGetUserAssets')
@@ -78,7 +146,7 @@ export const fetchGetUserAssets = () => {
   }
 }
 
-export const fetchGetShopGoods = () => {
+export const fetchGetShopGoods1 = () => {
   return async (argContract: IArgContract, arg: { address: string, setShopGoods: Dispatch<any> }) => {
     const list = await argContract?.contract?.methods.getShopGoods(arg?.address).call();
     console.log(list, 'fetchGetShopGoods')
@@ -86,19 +154,19 @@ export const fetchGetShopGoods = () => {
   }
 }
 
-export const fetchGetShopInfo = () => {
+export const fetchGetShopInfo1 = () => {
   return async (argContract: IArgContract, arg: { address: string }) => {
     await argContract?.contract.methods.shopObj(arg?.address).call();
   }
 }
 
-export const fetchGetGoodsInfo = () => {
+export const fetchGetGoodsInfo1 = () => {
   return async (argContract: IArgContract, arg: { id: number }) => {
     await argContract?.contract.methods.goodsObj(arg?.id).call();
   }
 }
 
-export const fetchGetUserList = () => {
+export const fetchGetUserList1 = () => {
   return async (argContract: IArgContract, arg: {}) => {
     const len = await argContract?.contract?.methods.getUserLength().call();
     let list: any[] = [];
@@ -109,7 +177,7 @@ export const fetchGetUserList = () => {
   }
 }
 
-export const fetchGetShopList = () => {
+export const fetchGetShopList1 = () => {
   return async (argContract: IArgContract, setValue: Dispatch<React.SetStateAction<any[]>>) => {
     const len = await argContract?.contract?.methods.getShopLength().call();
     let list: any[] = [];
@@ -121,7 +189,7 @@ export const fetchGetShopList = () => {
   }
 }
 
-export const fetchGetGoodsList = () => {
+export const fetchGetGoodsList1 = () => {
   return async (argContract: IArgContract, arg?: { setValue: Dispatch<React.SetStateAction<any[]>>, to?: number }) => {
     const lenght = await argContract?.contract?.methods.getGoodsLength().call();
     let list: any[] = [];
@@ -135,25 +203,25 @@ export const fetchGetGoodsList = () => {
   }
 }
 
-export const fetchMint = () => {
+export const fetchMint1 = () => {
   return async (argContract: IArgContract, arg: { ids: number[] }) => {
     await argContract?.contract.methods.mint(arg.ids).send({ from: argContract?.accounts?.address });
   }
 }
 
-export const fetchSetConfig = () => {
+export const fetchSetConfig1 = () => {
   return async (argContract: IArgContract, arg: { value: any }) => {
     await argContract?.contract.methods.setConfig(arg.value.bgColor, arg.value.gridColor, arg.value.withGrid, arg.value.index).send({ from: argContract?.accounts?.address });
   }
 }
 
-export const fetchApplication = () => {
+export const fetchApplication1 = () => {
   return async (argContract: IArgContract, arg: { name: string, index: number }) => {
     await argContract?.contract.methods.application(arg?.name, arg.index).send({ from: argContract?.accounts?.address });
   }
 }
 
-export const fetchPostGoods = () => {
+export const fetchPostGoods1 = () => {
   return async (argContract: IArgContract, arg: { value: IMerchandise }) => {
     await argContract?.contract.methods.postGoods(
       arg?.value?.name,
@@ -166,13 +234,13 @@ export const fetchPostGoods = () => {
   }
 }
 
-export const fetchBuyGoods = () => {
+export const fetchBuyGoods1 = () => {
   return async (argContract: IArgContract, arg: { id: number, goodsIndex: number, shopIndex: number, price: number }) => {
     await argContract?.contract.methods.buyGoods(arg.id, arg?.goodsIndex, arg?.shopIndex).send({ from: argContract?.accounts?.address, value: arg.price });
   }
 }
 
-export const fetchOutfit = () => {
+export const fetchOutfit1 = () => {
   return async (argContract: IArgContract, arg: { value: any }) => {
     await argContract?.contract.methods.outfit(arg?.value.id, arg?.value.index, arg?.value.isOutfit).send({ from: argContract?.accounts?.address });
   }

@@ -3,7 +3,8 @@ import { Tooltip, Select, message, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Dictionary, isEmpty, keys, map } from 'lodash';
 import { usePixelsMetaverseContract, usePixelsMetaverseHandleImg } from '../pixels-metavers/PixelsMetaversProvider';
-import { fetchApplication, fetchPostGoods, fetchRegister, fetchUserBaseInfo, useRequest } from '../pixels-metavers/apiHook';
+import { fetchApplication, fetchGetGoodsIdList, fetchPostGoods, fetchRegister, fetchUserInfo, useRequest } from '../pixels-metavers/apiHook';
+import { useUserInfo } from '../components/UserProvider';
 const { Option } = Select;
 
 const Label = ({ children }: { children: ReactNode }) => {
@@ -83,11 +84,15 @@ export const SubminNFT = () => {
   const [positionData, setPostionData] = useState("")
   const [shopName, setShopName] = useState("")
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const { accounts, contract } = usePixelsMetaverseContract()
-  const [userBaseInfo, setUserBaseInfo] = useState<Dictionary<any>>({})
+  const { accounts } = usePixelsMetaverseContract()
+  const { userInfo, setUserInfo, setGoodsList } = useUserInfo()
+  const address = accounts?.address
+  const getUserInfo = useRequest(fetchUserInfo)
+  const getGoodsIdList = useRequest(fetchGetGoodsIdList)
+
   const getInfo = () => {
-    if (isEmpty(accounts?.address)) return
-    getUserBaseInfo({ address: accounts?.address, setUserBaseInfo })
+    if (isEmpty(address)) return
+    getUserInfo({ address, setUserInfo })
   }
 
   const application = useRequest(fetchApplication, {
@@ -95,17 +100,12 @@ export const SubminNFT = () => {
       message.success("入驻成功！")
       getInfo()
     }
-  }, [userBaseInfo?.account])
-
-  const getUserBaseInfo = useRequest(fetchUserBaseInfo)
-
-  useEffect(() => {
-    getInfo()
-  }, [accounts?.address, contract])
+  }, [address])
 
   const postGoods = useRequest(fetchPostGoods, {
     onSuccess: () => {
       message.success("商品发布成功！")
+      getGoodsIdList({ setValue: setGoodsList, newNumber: Number(amount) })
       setIsModalVisible(false)
       setMerchandies({
         name: "",
@@ -121,20 +121,21 @@ export const SubminNFT = () => {
       setIsModalVisible(false)
     }
   }, [
-    userBaseInfo?.account,
+    address,
     name,
     category,
     amount,
     price,
     weight,
-    config?.bgColor
+    config?.bgColor,
+    setGoodsList
   ])
 
   const register = useRequest(fetchRegister, {
     onSuccess: () => {
       getInfo()
     }
-  }, [userBaseInfo?.account])
+  }, [address])
 
   const min = useMemo(() => Math.min(...positionsArr), [positionsArr])
 
@@ -203,7 +204,7 @@ export const SubminNFT = () => {
     return true;
   }, [name, category, amount, price]);
 
-  console.log(userBaseInfo, "userBaseInfo")
+  console.log(userInfo, "userBaseInfo")
 
   return (
     <div className="p-4 rounded-md text-gray-300"
@@ -218,7 +219,7 @@ export const SubminNFT = () => {
           <ExclamationCircleOutlined />
         </Tooltip>
       </div>
-      { !userBaseInfo?.account?.includes("0000000000000000000000000") && userBaseInfo?.isMerchant ? <div>
+      { !userInfo?.account?.includes("0000000000000000000000000") && userInfo?.isMerchant ? <div>
         <Label>商品名称</Label>
         <input
           className="search p-2 mt-1 pl-3 shangping"
@@ -307,20 +308,19 @@ export const SubminNFT = () => {
           maxLength={15}
           onChange={(e) => { setShopName(e.target.value) }}
         />
-        <button className="flex justify-center items-center h-10 mt-6 text-white cursor-pointer bg-red-500" style={{ width: "100%", borderRadius: 4, cursor: userBaseInfo?.account?.includes("0000000000000000000000000") ? "no-drop" : "pointer" }}
+        <button className="flex justify-center items-center h-10 mt-6 text-white cursor-pointer bg-red-500" style={{ width: "100%", borderRadius: 4, cursor: userInfo?.account?.includes("0000000000000000000000000") ? "no-drop" : "pointer" }}
           onClick={() => {
             if (!shopName) {
               message.warn("请输入店铺名称");
               return;
             }
             application({
-              name: shopName,
-              index: Number(userBaseInfo?.index)
+              name: shopName
             })
           }}
-          disabled={userBaseInfo?.account?.includes("0000000000000000000000000")}
+          disabled={userInfo?.account?.includes("0000000000000000000000000")}
         >申请入驻</button>
-        {userBaseInfo?.account?.includes("0000000000000000000000000") && <div className="mt-4">你还不是宇宙创始居民，请
+        {userInfo?.account?.includes("0000000000000000000000000") && <div className="mt-4">你还不是宇宙创始居民，请
         <span className="text-red-500 cursor-pointer" onClick={() => {
             register()
           }}>激活</span>自己的元宇宙身份！</div>}

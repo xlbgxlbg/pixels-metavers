@@ -1,29 +1,49 @@
-import { isEmpty } from "lodash";
+import { Dictionary, isEmpty } from "lodash";
 import * as React from "react";
-import { fetchUserInfo, useRequest } from "../pixels-metavers/apiHook";
+import { ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, Dispatch } from "react";
+import { fetchGetGoodsIdList, fetchGetGoodsInfo, fetchUserInfo, useRequest } from "../pixels-metavers/apiHook";
 import { usePixelsMetaverseContract } from "../pixels-metavers/PixelsMetaversProvider";
 
-export const UserInfoContext = React.createContext(
+export const UserInfoContext = createContext(
   {} as {
     userInfo: any;
-    setUserInfo: React.Dispatch<any>;
+    setUserInfo: Dispatch<any>;
+    goodsList: any[];
+    setGoodsList: Dispatch<any[]>;
+    goodsId?: number;
+    setGoodsId: Dispatch<React.SetStateAction<number | undefined>>
   },
 );
 
-export const useUserInfo = () => React.useContext(UserInfoContext);
+export const useUserInfo = () => useContext(UserInfoContext);
 
-export const UserInfoProvider = ({ children }: { children: React.ReactNode }) => {
-  const [userInfo, setUserInfo] = React.useState<any>();
+export const UserInfoProvider = ({ children }: { children: ReactNode }) => {
+  const [userInfo, setUserInfo] = useState<Dictionary<any>>({});
+  const [goodsList, setGoodsList] = useState<any[]>([]);
+  const [goodsId, setGoodsId] = useState<number | undefined>();
   const { accounts, contract } = usePixelsMetaverseContract()
-  const fetch = useRequest(fetchUserInfo)
+  const getUserInfo = useRequest(fetchUserInfo)
+  const getGoodsInfo = useRequest(fetchGetGoodsInfo)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isEmpty(accounts?.address)) return
-    fetch({ address: accounts?.address, setUserInfo })
+    getUserInfo({ address: accounts?.address, setUserInfo })
   }, [accounts?.address, contract])
 
+  const getGoodsIdList = useRequest(fetchGetGoodsIdList)
+
+  useEffect(() => {
+    getGoodsIdList({ setValue: setGoodsList })
+  }, [accounts?.address, contract])
+
+  /* useEffect(()=>{
+    if(!goodsId) return
+    getGoodsInfo({ id: goodsId, setGoodsList })
+  }, [goodsId]) */
+
   return (
-    <UserInfoContext.Provider value={{ userInfo, setUserInfo }}>
+    <UserInfoContext.Provider value={{ userInfo, setUserInfo, goodsList, setGoodsList, goodsId, setGoodsId }}>
       {children}
     </UserInfoContext.Provider>
   )

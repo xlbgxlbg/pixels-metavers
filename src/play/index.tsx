@@ -2,44 +2,32 @@ import { PersonCenter } from "./PersonCenter";
 import { Avatar } from "./Avatar";
 import { Merchants } from "./Merchants";
 import { PixelsMetaverseHandleImgProvider, usePixelsMetaverseContract } from "../pixels-metavers/PixelsMetaversProvider";
-import { useConvertedPostion, useGetPositionData } from "../pixels-metavers/canvasHook";
-import { Dictionary, filter, groupBy, isEmpty, map } from "lodash";
-import { useEffect, useMemo, useState } from "react";
+import { useConvertedPostion } from "../pixels-metavers/canvasHook";
+import { Dictionary, filter, isEmpty, map } from "lodash";
+import { useMemo } from "react";
 import { useUserInfo } from "../components/UserProvider";
-import { fetchGetUserAssets, fetchUserBaseInfo, useRequest } from "../pixels-metavers/apiHook";
-import React from "react";
 import { useLocation } from "react-router-dom";
 
 export const PixelsMetaverse = () => {
-  const { accounts, contract } = usePixelsMetaverseContract()
-  const [userBaseInfo, setUserBaseInfo] = useState<Dictionary<any>>({})
-  const [userAssetsInfo, setAssetsInfo] = useState<any[]>([])
+  const { accounts } = usePixelsMetaverseContract()
   const { search } = useLocation()
   const address = search ? search.split("=")[1] : accounts?.address
-
-  const getUserBaseInfo = useRequest(fetchUserBaseInfo)
-  const getUserAssetsInfo = useRequest(fetchGetUserAssets)
-
+  const { goodsList, userInfo, goodsId } = useUserInfo()
   const convertedPostion = useConvertedPostion()
 
-  useEffect(() => {
-    if (isEmpty(address)) return
-    getUserBaseInfo({ address: address, setUserBaseInfo })
-    getUserAssetsInfo({ address: address, setAssetsInfo })
-  }, [address, contract])
-
   const { noOutfitEdList, outfitEdList } = useMemo(() => {
-    if (isEmpty(userAssetsInfo)) return {
+    if (isEmpty(goodsList)) return {
       outfitEdList: [],
       noOutfitEdList: [],
     }
     return {
-      outfitEdList: filter(userAssetsInfo, item => item?.isOutfit),
-      noOutfitEdList: filter(userAssetsInfo, item => !item?.isOutfit)
+      outfitEdList: filter(goodsList, item => !item?.isSale && item?.isOutfit && item?.owner === address),
+      noOutfitEdList: filter(goodsList, item => !item?.isSale && !item?.isOutfit && item?.owner === address)
     }
-  }, [userAssetsInfo])
+  }, [goodsList, address, goodsId])
 
   const positions = useMemo(() => {
+    if (isEmpty(outfitEdList)) return "empty"
     let data: Dictionary<any> = {}
     map(outfitEdList, item => {
       const positionsData = convertedPostion({
@@ -62,17 +50,19 @@ export const PixelsMetaverse = () => {
     return `${str}${min}`
   }, [outfitEdList])
 
+  console.log(positions, "postion")
+
   return (
-    !isEmpty(userBaseInfo) ? <PixelsMetaverseHandleImgProvider size={480} showGrid={userBaseInfo?.withGrid} data={{
+    !isEmpty(userInfo) ? <PixelsMetaverseHandleImgProvider size={480} showGrid={userInfo?.withGrid} data={{
       positions: positions,
       size: 'large',
-      bgColor: userBaseInfo?.bgColor,
-      gridColor: userBaseInfo?.gridColor,
+      bgColor: userInfo?.bgColor,
+      gridColor: userInfo?.gridColor,
     }}>
       <div className="flex justify-between bg-transparent flex-1 mt-4">
-        <PersonCenter outfitEdList={outfitEdList} noOutfitEdList={noOutfitEdList} setAssetsInfo={setAssetsInfo}/>
+        <PersonCenter outfitEdList={outfitEdList} noOutfitEdList={noOutfitEdList} />
         <Avatar />
-        <Merchants setAssetsInfo={setAssetsInfo}/>
+        <Merchants />
       </div>
     </PixelsMetaverseHandleImgProvider> : <div></div>
   )

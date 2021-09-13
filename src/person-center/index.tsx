@@ -1,52 +1,45 @@
-import React, { Dispatch, useEffect, useMemo, useState } from "react"
-import { Dictionary, filter, isEmpty, map } from "lodash";
+import { useMemo } from "react"
+import { filter, isEmpty, map } from "lodash";
 import { message } from "antd";
 import { AppstoreOutlined } from "@ant-design/icons";
 import { PixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversImg";
 import { PixelsMetaverseHandleImgProvider, usePixelsMetaverseContract, usePixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversProvider";
-import { fetchGetShopGoods, fetchGetUserAssets, fetchRegister, fetchSetConfig, fetchUserBaseInfo, useRequest } from "../pixels-metavers/apiHook";
+import { fetchRegister, fetchSetConfig, fetchUserInfo, useRequest } from "../pixels-metavers/apiHook";
 import { AvatarCard, NoData } from "../play/PersonCenter";
 import { useGetPositionStr } from "../pixels-metavers/canvasHook";
 import { useLocation } from "react-router";
+import { useUserInfo } from "../components/UserProvider";
 
-export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo, setUserBaseInfo, setAssetsInfo }: {
-  noOutfitEdList: any[], outfitEdList: any[], userBaseInfo: any, setUserBaseInfo: Dispatch<React.SetStateAction<Dictionary<any>>>, setAssetsInfo: Dispatch<React.SetStateAction<any[]>>
+export const PersonCenterCore = ({ outfitEdList, noOutfitEdList }: {
+  noOutfitEdList: any[], outfitEdList: any[]
 }) => {
   const { setConfig, config, canvas2Ref } = usePixelsMetaverseHandleImg()
-  const { accounts, contract } = usePixelsMetaverseContract()
-  const [shopGoods, setShopGoods] = useState<any[]>([])
-  const getUserBaseInfo = useRequest(fetchUserBaseInfo)
+  const { accounts } = usePixelsMetaverseContract()
   const { search } = useLocation()
+  const { userInfo, setUserInfo, goodsList } = useUserInfo()
   const address = search ? search.split("=")[1] : accounts.address
+  const getUserInfo = useRequest(fetchUserInfo)
+
+  const getInfo = () => {
+    if (isEmpty(address)) return
+    getUserInfo({ address, setUserInfo })
+  }
+
   const goSetConfig = useRequest(fetchSetConfig, {
     onSuccess: () => {
       message.success("更新信息成功！")
-      if (isEmpty(address)) return
-      getUserBaseInfo({ address: address, setUserBaseInfo })
+      getInfo()
     }
-  }, [config, setUserBaseInfo, address])
+  }, [config, address])
 
   const fetch = useRequest(fetchRegister, {
     onSuccess: () => {
       message.success("激活账户成功！")
-      if (isEmpty(address)) return
-      getUserBaseInfo({ address: address, setUserBaseInfo })
+      getInfo()
     }
-  }, [setUserBaseInfo, address])
+  }, [address])
 
-  const getShopGoods = useRequest(fetchGetShopGoods)
-
-  useEffect(() => {
-    if (!address) return
-    getShopGoods({
-      address: address,
-      setShopGoods
-    })
-  }, [contract, address])
-
-  console.log(address === accounts?.address, address, accounts?.address)
-
-  console.log(shopGoods, "shopGoods shopGoods")
+  const shopGoods = useMemo(() => filter(goodsList, item => item?.owner === address && item?.isSale), [goodsList])
 
   return (
     <div className="flex justify-between m-auto p-6 mt-4 rounded-md" style={{
@@ -70,12 +63,12 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo, s
         <div className="overflow-y-scroll" style={{ height: "calc(100% - 240px)" }}>
           <div className="flex justify-between items-center mt-8">
             <div>账户</div>
-            <div className="overflow-x-scroll" style={{ width: 180 }}>{userBaseInfo?.account || "0x000000000000000000000000000000000000000000000000000"}</div>
+            <div className="overflow-x-scroll" style={{ width: 180 }}>{userInfo?.account || "0x000000000000000000000000000000000000000000000000000"}</div>
           </div>
           <div className="flex justify-between items-center mt-3">
             <div>类型</div>
-            {!userBaseInfo?.account?.includes("0000000000000000000000000") && <div>{userBaseInfo?.isMerchant ? "商户" : "用户"}</div>}
-            {userBaseInfo?.account?.includes("0000000000000000000000000") && <div className="cursor-pointer text-red-500" onClick={fetch}>去激活账户</div>}
+            {!userInfo?.account?.includes("0000000000000000000000000") && <div>{userInfo?.isMerchant ? "商户" : "用户"}</div>}
+            {userInfo?.account?.includes("0000000000000000000000000") && <div className="cursor-pointer text-red-500" onClick={fetch}>去激活账户</div>}
           </div>
           <div className="flex justify-between items-center mt-3">
             <div>显示辅助线</div>
@@ -103,8 +96,7 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo, s
                 value: {
                   bgColor: config?.bgColor,
                   gridColor: config?.gridColor,
-                  withGrid: config?.withGrid,
-                  index: userBaseInfo?.index
+                  withGrid: config?.withGrid
                 }
               })
             }}
@@ -117,7 +109,7 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo, s
             <div className="">已使用</div>
             {
               map(outfitEdList, item => {
-                return <AvatarCard key={item?.id} item={item} type="assets" setAssetsInfo={setAssetsInfo}/>
+                return <AvatarCard key={item?.id} item={item} type="assets" />
               })
             }
           </div>}
@@ -125,7 +117,7 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo, s
             <div className="">未使用</div>
             {
               map(noOutfitEdList, item => {
-                return (<AvatarCard key={item?.id} item={item} type="assets" setAssetsInfo={setAssetsInfo}/>)
+                return (<AvatarCard key={item?.id} item={item} type="assets" />)
               })
             }
           </div>}
@@ -135,7 +127,7 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo, s
             <div className="">店铺商品</div>
             {
               map(shopGoods, item => {
-                return (<AvatarCard key={item?.id} item={item} type="buyGoods" setAssetsInfo={setAssetsInfo} setGoodsInfo={setShopGoods}/>)
+                return (<AvatarCard key={item?.id} item={item} type="buyGoods" />)
               })
             }
           </div>
@@ -146,42 +138,33 @@ export const PersonCenterCore = ({ outfitEdList, noOutfitEdList, userBaseInfo, s
 }
 
 export const PersonCenter = () => {
-  const { accounts, contract } = usePixelsMetaverseContract()
-  const [userBaseInfo, setUserBaseInfo] = useState<Dictionary<any>>({})
-  const [userAssetsInfo, setAssetsInfo] = useState<any[]>([])
-
-  const getUserBaseInfo = useRequest(fetchUserBaseInfo)
-  const getUserAssetsInfo = useRequest(fetchGetUserAssets)
+  const { accounts } = usePixelsMetaverseContract()
+  const { goodsList, userInfo } = useUserInfo()
   const { search } = useLocation()
   const address = search ? search.split("=")[1] : accounts.address
 
-  React.useEffect(() => {
-    if (isEmpty(address)) return
-    getUserBaseInfo({ address: address, setUserBaseInfo })
-    getUserAssetsInfo({ address: address, setAssetsInfo })
-  }, [address, contract, setUserBaseInfo, setAssetsInfo])
-
   const { noOutfitEdList, outfitEdList } = useMemo(() => {
-    if (isEmpty(userAssetsInfo)) return {
+    if (isEmpty(goodsList)) return {
       outfitEdList: [],
       noOutfitEdList: [],
     }
     return {
-      outfitEdList: filter(userAssetsInfo, item => item?.isOutfit),
-      noOutfitEdList: filter(userAssetsInfo, item => !item?.isOutfit)
+      outfitEdList: filter(goodsList, item => !item?.isSale && item?.isOutfit && item?.owner === address),
+      noOutfitEdList: filter(goodsList, item => !item?.isSale && !item?.isOutfit && item?.owner === address)
     }
-  }, [userAssetsInfo])
+  }, [goodsList, address])
+
   const positions = useGetPositionStr(outfitEdList)
 
   return (
-    !isEmpty(userBaseInfo) && positions ? <PixelsMetaverseHandleImgProvider size={240} showGrid={userBaseInfo?.withGrid} data={{
+    !isEmpty(userInfo) && positions ? <PixelsMetaverseHandleImgProvider size={240} showGrid={userInfo?.withGrid} data={{
       positions: positions,
       size: 'large',
-      bgColor: userBaseInfo?.bgColor,
-      gridColor: userBaseInfo?.gridColor,
+      bgColor: userInfo?.bgColor,
+      gridColor: userInfo?.gridColor,
     }}>
       <div className="flex w-full">
-        <PersonCenterCore outfitEdList={outfitEdList} noOutfitEdList={noOutfitEdList} userBaseInfo={userBaseInfo} setUserBaseInfo={setUserBaseInfo} setAssetsInfo={setAssetsInfo}/>
+        <PersonCenterCore outfitEdList={outfitEdList} noOutfitEdList={noOutfitEdList} />
       </div>
     </PixelsMetaverseHandleImgProvider> : <div></div>
   )

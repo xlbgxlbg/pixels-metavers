@@ -1,20 +1,17 @@
-import { filter, isEmpty, map, reverse } from "lodash";
-import React, { Dispatch, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { fetchBuyGoods, fetchGetGoodsList, useRequest } from "../pixels-metavers/apiHook";
+import { filter, isEmpty, map } from "lodash";
+import { useMemo } from "react";
+import { useHistory, useLocation } from "react-router-dom";
+import { useUserInfo } from "../components/UserProvider";
 import { usePixelsMetaverseContract } from "../pixels-metavers/PixelsMetaversProvider";
 import { AvatarCard, NoData } from "./PersonCenter";
 
-export const Merchants = ({ setAssetsInfo }: { setAssetsInfo: Dispatch<React.SetStateAction<any[]>>, }) => {
+export const Merchants = () => {
   const history = useHistory()
-  const [data, setData] = useState<any[]>([])
-  const { accounts, contract } = usePixelsMetaverseContract()
-
-  const getGoodsList = useRequest(fetchGetGoodsList)
-
-  useEffect(() => {
-    getGoodsList({ setValue: setData, to: 10 })
-  }, [setData, contract])
+  const { accounts } = usePixelsMetaverseContract()
+  const { search } = useLocation()
+  const address = search ? search.split("=")[1] : accounts.address
+  const { goodsList } = useUserInfo()
+  const shopGoods = useMemo(() => filter(goodsList, item => item?.isSale), [goodsList])
 
   return (
     <div className="border m-4 p-4 card" style={{ boxShadow: "5px 5px 10px rgba(225,225,225,0.3)" }}>
@@ -22,10 +19,10 @@ export const Merchants = ({ setAssetsInfo }: { setAssetsInfo: Dispatch<React.Set
         <div>热门商品</div>
         <div className="cursor-pointer hover:text-red-500" onClick={() => { history.push("/mall") }}>查看更多</div>
       </div>
-      { !isEmpty(filter(data, ite=>ite?.isSale)) ? <div className="overflow-y-scroll" style={{ height: "calc(100% - 30px)" }}>
+      { !isEmpty(shopGoods) ? <div className="overflow-y-scroll" style={{ height: "calc(100% - 30px)" }}>
         {
-          map(filter(data, ite=>ite?.isSale), item => {
-            return <AvatarCard key={item?.id} item={item} type={"buyGoods"} setGoodsInfo={setData} setAssetsInfo={setAssetsInfo} />
+          map(shopGoods, item => {
+            return <AvatarCard key={item?.id} item={item} type={"homeBuyGoods"} />
           })
         }
       </div> : <NoData />}

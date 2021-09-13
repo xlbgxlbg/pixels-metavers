@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react"
-import { useClearCanvas, useDealImg, useDisplayGrad, useDrawImgColor } from "./canvasHook"
+import { useClearCanvas, useDealImg, useDisplayGrad } from "./canvasHook"
 import { usePixelsMetaverseHandleImg } from "./PixelsMetaversProvider"
 import { loadProduced } from "./slic"
 
