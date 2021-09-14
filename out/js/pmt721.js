@@ -1,4 +1,4 @@
-{
+const pmt721 = {
   "contractName": "PMT721",
   "abi": [
     {

@@ -1733,7 +1733,7 @@ const migrations = {
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-09-13T14:25:21.122Z",
+  "updatedAt": "2021-09-14T09:30:23.941Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
