@@ -7,15 +7,21 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 contract PMT721 is ERC721 {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenId;
-
+    address _owner;
     address _minter;
+
     modifier MustMinter(address from) {
         require(from == _minter, "Only Minter Can Do It!");
         _;
     }
 
+    modifier MustOwner(address from) {
+        require(from == _owner, "Only Owner Can Do It!");
+        _;
+    }
+
     constructor() ERC721("PixelsMetavers", "PMT") {
-        _minter = msg.sender;
+        _owner = msg.sender;
     }
 
     function mint() public MustMinter(msg.sender) {
@@ -28,15 +34,15 @@ contract PMT721 is ERC721 {
         return _exists(id);
     }
 
-    function setMinter(address minter) public {
+    function setMinter(address minter) public MustOwner(msg.sender) {
         _minter = minter;
     }
 
-    function getMinter() public view returns (address){
+    function getMinter() public view returns (address) {
         return _minter;
     }
 
-    function getCurrentID() public view returns (uint){
+    function getCurrentID() public view returns (uint256) {
         return _tokenId.current();
     }
 }

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, createContext, ReactNode, useState, useContext, Dispatch, useRef, useMemo } from "react";
 import Web3 from "web3";
-import PixelsMetaverseContract from "./contracts/PixelsMetavers.json";
+import PixelsMetaverseContract from "../contracts/PixelsMetavers.json";
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
 import { IConfigOptions, IPixelsMetaverseImgByPositionData, TPostions } from "./PixelsMetaversImg";

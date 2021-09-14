@@ -114,6 +114,3 @@ https://baike.baidu.com/item/RGB/342517 RGB （颜色系统）每像素颜色167
 我们不是做nft，我们是做元宇宙，只不过当前的条件，只能慢慢构建宇宙，从头开始。
 
 商品跟着ID走，ID跟着address走，商品本质上就是一个NFT，只不过是一个同质化的NFT
-
-0-8n|aq|cn|db|a3|9f|8r|83|7f|6r|63|5f|4r|3e|3c|3b|40|37|4i|56|6h|76|7u|8i|96|9u|aj|b7|bv|cj|d7|2l|2m|2n|2o|1x|1y|1z|20|21|1c|1b|n|o|p-2-9y|9z|a0|b9-74-6k|bz|43|3u|2p|2k|1d|1-1ekg-by|5t|1a|0-1eki-75-47pc-6p-jsx7-6l-pezq-78-xq80-c0|bd-1kj1f-6q-1m2sw-58-1m2zy-7d-1nh6c-5d-1ouqd-5w-1q93p-61|62-1uglz-5x-86
-

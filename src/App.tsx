@@ -7,9 +7,7 @@ import PixelsMetaverseHead from './components/PixelsMetaverseHead';
 import { useWeb3js, Web3jsProvider } from './api/hook';
 import { PixelsMetaverseContextProvider } from './pixels-metavers/PixelsMetaversProvider';
 import bgSvg from "./image/bg.svg"
-import { Application } from './application';
-import React from 'react';
-import { Loading, LoadingProvider } from './components/Loading';
+import { Loading } from './components/Loading';
 import { UserInfoProvider } from './components/UserProvider';
 import { PersonCenter } from './person-center';
 import { Mall } from './mall';

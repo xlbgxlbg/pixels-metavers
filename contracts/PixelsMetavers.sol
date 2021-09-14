@@ -1,12 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
+import "./IPMT721.sol";
 
-contract PixelsMetavers is ERC721 {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenId;
+contract PixelsMetavers {
+    IPMT721 PMT721;
+    address owner;
+    modifier MustOwner(address from) {
+        require(from == owner, "Only Owner Can Do It!");
+        _;
+    }
+
     uint256 userAmount;
 
     struct UserStruct {
@@ -41,7 +45,7 @@ contract PixelsMetavers is ERC721 {
     }
 
     modifier MustGoodsIsExist(uint256 id) {
-        require(_exists(id), "The product does not exist!");
+        require(IPMT721(PMT721).exits(id), "The product does not exist!");
         _;
     }
 
@@ -53,7 +57,9 @@ contract PixelsMetavers is ERC721 {
         unlocked = 1;
     }
 
-    constructor() ERC721("PixelsMetavers", "PMT") {}
+    constructor() {
+        owner = msg.sender;
+    }
 
     function register() public Lock {
         require(
@@ -102,11 +108,11 @@ contract PixelsMetavers is ERC721 {
     ) public Lock {
         require(user[msg.sender].isMerchant, "Only Merchant Can Do It!");
         for (uint256 i; i < amount; i++) {
-            _tokenId.increment();
-            uint256 id = _tokenId.current();
-            _mint(msg.sender, id);
-            goods[id] = GoodsStruct(
-                id,
+            IPMT721(PMT721).mint();
+            uint256 currentID = IPMT721(PMT721).getCurrentID();
+
+            goods[currentID] = GoodsStruct(
+                currentID,
                 msg.sender,
                 name,
                 category,
@@ -116,7 +122,7 @@ contract PixelsMetavers is ERC721 {
                 false,
                 bgColor
             );
-            goodsList.push(id);
+            goodsList.push(currentID);
         }
     }
 
@@ -135,7 +141,8 @@ contract PixelsMetavers is ERC721 {
 
         (bool success, ) = goods[id].owner.call{value: msg.value}(new bytes(0));
         require(success, "Transfer failed.");
-        safeTransferFrom(goods[id].owner, msg.sender, id);
+
+        IPMT721(PMT721).safeTransferFrom(address(this), msg.sender, id);
 
         goods[id].owner = msg.sender;
         goods[id].isSale = false;
@@ -154,14 +161,7 @@ contract PixelsMetavers is ERC721 {
         goods[id].isOutfit = isOutfit;
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal virtual override {
-        if (goods[tokenId].owner == from) {
-            goods[tokenId].owner = to;
-            goods[tokenId].isSale = false;
-        }
+    function setPMT721(address pmt721) public MustOwner(msg.sender) {
+        PMT721 = IPMT721(pmt721);
     }
 }

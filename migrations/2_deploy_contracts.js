@@ -1,5 +1,5 @@
-var Todolist = artifacts.require("./Todolist.sol");
+var PMT721 = artifacts.require("./PMT721.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(Todolist);
+  deployer.deploy(PMT721);
 };

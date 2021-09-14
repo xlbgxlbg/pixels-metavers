@@ -66,11 +66,15 @@ export const AvatarCard = ({ item, type }: {
             })
           }}>{item?.isOutfit ? "移除" : "配置"}</div>}
 
-          {type === "buyGoods" && <div className="flex justify-between items-center mt-2">
+          {type === "homeBuyGoods" && <div className="flex justify-between items-center mt-2">
             <div className="p px-2 rounded-sm ml-2 mr-2" style={{ background: "rgba(225, 225, 225, 0.1)" }}>{Number(item?.price) / (10 ** 18)}ETH</div>
             <button className="p px-4 bg-red-500 rounded-sm cursor-pointer"
               style={{ background: item?.isSale ? "rgba(239, 68, 68)" : "rgba(225,225,225, 0.1)" }}
               onClick={() => {
+                if (userInfo?.account?.includes("0000000000000000000000000")) {
+                  message.warning("你还不是平台用户，请激活自己的账户！")
+                  return
+                }
                 buyGoods({
                   id: Number(item?.id),
                   price: Number(item?.price),

@@ -33,7 +33,7 @@ export const UserInfoProvider = ({ children }: { children: ReactNode }) => {
   const getGoodsIdList = useRequest(fetchGetGoodsIdList)
 
   useEffect(() => {
-    getGoodsIdList({ setValue: setGoodsList })
+    getGoodsIdList({ setValue: setGoodsList, newNumber: -1 })
   }, [accounts?.address, contract])
 
   console.log(accounts?.networkId, "accounts?.networkIDaccounts?.networkId", accounts?.address)

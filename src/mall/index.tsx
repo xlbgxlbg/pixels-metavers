@@ -187,6 +187,10 @@ export const Mall = () => {
                             }}
                           >{item?.owner}</div>}
                           <button className="p px-2 bg-red-500 rounded-sm cursor-pointer" style={{ background: item?.isSale ? "rgba(239, 68, 68)" : "rgba(225,225,225, 0.1)", width: 60 }} onClick={() => {
+                            if (userInfo?.account?.includes("0000000000000000000000000")) {
+                              message.warning("你还不是平台用户，请激活自己的账户！")
+                              return
+                            }
                             buyGoods({
                               id: Number(item?.id),
                               price: Number(item?.price),
