@@ -50,7 +50,7 @@ export const PixelsMetaverse = () => {
     return `${str}${min}`
   }, [outfitEdList])
 
-  console.log(positions, "postion")
+  console.log(positions, "postion", isEmpty(userInfo))
 
   return (
     !isEmpty(userInfo) ? <PixelsMetaverseHandleImgProvider size={480} showGrid={userInfo?.withGrid} data={{
@@ -64,6 +64,6 @@ export const PixelsMetaverse = () => {
         <Avatar />
         <Merchants />
       </div>
-    </PixelsMetaverseHandleImgProvider> : <div></div>
+    </PixelsMetaverseHandleImgProvider> : <div className="flex justify-center item-center text-white mt-60">请链接钱包</div>
   )
 }

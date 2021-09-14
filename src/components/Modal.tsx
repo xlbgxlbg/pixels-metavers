@@ -18,7 +18,7 @@ const SLightbox = styled.div<ILightboxStyleProps>`
   margin-left: -50vw;
   top: ${({ offset }) => (offset ? `-${offset}px` : 0)};
   left: 50%;
-  z-index: 2;
+  z-index: 1001;
   will-change: opacity;
   background-color: ${({ opacity }) => {
     let alpha = 0.4;
@@ -43,6 +43,7 @@ const SModalContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10000
 `;
 
 const SHitbox = styled.div`
@@ -105,6 +106,7 @@ const SModalContent = styled.div`
   width: 100%;
   position: relative;
   word-wrap: break-word;
+  z-index: 10000
 `;
 
 interface IModalState {

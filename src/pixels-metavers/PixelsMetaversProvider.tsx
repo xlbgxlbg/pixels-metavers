@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, createContext, ReactNode, useState, useContext, Dispatch, useRef } from "react";
+import React, { useCallback, useEffect, createContext, ReactNode, useState, useContext, Dispatch, useRef, useMemo } from "react";
 import Web3 from "web3";
 import PixelsMetaverseContract from "./contracts/PixelsMetavers.json";
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
 import { IConfigOptions, IPixelsMetaverseImgByPositionData, TPostions } from "./PixelsMetaversImg";
-import { Dictionary, isEmpty } from "lodash";
+import { Dictionary, map } from "lodash";
 import { useConvertedPostion, useDealClick, useGetClickGradPosition } from "./canvasHook";
 import { LoadingProvider } from "../components/Loading";
 
@@ -96,6 +96,8 @@ export const PixelsMetaverseHandleImgContext = createContext(
     config: IConfigOptions;
     positions: TPostions;
     positionsArr: number[];
+    selectList: string[];
+    setSelectList: Dispatch<React.SetStateAction<string[]>>;
     setConfig: Dispatch<React.SetStateAction<IConfigOptions>>;
     setPositions: Dispatch<React.SetStateAction<TPostions>>;
     setPositionsArr: Dispatch<React.SetStateAction<number[]>>;
@@ -126,6 +128,7 @@ export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGri
     gridColor: data.gridColor || "#e1e1e1",
     isHandDraw: !!handDraw
   });
+  const [selectList, setSelectList] = useState<string[]>([])
 
   const [positions, setPositions] = useState<TPostions>({})
   const [positionsArr, setPositionsArr] = useState<number[]>([])
@@ -137,13 +140,18 @@ export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGri
 
   useEffect(() => {
     if (!data.positions) return
-    if (data.positions === "empty") {
-      setPositions({})
-    }
-    if (!data.positions.includes("-")) return
+    let selectData: Dictionary<any> = {}
+
+    map(selectList, item => {
+      const positionsData = getPositionData({
+        positions: item
+      })
+      selectData = { ...selectData, ...positionsData }
+    })
+
     const positionObj = getPositionData(data)
-    setPositions(positionObj)
-  }, [data.positions])
+    setPositions( { ...positionObj, ...selectData })
+  }, [data.positions, selectList])
 
   useEffect(() => {
     dealClick?.setValue({ ...positions })
@@ -161,7 +169,9 @@ export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGri
         canvas2Ref,
         getGradPosition,
         positionsArr,
-        setPositionsArr
+        setPositionsArr,
+        selectList,
+        setSelectList
       }}
     >
       {children}

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { PixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversImg";
 import { usePixelsMetaverseHandleImg } from "../pixels-metavers/PixelsMetaversProvider";
 

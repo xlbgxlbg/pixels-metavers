@@ -166,6 +166,6 @@ export const PersonCenter = () => {
       <div className="flex w-full">
         <PersonCenterCore outfitEdList={outfitEdList} noOutfitEdList={noOutfitEdList} />
       </div>
-    </PixelsMetaverseHandleImgProvider> : <div></div>
+    </PixelsMetaverseHandleImgProvider>: <div className="flex justify-center item-center text-white mt-60">请链接钱包</div>
   )
 }

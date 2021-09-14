@@ -267,3 +267,7 @@ input{
   background: rgba(225,225,225, 0.1);
   border-radius: 5px;
 }
+
+.web3modal-modal-card{
+  z-index: 1000000 !important;
+}
