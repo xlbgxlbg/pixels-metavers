@@ -74,13 +74,22 @@ export const fetchGetGoodsInfo = async (argContract: IArgContract, arg: { id: nu
 export const fetchGetGoodsIdList = async (argContract: IArgContract, arg?: { setValue: Dispatch<React.SetStateAction<any[]>>, newNumber?: number }) => {
   const idList = await argContract?.contract?.methods.getGoodsList().call();
   const len = idList.length || 0;
-  //let list: any[] = [];
-  for (let i = len - 1; i >= len - (arg?.newNumber || len); i--) {
-    console.log(Number(idList[i]))
-    let item = await argContract?.contract?.methods.goods(Number(idList[i])).call()
-    arg?.setValue && !arg.newNumber && arg?.setValue((pre) => ([...pre, item]))
-    arg?.setValue && arg.newNumber && arg?.setValue((pre) => ([item, ...pre]))
-    //list.push()
+  if (arg?.newNumber === -1) {
+    for (let i = len - 1; i >= 0; i--) {
+      let item = await argContract?.contract?.methods.goods(Number(idList[i])).call()
+      arg?.setValue && arg?.setValue((pre) => {
+        if (i === len - 1) {
+          return [item]
+        }
+        return [...pre, item]
+      })
+    }
+  } else {
+    for (let i = len - 1; i >= len - (arg?.newNumber || len); i--) {
+      let item = await argContract?.contract?.methods.goods(Number(idList[i])).call()
+      arg?.setValue && !arg.newNumber && arg?.setValue((pre) => ([...pre, item]))
+      arg?.setValue && arg.newNumber && arg?.setValue((pre) => ([item, ...pre]))
+    }
   }
 }
 

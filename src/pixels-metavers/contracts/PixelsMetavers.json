@@ -34466,6 +34466,12 @@
     "version": "0.8.0+commit.c7dfd78e.Emscripten.clang"
   },
   "networks": {
+    "3": {
+      "events": {},
+      "links": {},
+      "address": "0xf0644d92b422bf77983799035d4079f01f7af3fe",
+      "transactionHash": "0xa6c7e5f77f500acd801293d9e9f2aaf601383429199134938da9758f2e059fa2"
+    },
     "5777": {
       "events": {},
       "links": {},

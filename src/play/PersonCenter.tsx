@@ -31,7 +31,7 @@ export const AvatarCard = ({ item, type }: {
   const { userInfo } = useUserInfo()
 
   return (
-    <div key={item?.id + 1} className="mt-2 item-avatar p-2 flex justify-between border-gray-500 border-b">
+    <div key={item?.id + accounts?.newworkId} className="mt-2 item-avatar p-2 flex justify-between border-gray-500 border-b">
       <PixelsMetaverseImgByPositionData data={{ ...item, positions: item.data }} size={96}
         style={{ borderRadius: 4, background: item?.bgColor || userInfo?.user?.bgColor || "#e1e1e11a", cursor: 'pointer', boxShadow: "0px 0px 5px rgba(225,225,225,0.3)" }}
         onClick={() => {

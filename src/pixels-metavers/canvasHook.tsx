@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { cloneDeep, Dictionary, map } from "lodash";
+import { cloneDeep, Dictionary, isEmpty, map } from "lodash";
 import { IConfigOptions, IImgSize, TData } from "./PixelsMetaversImg";
 import { usePixelsMetaverseContract } from "./PixelsMetaversProvider";
 import { useGetListFun } from "./apiHook";
@@ -141,7 +141,8 @@ export const useGetPositionData = (address: string) => {
 
 export const useConvertedPostion = () => {
   return useCallback((data: TData) => {
-    const position = data.positions?.split("-")
+    if(isEmpty(data?.positions)) return {}
+    const position = data?.positions?.split("-")
     let positionObj: Dictionary<string> = {}
     let postionStr = ""
     const len = position.length

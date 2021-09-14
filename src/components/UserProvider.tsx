@@ -24,7 +24,6 @@ export const UserInfoProvider = ({ children }: { children: ReactNode }) => {
   const [goodsId, setGoodsId] = useState<number | undefined>();
   const { accounts, contract } = usePixelsMetaverseContract()
   const getUserInfo = useRequest(fetchUserInfo)
-  const getGoodsInfo = useRequest(fetchGetGoodsInfo)
 
   useEffect(() => {
     if (isEmpty(accounts?.address)) return
@@ -36,6 +35,14 @@ export const UserInfoProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     getGoodsIdList({ setValue: setGoodsList })
   }, [accounts?.address, contract])
+
+  console.log(accounts?.networkId, "accounts?.networkIDaccounts?.networkId", accounts?.address)
+
+  useEffect(() => {
+    if (isEmpty(accounts?.networkId)) return
+    setGoodsList([])
+    getGoodsIdList({ setValue: setGoodsList, newNumber: -1 })
+  }, [accounts?.networkId])
 
   /* useEffect(()=>{
     if(!goodsId) return

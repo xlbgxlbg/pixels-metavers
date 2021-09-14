@@ -1,16 +1,29 @@
-import { filter, find, groupBy, isEmpty, keys, map } from "lodash";
-import { Dropdown, Menu, message, Select } from "antd";
+import { Dictionary, filter, find, groupBy, isEmpty, keys, map, orderBy, sortBy } from "lodash";
+import { message, Select } from "antd";
 import { PixelsMetaverseImgByPositionData } from "../pixels-metavers/PixelsMetaversImg";
 import { useUserInfo } from "../components/UserProvider";
-import { fetchBuyGoods, fetchGetGoodsInfo, useRequest } from "../pixels-metavers/apiHook";
+import { fetchBuyGoods, useRequest } from "../pixels-metavers/apiHook";
 import { NoData } from "../play/PersonCenter";
 import { categoryData } from "../produced/Submit";
 import { useHistory } from "react-router";
-import React, { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { usePixelsMetaverseContract } from "../pixels-metavers/PixelsMetaversProvider";
 const { Option } = Select;
 
 export const Mall = () => {
   const { goodsList, setGoodsList } = useUserInfo()
+  const { accounts } = usePixelsMetaverseContract()
+  const [{
+    sort,
+    owner,
+    sale,
+    category
+  }, setList] = useState<Dictionary<any>>({
+    sort: "",
+    owner: "",
+    sale: "",
+    category: ""
+  })
 
   const buyGoods = useRequest(fetchBuyGoods, {
     onSuccess: () => {
@@ -20,28 +33,20 @@ export const Mall = () => {
   const history = useHistory()
   const { userInfo } = useUserInfo()
 
-  const handleMenuClick = (val: string) => {
-    console.log(val)
-  }
-
-  function onChange(value: any) {
-    console.log(`selected ${value}`);
-  }
-
   function onSearch(val: any) {
     console.log('search:', val);
   }
 
-  const menu = (
-    <Menu onClick={(val) => {
-      handleMenuClick(val?.key)
-    }}>
-      <Menu.Item key="1">按时间降序</Menu.Item>
-      <Menu.Item key="2">按时间升序</Menu.Item>
-      <Menu.Item key="3">按金额降序</Menu.Item>
-      <Menu.Item key="4">按金额升序</Menu.Item>
-    </Menu>
-  )
+  /*   const menu = (
+      <Menu onClick={(val) => {
+        handleMenuClick(val?.key)
+      }}>
+        <Menu.Item key="1">按时间降序</Menu.Item>
+        <Menu.Item key="2">按时间升序</Menu.Item>
+        <Menu.Item key="3">按金额降序</Menu.Item>
+        <Menu.Item key="4">按金额升序</Menu.Item>
+      </Menu>
+    ) */
 
   const shopList = useMemo(() => {
     return groupBy(goodsList, item => item?.owner)
@@ -55,7 +60,37 @@ export const Mall = () => {
     return groupBy(goodsList, item => item?.isSale)
   }, [goodsList])
 
-  console.log(saleList)
+  const sortList = [
+    {
+      label: "按时间降序",
+      value: "id-desc",
+    },
+    {
+      label: "按时间升序",
+      value: "id-asc",
+    },
+    {
+      label: "按金额降序",
+      value: "price-desc",
+    },
+    {
+      label: "按金额升序",
+      value: "price-asc",
+    },
+  ]
+
+  const data = useMemo(() => {
+    const ownerList = owner ? filter(goodsList, item => item?.owner === owner) : goodsList
+    const categoryList = category ? filter(ownerList, item => item?.category === category) : ownerList
+    const saleList = sale ? filter(categoryList, item => String(item?.isSale) === sale) : categoryList
+    let sortList;
+    if (sort) {
+      sortList = orderBy(saleList, [sort?.split("-")[0]], [sort?.split("-")[1]]);
+    } else {
+      sortList = saleList
+    }
+    return sortList
+  }, [goodsList, owner, category, sale, sort])
 
   return (
     <div className="flex justify-between m-auto p-6 mt-4 rounded-md" style={{
@@ -75,7 +110,9 @@ export const Mall = () => {
                   allowClear
                   placeholder="选择地址"
                   optionFilterProp="children"
-                  onChange={onChange}
+                  onChange={(val) => {
+                    setList((pre) => ({ ...pre, owner: val }))
+                  }}
                   onSearch={onSearch}
                   filterOption={(input, option) =>
                     option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -88,7 +125,9 @@ export const Mall = () => {
                   allowClear
                   placeholder="选择商品种类"
                   optionFilterProp="children"
-                  onChange={onChange}
+                  onChange={(val) => {
+                    setList((pre) => ({ ...pre, category: val }))
+                  }}
                 >
                   {map(keys(goodsCatagoryList), item => <Option value={item}>{filter(categoryData, ite => ite.value === item)[0]?.label}</Option>)}
                 </Select>
@@ -97,20 +136,33 @@ export const Mall = () => {
                   allowClear
                   placeholder="选择是否出售"
                   optionFilterProp="children"
-                  onChange={onChange}
+                  onChange={(val) => {
+                    setList((pre) => ({ ...pre, sale: val }))
+                  }}
                 >
                   {map(keys(saleList), item => <Option value={item}>{item == "true" ? "未出售" : "已出售"}</Option>)}
                 </Select>
-                <Dropdown overlay={menu} placement="bottomRight">
+                <Select
+                  style={{ width: 200, marginLeft: 20 }}
+                  allowClear
+                  placeholder="选择排序"
+                  optionFilterProp="children"
+                  onChange={(val) => {
+                    setList((pre) => ({ ...pre, sort: val }))
+                  }}
+                >
+                  {map(sortList, item => <Option value={item?.value}>{item?.label}</Option>)}
+                </Select>
+                {/* <Dropdown overlay={menu} placement="bottomRight">
                   <div className="flex items-center justify-center rounded-md cursor-pointer contect ml-4" style={{ height: 34, width: 40, marginTop: -1 }}>···</div>
-                </Dropdown>
+                </Dropdown> */}
               </div>
             </div>
-            {!isEmpty(goodsList) ? <div className="flex flex-wrap overflow-y-scroll" style={{ height: "calc(100vh - 170px)" }}>
+            {!isEmpty(data) ? <div className="flex flex-wrap overflow-y-scroll" style={{ height: "calc(100vh - 170px)" }}>
               {
-                map(goodsList, (item, i) => {
+                map(data, (item, i) => {
                   return (
-                    <div key={item?.id} className="p-2 mb-4 flex-col flex" style={{
+                    <div key={item?.id + accounts?.newworkId} className="p-2 mb-4 flex-col flex" style={{
                       background: "rgba(225,225,225, 0.1)",
                       borderRadius: 5,
                       height: 216 + 100,

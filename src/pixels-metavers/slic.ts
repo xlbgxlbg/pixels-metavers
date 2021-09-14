@@ -1,4 +1,4 @@
-import SLIC from "../canvas/js/SLIC.js"
+import SLIC from "./slic/index"
 
 export const loadProduced = ({
   canvas,

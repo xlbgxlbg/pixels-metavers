@@ -38,7 +38,8 @@ export const useGetContractInfo = (web3: Web3, networkId: number) => {
 
       setAccounts((pre: any) => ({
         ...pre,
-        address: address[0]
+        address: address[0],
+        networkId
       }))
 
       setContract(contract)
@@ -71,7 +72,8 @@ export const PixelsMetaverseContextProvider = ({ children, web3, networkId, curr
     setAccounts((pre: any) => ({
       ...pre,
       web3: web3,
-      address: currentAddress
+      address: currentAddress,
+      networkId
     }))
   }, [web3, networkId, currentAddress])
 
@@ -150,7 +152,7 @@ export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGri
     })
 
     const positionObj = getPositionData(data)
-    setPositions( { ...positionObj, ...selectData })
+    setPositions({ ...positionObj, ...selectData })
   }, [data.positions, selectList])
 
   useEffect(() => {

@@ -1,6 +1,5 @@
 import React, { DetailedHTMLProps, RefObject, useEffect, useMemo, useRef } from "react"
 import { cloneDeep, Dictionary } from "lodash";
-import { stringRadixDeal } from "./utilities/radix";
 import { useClearCanvas, useConvertedPostion, useDealImg, useDisplayGrad, useDrawImgColor, useGetPositionData, useSetCanvasSize } from "./canvasHook";
 import { usePixelsMetaverseHandleImg } from "./PixelsMetaversProvider";
 import { get16Color } from "./utilities";
@@ -152,8 +151,6 @@ export const PixelsMetaverseHandleImg = ({ canvasRef, showBgImg, showGridColor, 
     })
   }
 
-  console.log(value, "value", value)
-
   return (
     <PixelsMetaverseCanvas
       config={config}
@@ -201,7 +198,6 @@ export const PixelsMetaverseCanvas = ({
   useEffect(() => {
     const canvas = canvasRef?.current
     if (!canvas || config.imgSize.width <= 0 || (config?.withGrid && config.sizeGrid <= 0)) return
-    console.log("绘制数据", data)
     const context = canvas.getContext("2d") as CanvasRenderingContext2D
     setSize(canvas, config.imgSize)
     clearCanvas(canvas, context)
