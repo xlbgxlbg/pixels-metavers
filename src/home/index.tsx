@@ -47,15 +47,15 @@ export const Website = () => {
             <div className="rounded-md shadow transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-105">
               <div className="cursorP w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white hover:text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10"
                 onClick={() => { history.push("app") }}>
-                  开始游戏
+                  Get started
               </div>
             </div>
-            <div className="cursorP mt-3 sm:mt-0 sm:ml-3 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-105">
+            {/* <div className="cursorP mt-3 sm:mt-0 sm:ml-3 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-105">
               <div className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 hover:text-indigo-700 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10"
               >
                 白皮书
                 </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </main>

@@ -142,6 +142,9 @@ export const PixelsMetaverseHandleImgProvider = ({ children, data, size, showGri
 
   useEffect(() => {
     if (!data.positions) return
+    if(data.positions === "empty"){
+      setPositions({})
+    }
     let selectData: Dictionary<any> = {}
 
     map(selectList, item => {

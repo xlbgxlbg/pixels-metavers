@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { cloneDeep, Dictionary, isEmpty, map } from "lodash";
 import { IConfigOptions, IImgSize, TData } from "./PixelsMetaversImg";
 import { usePixelsMetaverseContract } from "./PixelsMetaversProvider";
-import { useGetListFun } from "./apiHook";
 
 export const useDisplayGrad = () => {
   return useCallback((context: CanvasRenderingContext2D, config: IConfigOptions) => {
@@ -128,14 +127,11 @@ export const useGetPositionData = (address: string) => {
     size: "large"
   })
   const { contract } = usePixelsMetaverseContract()
-  const getList = useGetListFun()
 
   useEffect(() => {
     if (!address) return
     if (!contract) return
-    getList(contract, setValue)
   }, [address, setValue, contract])
-
   return value
 }
 
