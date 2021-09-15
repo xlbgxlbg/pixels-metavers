@@ -7,13 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Truffle Contract Page</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.4/web3.min.js"></script>
-    <script src="../js/pmt721.js"></script>
+    <script src="../js/ierc721Metadata.js"></script>
     <script src="../contract.js"></script>
 </head>
 
 <body>
     <script>
-        getContract(pmt721)
+        getContract(ierc721Metadata)
     </script>
     <div>
 	
@@ -62,9 +62,9 @@
                 return
               }
               
-              const data = await contract.methods.balanceOf(dom0.value,).call();
+              const data = await contract.methods.balanceOf(dom0.value,).send({ from: accounts[0] });
         const dom = document.getElementById("balanceOf");
-		dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data) 
+		dom.innerHTML = true 
 		getAllFunData()
         console.log("balanceOf", data)
       }
@@ -90,9 +90,9 @@
                 return
               }
               
-              const data = await contract.methods.getApproved(dom0.value,).call();
+              const data = await contract.methods.getApproved(dom0.value,).send({ from: accounts[0] });
         const dom = document.getElementById("getApproved");
-		dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data) 
+		dom.innerHTML = true 
 		getAllFunData()
         console.log("getApproved", data)
       }
@@ -124,9 +124,9 @@
                 return
               }
               
-              const data = await contract.methods.isApprovedForAll(dom0.value,dom1.value,).call();
+              const data = await contract.methods.isApprovedForAll(dom0.value,dom1.value,).send({ from: accounts[0] });
         const dom = document.getElementById("isApprovedForAll");
-		dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data) 
+		dom.innerHTML = true 
 		getAllFunData()
         console.log("isApprovedForAll", data)
       }
@@ -145,24 +145,6 @@
   
     <div>
 	
-  <script>
-  async function getnamevalue() {
-  const data = await contract.methods.name().call();
-  const dom = document.getElementById("name");
-  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
-  console.log("name", data)
-}
-        </script>
-  <button style="margin: 10px" onclick="getnamevalue()">
-    name
-  </button>
-  <span id="name">
-  </span>
-		
-    </div >
-  
-    <div>
-	
         <script>
             async function getownerOfvalue() {
               
@@ -172,9 +154,9 @@
                 return
               }
               
-              const data = await contract.methods.ownerOf(dom0.value,).call();
+              const data = await contract.methods.ownerOf(dom0.value,).send({ from: accounts[0] });
         const dom = document.getElementById("ownerOf");
-		dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data) 
+		dom.innerHTML = true 
 		getAllFunData()
         console.log("ownerOf", data)
       }
@@ -256,7 +238,7 @@
                 return
               }
               
-              const dom3 = document.getElementById("safeTransferFrom_dataparamas")
+              const dom3 = document.getElementById("safeTransferFromdataparamas")
               if(dom3.value === ""){
                 window.alert("safeTransferFrom值为空")
                 return
@@ -279,7 +261,7 @@
             
             <input id = "safeTransferFromtokenIdparamas" placeholder="tokenId" type="number"/>
             
-            <input id = "safeTransferFrom_dataparamas" placeholder="_data" type="string"/>
+            <input id = "safeTransferFromdataparamas" placeholder="data" type="string"/>
             
         <span id="safeTransferFrom">
                   </span>
@@ -296,7 +278,7 @@
                 return
               }
               
-              const dom1 = document.getElementById("setApprovalForAllapprovedparamas")
+              const dom1 = document.getElementById("setApprovalForAll_approvedparamas")
               if(dom1.value === ""){
                 window.alert("setApprovalForAll值为空")
                 return
@@ -315,7 +297,7 @@
 
             <input id = "setApprovalForAlloperatorparamas" placeholder="operator" type="string"/>
             
-            <input id = "setApprovalForAllapprovedparamas" placeholder="approved" type="string"/>
+            <input id = "setApprovalForAll_approvedparamas" placeholder="_approved" type="string"/>
             
         <span id="setApprovalForAll">
                   </span>
@@ -332,9 +314,9 @@
                 return
               }
               
-              const data = await contract.methods.supportsInterface(dom0.value,).call();
+              const data = await contract.methods.supportsInterface(dom0.value,).send({ from: accounts[0] });
         const dom = document.getElementById("supportsInterface");
-		dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data) 
+		dom.innerHTML = true 
 		getAllFunData()
         console.log("supportsInterface", data)
       }
@@ -346,52 +328,6 @@
             <input id = "supportsInterfaceinterfaceIdparamas" placeholder="interfaceId" type="string"/>
             
         <span id="supportsInterface">
-                  </span>
-    </div >
-  
-    <div>
-	
-  <script>
-  async function getsymbolvalue() {
-  const data = await contract.methods.symbol().call();
-  const dom = document.getElementById("symbol");
-  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
-  console.log("symbol", data)
-}
-        </script>
-  <button style="margin: 10px" onclick="getsymbolvalue()">
-    symbol
-  </button>
-  <span id="symbol">
-  </span>
-		
-    </div >
-  
-    <div>
-	
-        <script>
-            async function gettokenURIvalue() {
-              
-              const dom0 = document.getElementById("tokenURItokenIdparamas")
-              if(dom0.value === ""){
-                window.alert("tokenURI值为空")
-                return
-              }
-              
-              const data = await contract.methods.tokenURI(dom0.value,).call();
-        const dom = document.getElementById("tokenURI");
-		dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data) 
-		getAllFunData()
-        console.log("tokenURI", data)
-      }
-        </script>
-  <button style="margin: 10px" onclick="gettokenURIvalue()">
-    tokenURI
-  </button>
-
-            <input id = "tokenURItokenIdparamas" placeholder="tokenId" type="number"/>
-            
-        <span id="tokenURI">
                   </span>
     </div >
   
@@ -442,17 +378,35 @@
     <div>
 	
   <script>
-  async function getmintvalue() {
-  const data = await contract.methods.mint().send({ from: accounts[0] });
-  const dom = document.getElementById("mint");
+  async function getnamevalue() {
+  const data = await contract.methods.name().send({ from: accounts[0] });
+  const dom = document.getElementById("name");
   dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
-  console.log("mint", data)
+  console.log("name", data)
 }
         </script>
-  <button style="margin: 10px" onclick="getmintvalue()">
-    mint
+  <button style="margin: 10px" onclick="getnamevalue()">
+    name
   </button>
-  <span id="mint">
+  <span id="name">
+  </span>
+		
+    </div >
+  
+    <div>
+	
+  <script>
+  async function getsymbolvalue() {
+  const data = await contract.methods.symbol().send({ from: accounts[0] });
+  const dom = document.getElementById("symbol");
+  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
+  console.log("symbol", data)
+}
+        </script>
+  <button style="margin: 10px" onclick="getsymbolvalue()">
+    symbol
+  </button>
+  <span id="symbol">
   </span>
 		
     </div >
@@ -460,97 +414,33 @@
     <div>
 	
         <script>
-            async function getexitsvalue() {
+            async function gettokenURIvalue() {
               
-              const dom0 = document.getElementById("exitsidparamas")
+              const dom0 = document.getElementById("tokenURItokenIdparamas")
               if(dom0.value === ""){
-                window.alert("exits值为空")
+                window.alert("tokenURI值为空")
                 return
               }
               
-              const data = await contract.methods.exits(dom0.value,).call();
-        const dom = document.getElementById("exits");
-		dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data) 
-		getAllFunData()
-        console.log("exits", data)
-      }
-        </script>
-  <button style="margin: 10px" onclick="getexitsvalue()">
-    exits
-  </button>
-
-            <input id = "exitsidparamas" placeholder="id" type="number"/>
-            
-        <span id="exits">
-                  </span>
-    </div >
-  
-    <div>
-	
-        <script>
-            async function getsetMintervalue() {
-              
-              const dom0 = document.getElementById("setMinterminterparamas")
-              if(dom0.value === ""){
-                window.alert("setMinter值为空")
-                return
-              }
-              
-              const data = await contract.methods.setMinter(dom0.value,).send({ from: accounts[0] });
-        const dom = document.getElementById("setMinter");
+              const data = await contract.methods.tokenURI(dom0.value,).send({ from: accounts[0] });
+        const dom = document.getElementById("tokenURI");
 		dom.innerHTML = true 
 		getAllFunData()
-        console.log("setMinter", data)
+        console.log("tokenURI", data)
       }
         </script>
-  <button style="margin: 10px" onclick="getsetMintervalue()">
-    setMinter
+  <button style="margin: 10px" onclick="gettokenURIvalue()">
+    tokenURI
   </button>
 
-            <input id = "setMinterminterparamas" placeholder="minter" type="string"/>
+            <input id = "tokenURItokenIdparamas" placeholder="tokenId" type="number"/>
             
-        <span id="setMinter">
+        <span id="tokenURI">
                   </span>
-    </div >
-  
-    <div>
-	
-  <script>
-  async function getgetMintervalue() {
-  const data = await contract.methods.getMinter().call();
-  const dom = document.getElementById("getMinter");
-  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
-  console.log("getMinter", data)
-}
-        </script>
-  <button style="margin: 10px" onclick="getgetMintervalue()">
-    getMinter
-  </button>
-  <span id="getMinter">
-  </span>
-		
-    </div >
-  
-    <div>
-	
-  <script>
-  async function getgetCurrentIDvalue() {
-  const data = await contract.methods.getCurrentID().call();
-  const dom = document.getElementById("getCurrentID");
-  dom.innerHTML = typeof data !== 'object' ? data : JSON.stringify(data);
-  console.log("getCurrentID", data)
-}
-        </script>
-  <button style="margin: 10px" onclick="getgetCurrentIDvalue()">
-    getCurrentID
-  </button>
-  <span id="getCurrentID">
-  </span>
-		
     </div >
   
 	<script>
-		let allFunArrList = [getnamevalue,getsymbolvalue,getgetMintervalue,getgetCurrentIDvalue,]
+		let allFunArrList = []
 	function getAllFunData(){
 		for(let i=0; i<allFunArrList.length; i++){
 			allFunArrList[i]()

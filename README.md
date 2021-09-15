@@ -1,116 +1,42 @@
-# Getting Started with Create React App
+# 像素元宇宙
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 像素元宇宙简介：
+像素元宇宙是一个百分百由玩家自主绘制的世界，在元宇宙中，每个居民都可以将现实中的一切进行复制和克隆。宇宙居民不受随机数的约束，可以自主决定自己的宇宙身份、外貌、装备以及资产等。宇宙中有各种身份和职能供居民选择，如他们可以选择医生、警察或者商人等等。作为医生，他可以改变居民的性别或者是样貌。作为商人，他可以制作眼镜、口罩、帽子等等产品进行出售。
 
-## Available Scripts
+## 像素元宇宙特点
 
-In the project directory, you can run:
+* 高度自治化: 像素元宇宙是一个高度自治且去中心化的，用户所有资产都是在链上，不可篡改和伪造。所有资产不存储于任何中心化的服务器，仅仅在区块链获取到数据后通过开源的前端UI组件即可绘制用户的区块链身份等信息，不与任何资源链接做绑定。
 
-### `yarn start`
+* 万物资产化: 像素元宇宙合约继承了ERC721标准的所有接口和功能，所有资产均可全链流通。宇宙中所有物品、器官、资产等都是ERC721标准的TOKEN，宇宙中的一切都进行了TOKEN化。
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+* 资产乐高化: 用户可通过合约来重组配置自己，重组性特别强。商人制作的产品越精细，居民可组合性越强，宇宙越清晰越丰富，是真正的实现了NFT碎片化。
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+* 宇宙层级化: 像素元宇宙分为5个层级，每个层级都是一个独立的合约，所有资产又同处于一个ERC721合约。每个层级的居民有不同的行为和样式。如层次分明层宇宙的居民只有有跑跳等功能，而洞察秋毫层宇宙却可以进行竞技类游戏。宇宙可支持像素越细，宇宙功能则会越丰富。宇宙不断社会化，发展越趋近于现实世界。
 
-### `yarn test`
+## 像素元宇宙现状和未来
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+当前元宇宙仅仅支持20px像素的绘制，也就是仅仅支持绘制头部信息，也寓意着像素元宇宙，从头开始。当前居民可以上传器官或物品图片，通过算法生成像素画。商家可通过对该像素画的复制来生成和发行该像素部位对应的资产。居民可购买该资产并决定是否配置资产到链上身份。
 
-### `yarn build`
+当前宇宙初始有10000个原始居民名额，是为创世像素元宇宙居民。当宇宙升级到渺若烟云层时，也就是可绘制身体以及四肢时。原始居民可以选择自己的职业和性别或身份，在选择一定时间后可以通过男女配对来生育子女，每个子女成人后也可以通过配对生育他们的子女。宇宙总人口1024000，直到达到宇宙总人口便不
+再新增居民。
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+最高层级的元宇宙可以体验到大部分现实世界的生活，居民可通过木工身份来建造宇宙的房屋和家具等等，而出租车司机可以通过自身携带的属性将居民快速的送往目的地，而没有交通工具的居民仅仅只能花费更多的时间和精力。居民可以体验生老病死、富贵美丑等，满足你内心深处对于自己理想身份的所有幻想。
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+未来宇宙的场景可以很丰富，这一切都是在所有居民共同作用下实现的。所以，加入像素元宇宙吧，让我们去创建自己的宇宙。在像素元宇宙的世界里，自由翱翔吧。
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `yarn eject`
+## 项目启动
+```sh
+1. yarn
+2. yarn start
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+> 当前项目基于truffle框架开发，如果仅仅只是查看项目可无需安装，若需重新部署合约，则需要安装truffle，具体可参考该[truffle框架文档](https://learnblockchain.cn/docs/truffle/index.html)
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+> 合约部署后需要设置721合约token的发行者，可自行编写代码调用接口，或者是安装[contract-json-converted-html](https://github.com/xiangzhengfeng/truffle-contract-json-converted-html)npm包，将truffle生成的智能合约json文件直接转换成html文件，可以自动生成可视化的页面进行调用和查看数据。
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## react-pixels-metaverse
+项目中将所有绘制进行了封装和抽离，任何项目方可以安装[react-pixels-metaverse](https://github.com/PixelsMetaverse/react-pixels-metaverse)该npm包，并在自己的项目中引入UI组件，传入用户地址或身份数据即可生成他的像素元宇宙身份图案。
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-
-开发计划
-8月30日 完成项目前端项目的搭建和完成首页开发
-8月31日 完成游戏页面包括图片面板，左侧装扮面板和右侧商家面板
-9月01日 完成个人中心页面和商家页面，通过右上角下拉框来切换
-9月02日 完成整个游戏前端和合约交互接口的定义的规划以及前几天任务的补全
-9月03日 完成头像绘制的算法的结构和大体逻辑
-9月04日 完成头像绘制的算法
-9月05日 完成头像的绘制和展示，以及构思合约的初步逻辑
-9月06日 编写合约
-9月07日 编写合约
-9月08日 编写合约
-9月09日 编写合约
-9月10日 部署合约
-9月11日 合约和前端的交互
-9月12日 复盘或补全之前所有工作，并结束所有开发工作
-9月13日 编写白皮书
-9月14日 整理PPT或发言稿
-9月15日 上传项目或者录制视频
-
-https://baike.baidu.com/item/RGB/342517 RGB （颜色系统）每像素颜色16777216(256 * 256 * 256)种
-
-清晰度
-1px  洞察秋毫级
-3px  层次分明级
-5px  远人无目级
-8px  渺若烟云级
-10px 云雾迷蒙级
-
-用户可以上传器官或物品图片，然后通过那个算法生成一个很详细的像素画，然后再通过像素画来生成一个画的数据，然后就可以把这个数据发布了。
-
-像素元宇宙
-从头开始
-扩展四肢
-立体环绕
-唱跳海聊
-动作竞技
-
-每个部件组合又切合了nft碎片化的趋势
-
-合约初始只会有10000个原始居民名额，是为创世像素元宇宙居民。原始居民可以选择自己的职业，可以成为医生或者是商人等等。
-创世居民在发行1个月以后可以通过男女配对来生育子女，每个子女生长周期为1个月。成人后也可以通过配对生育子女。合约总人口1024000人
-
-我们不是做nft，我们是做元宇宙，只不过当前的条件，只能慢慢构建宇宙，从头开始。
-
-商品跟着ID走，ID跟着address走，商品本质上就是一个NFT，只不过是一个同质化的NFT
+> 该包近期将会发布，届时任何网站都可引入该组件来生成用户熟悉的区块链身份头像。
